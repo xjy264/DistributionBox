@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.distributionbox.mapper.MaintenanceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.distributionbox.entity.Maintenance">
+        <id column="id" property="id" />
+        <result column="report_user" property="reportUser" />
+        <result column="report_time" property="reportTime" />
+        <result column="fix_user" property="fixUser" />
+        <result column="fix_time" property="fixTime" />
+        <result column="components" property="components" />
+        <result column="fault_phenomenon" property="faultPhenomenon" />
+        <result column="fault_reason" property="faultReason" />
+        <result column="fix_process" property="fixProcess" />
+        <result column="remark" property="remark" />
+        <result column="first_photo" property="firstPhoto" />
+        <result column="second_photo" property="secondPhoto" />
+        <result column="third_photo" property="thirdPhoto" />
+        <result column="fourth_photo" property="fourthPhoto" />
+    </resultMap>
+
+</mapper>

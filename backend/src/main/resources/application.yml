@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: distributionbox-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/distributionbox?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
+    locations: filesystem:../sql/migrations
+    baseline-on-migrate: true
+
+app:
+  security:
+    jwt-secret: ${JWT_SECRET:distributionbox-dev-secret-key-please-change}
+    jwt-expiration-minutes: ${JWT_EXP_MINUTES:720}
+  files:
+    upload-path: ${FILE_UPLOAD_PATH:../files/}
+    base-url: ${FILE_BASE_URL:http://localhost:8080/files/}
+
+logging:
+  level:
+    com.baomidou.mybatisplus: info
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

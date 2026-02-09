@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.distributionbox.mapper.BoxMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.distributionbox.entity.Box">
+        <id column="id" property="id" />
+        <result column="box_address" property="boxAddress" />
+        <result column="box_system" property="boxSystem" />
+        <result column="inspector" property="inspector" />
+        <result column="box_number" property="boxNumber" />
+        <result column="voltage" property="voltage" />
+        <result column="maintenance_time" property="maintenanceTime" />
+        <result column="guardian" property="guardian" />
+        <result column="party" property="party" />
+        <result column="a_resistance" property="aResistance" />
+        <result column="a_starting" property="aStarting" />
+        <result column="a_running" property="aRunning" />
+        <result column="b_resistance" property="bResistance" />
+        <result column="b_starting" property="bStarting" />
+        <result column="b_running" property="bRunning" />
+        <result column="c_resistance" property="cResistance" />
+        <result column="c_starting" property="cStarting" />
+        <result column="c_running" property="cRunning" />
+        <result column="npe_resistance" property="npeResistance" />
+        <result column="n_starting" property="nStarting" />
+        <result column="n_running" property="nRunning" />
+        <result column="ab_resistance" property="abResistance" />
+        <result column="ac_resistance" property="acResistance" />
+        <result column="bc_resistance" property="bcResistance" />
+        <result column="system_chart" property="systemChart" />
+        <result column="number" property="number" />
+        <result column="distribution" property="distribution" />
+        <result column="lightning" property="lightning" />
+        <result column="zero" property="zero" />
+        <result column="ground" property="ground" />
+        <result column="seal" property="seal" />
+        <result column="label" property="label" />
+        <result column="pipe" property="pipe" />
+        <result column="havelock" property="havelock" />
+        <result column="cleaning" property="cleaning" />
+        <result column="cable" property="cable" />
+    </resultMap>
+
+</mapper>

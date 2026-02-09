@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS sys_department (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  department VARCHAR(100),
+  address VARCHAR(255)
+);

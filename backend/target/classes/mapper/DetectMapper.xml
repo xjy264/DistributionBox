@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.distributionbox.mapper.DetectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.distributionbox.entity.Detect">
+        <result column="pid" property="pid" />
+        <result column="number_state" property="numberState" />
+        <result column="number_remark" property="numberRemark" />
+        <result column="electronic_state" property="electronicState" />
+        <result column="electronic_remark" property="electronicRemark" />
+        <result column="appearance_state" property="appearanceState" />
+        <result column="appearance_remark" property="appearanceRemark" />
+        <result column="robustness_state" property="robustnessState" />
+        <result column="robustness_remark" property="robustnessRemark" />
+        <result column="lock_state" property="lockState" />
+        <result column="lock_remark" property="lockRemark" />
+        <result column="cable_state" property="cableState" />
+        <result column="cable_remark" property="cableRemark" />
+        <result column="system_state" property="systemState" />
+        <result column="system_remark" property="systemRemark" />
+        <result column="components_state" property="componentsState" />
+        <result column="components_remark" property="componentsRemark" />
+        <result column="wiring_state" property="wiringState" />
+        <result column="wiring_remark" property="wiringRemark" />
+        <result column="loose_state" property="looseState" />
+        <result column="loose_remark" property="looseRemark" />
+        <result column="temperature_state" property="temperatureState" />
+        <result column="temperature_remark" property="temperatureRemark" />
+        <result column="lightning_state" property="lightningState" />
+        <result column="lightning_remark" property="lightningRemark" />
+        <result column="jumper_state" property="jumperState" />
+        <result column="jumper_remark" property="jumperRemark" />
+        <result column="inout_state" property="inoutState" />
+        <result column="inout_remark" property="inoutRemark" />
+        <result column="zero_state" property="zeroState" />
+        <result column="zero_remark" property="zeroRemark" />
+        <result column="ground_state" property="groundState" />
+        <result column="ground_remark" property="groundRemark" />
+        <result column="barrier_state" property="barrierState" />
+        <result column="barrier_remark" property="barrierRemark" />
+        <result column="cleaning_state" property="cleaningState" />
+        <result column="cleaning_remark" property="cleaningRemark" />
+        <result column="screws_state" property="screwsState" />
+        <result column="screws_remark" property="screwsRemark" />
+        <result column="first_other_state" property="firstOtherState" />
+        <result column="first_other_remark" property="firstOtherRemark" />
+        <result column="working_state" property="workingState" />
+        <result column="working_remark" property="workingRemark" />
+        <result column="cracking_state" property="crackingState" />
+        <result column="cracking_remark" property="crackingRemark" />
+        <result column="workingtemperature_state" property="workingtemperatureState" />
+        <result column="workingtemperature_remark" property="workingtemperatureRemark" />
+        <result column="insulation_state" property="insulationState" />
+        <result column="insulation_remark" property="insulationRemark" />
+        <result column="discoloration_state" property="discolorationState" />
+        <result column="discoloration_remark" property="discolorationRemark" />
+        <result column="order_state" property="orderState" />
+        <result column="order_remark" property="orderRemark" />
+        <result column="bridge_state" property="bridgeState" />
+        <result column="bridge_remark" property="bridgeRemark" />
+        <result column="bridgeconnect_state" property="bridgeconnectState" />
+        <result column="bridgeconnect_remark" property="bridgeconnectRemark" />
+        <result column="bridgelid_state" property="bridgelidState" />
+        <result column="bridgelid_remark" property="bridgelidRemark" />
+        <result column="third_state" property="thirdState" />
+        <result column="third_remark" property="thirdRemark" />
+    </resultMap>
+
+</mapper>
