@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.distributionbox.mapper.InspectionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.distributionbox.entity.Inspection">
+        <id column="id" property="id" />
+        <result column="inspection_user" property="inspectionUser" />
+        <result column=" guardian_user" property="guardianUser" />
+        <result column="inspection_time" property="inspectionTime" />
+        <result column="circuit_name" property="circuitName" />
+        <result column="operating_current" property="operatingCurrent" />
+        <result column="starting_current" property="startingCurrent" />
+        <result column="first_url" property="firstUrl" />
+        <result column="second_url" property="secondUrl" />
+        <result column="third_url" property="thirdUrl" />
+        <result column="fourth_url" property="fourthUrl" />
+        <result column="fifth_url" property="fifthUrl" />
+        <result column="appearance_url" property="appearanceUrl" />
+        <result column="check_lock" property="checkLock" />
+        <result column="check_sanitation" property="checkSanitation" />
+        <result column="check_appearance" property="checkAppearance" />
+        <result column="check_tags" property="checkTags" />
+        <result column="check_system" property="checkSystem" />
+        <result column="check_firewall" property="checkFirewall" />
+        <result column="check_jumper" property="checkJumper" />
+        <result column="check_barriers" property="checkBarriers" />
+        <result column="check_zero" property="checkZero" />
+        <result column="check_ground" property="checkGround" />
+        <result column="check_temperature" property="checkTemperature" />
+        <result column="check_components" property="checkComponents" />
+        <result column="earlier_url" property="earlierUrl" />
+        <result column="later_url" property="laterUrl" />
+    </resultMap>
+
+</mapper>
