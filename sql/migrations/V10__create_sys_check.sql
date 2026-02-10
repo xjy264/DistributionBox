@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS sys_check (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  pid VARCHAR(100),
+  content VARCHAR(500),
+  state VARCHAR(50),
+  remark VARCHAR(255)
+);

@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS sys_role (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(255),
+  identity VARCHAR(100)
+);

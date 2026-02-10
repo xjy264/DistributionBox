@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS sys_tax (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255),
+  pre VARCHAR(255),
+  after VARCHAR(255),
+  rate VARCHAR(100),
+  fund VARCHAR(255)
+);

@@ -1,0 +1,1 @@
+import{_ as o,o as r,c as t,a as n}from"./index-CkmIPjxY.js";const a={};function s(c,e){return r(),t("div",null,[...e[0]||(e[0]=[n("h3",null,"地图视图",-1),n("p",null,"此处可接入地图服务展示站点与配电箱位置。",-1)])])}const _=o(a,[["render",s]]);export{_ as default};

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.distributionbox.mapper.ComponentsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.distributionbox.entity.Components">
+        <id column="id" property="id" />
+        <result column="components_name" property="componentsName" />
+        <result column="components_unit" property="componentsUnit" />
+        <result column="components_quantity" property="componentsQuantity" />
+        <result column="components_type" property="componentsType" />
+        <result column="components_nominal" property="componentsNominal" />
+        <result column="components_starting" property="componentsStarting" />
+        <result column="components_running" property="componentsRunning" />
+        <result column="components_state" property="componentsState" />
+        <result column="box_id" property="boxId" />
+    </resultMap>
+
+</mapper>
