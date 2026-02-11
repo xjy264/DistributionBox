@@ -69,8 +69,10 @@ const fields = [
   { key: 'role', label: '角色' }
 ]
 
+const USER_API_BASE = '/user'
+
 const load = async () => {
-  const res = await http.get('/users/page', {
+  const res = await http.get(`${USER_API_BASE}/page`, {
     params: {
       pageNum: pageNum.value,
       pageSize: pageSize.value,
@@ -79,8 +81,9 @@ const load = async () => {
       address: filters.address
     }
   })
-  tableData.value = res.data.data.content
-  total.value = res.data.data.totalElements
+  const pageData = res.data?.data || {}
+  tableData.value = pageData.records || pageData.content || []
+  total.value = pageData.total || pageData.totalElements || 0
 }
 
 const reset = () => {
@@ -101,13 +104,13 @@ const edit = (row: any) => {
 }
 
 const save = async () => {
-  await http.post('/users', form)
+  await http.post(USER_API_BASE, form)
   dialogVisible.value = false
   load()
 }
 
 const remove = async (id: number) => {
-  await http.delete(`/users/${id}`)
+  await http.delete(`${USER_API_BASE}/${id}`)
   load()
 }
 
