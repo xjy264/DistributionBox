@@ -7,9 +7,7 @@
       <el-select v-model="filters.area" placeholder="工区" class="field" clearable filterable @change="onFilterAreaChange">
         <el-option v-for="opt in filterAreaOptions" :key="opt" :label="opt" :value="opt" />
       </el-select>
-      <el-select v-model="filters.address" placeholder="安装地点" class="field" clearable filterable>
-        <el-option v-for="opt in filterAddressOptions" :key="opt" :label="opt" :value="opt" />
-      </el-select>
+      <el-input v-model="filters.address" placeholder="安装地点" class="field" clearable />
       <el-button type="primary" @click="load">搜索</el-button>
       <el-button @click="reset">重置</el-button>
       <el-button type="success" @click="openDialog">新增</el-button>
@@ -58,9 +56,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="安装地点">
-          <el-select v-model="form.boxAddress" style="width: 100%" filterable allow-create default-first-option>
-            <el-option v-for="opt in formAddressOptions" :key="opt" :label="opt" :value="opt" />
-          </el-select>
+          <el-input v-model="form.boxAddress" />
         </el-form-item>
         <el-form-item label="规格">
           <el-input v-model="form.size" />
@@ -122,9 +118,7 @@ const getAddressOptions = (stationName: string, areaName: string) => {
 }
 
 const filterAreaOptions = computed(() => getAreaOptions(filters.station))
-const filterAddressOptions = computed(() => getAddressOptions(filters.station, filters.area))
 const formAreaOptions = computed(() => getAreaOptions(form.station || ''))
-const formAddressOptions = computed(() => getAddressOptions(form.station || '', form.area || ''))
 
 const loadLocations = async () => {
   try {
@@ -182,16 +176,9 @@ const onFilterStationChange = () => {
   if (!filterAreaOptions.value.includes(filters.area)) {
     filters.area = ''
   }
-  if (!filterAddressOptions.value.includes(filters.address)) {
-    filters.address = ''
-  }
 }
 
-const onFilterAreaChange = () => {
-  if (!filterAddressOptions.value.includes(filters.address)) {
-    filters.address = ''
-  }
-}
+const onFilterAreaChange = () => {}
 
 const openDialog = () => {
   Object.keys(form).forEach((k) => delete form[k])
@@ -208,16 +195,9 @@ const onFormStationChange = () => {
   if (!formAreaOptions.value.includes(form.area)) {
     form.area = ''
   }
-  if (!formAddressOptions.value.includes(form.boxAddress)) {
-    form.boxAddress = ''
-  }
 }
 
-const onFormAreaChange = () => {
-  if (!formAddressOptions.value.includes(form.boxAddress)) {
-    form.boxAddress = ''
-  }
-}
+const onFormAreaChange = () => {}
 
 const save = async () => {
   if (!form.boxId || !String(form.boxId).trim()) {
