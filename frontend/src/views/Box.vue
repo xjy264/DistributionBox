@@ -19,11 +19,12 @@
       <el-table-column prop="area" label="工区" />
       <el-table-column prop="boxAddress" label="安装地点" />
       <el-table-column prop="size" label="规格" />
-      <el-table-column label="操作" width="240">
+      <el-table-column label="操作" width="340">
         <template #default="scope">
           <el-button size="small" @click="edit(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="remove(scope.row.id)">删除</el-button>
           <el-button size="small" type="primary" @click="print(scope.row.id)">打印</el-button>
+          <el-button size="small" type="success" @click="viewDetail(scope.row)">查看详细信息</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,6 +88,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 
@@ -103,6 +105,7 @@ const total = ref(0)
 const dialogVisible = ref(false)
 const form = reactive<any>({})
 const locationTree = ref<TreeNode[]>([])
+const router = useRouter()
 
 const stationOptions = computed(() => locationTree.value.map((item) => item.name))
 
@@ -216,6 +219,13 @@ const save = async () => {
 const remove = async (id: number) => {
   await http.delete(`/box/${id}`)
   load()
+}
+
+const viewDetail = (row: any) => {
+  router.push({
+    path: `/box-detail/${row.id}`,
+    query: { boxId: row.boxId || '' }
+  })
 }
 
 const print = (id: number) => {

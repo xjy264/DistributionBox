@@ -9,9 +9,10 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: MainLayout,
     children: [
-      { path: '', redirect: '/home' },
-      { path: 'home', component: () => import('@/views/Home.vue') },
+      { path: '', redirect: '/box' },
       { path: 'box', component: () => import('@/views/Box.vue') },
+      { path: 'box-detail/:id', component: () => import('@/views/BoxDetail.vue') },
+      { path: 'dict', component: () => import('@/views/Dict.vue') },
       { path: 'components', component: () => import('@/views/Components.vue') },
       { path: 'inspection', component: () => import('@/views/Inspection.vue') },
       { path: 'detect', component: () => import('@/views/Detect.vue') },
