@@ -1,0 +1,51 @@
+package com.distributionbox.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@TableName("sys_inspection_item")
+public class InspectionItem implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    private Integer taskId;
+
+    private Integer boxId;
+
+    private String firstUrl;
+    private String secondUrl;
+    private String thirdUrl;
+    private String fourthUrl;
+    private String fifthUrl;
+    private String appearanceUrl;
+    private String earlierUrl;
+    private String laterUrl;
+    private String switchModel;
+    private String currentRating;
+    private String traverseSection;
+    private String supplyVoltage;
+    private String aStarting;
+    private String aRunning;
+    private String bStarting;
+    private String bRunning;
+    private String cStarting;
+    private String cRunning;
+    private String remark;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updatedAt;
+}
