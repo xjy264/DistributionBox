@@ -111,8 +111,10 @@ const goRegister = () => router.push('/register')
   height: 42px;
   margin-top: 8px;
   border-radius: 8px;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1;
+  padding: 0;
 }
 
 .full :deep(span) {
@@ -120,6 +122,7 @@ const goRegister = () => router.push('/register')
   width: 100%;
   justify-content: center;
   align-items: center;
+  line-height: 1;
 }
 
 .primary {
