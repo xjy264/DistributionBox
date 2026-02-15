@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import MainLayout from '@/layouts/MainLayout.vue'
+import { pinia } from '@/stores'
 
 const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('@/views/Login.vue') },
@@ -42,15 +43,22 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  const store = useUserStore()
+  const store = useUserStore(pinia)
+
   if (to.path === '/login' || to.path === '/register') {
+    if (to.path === '/login' && store.token) {
+      next('/box')
+      return
+    }
     next()
     return
   }
+
   if (!store.token) {
     next('/login')
     return
   }
+
   next()
 })
 
