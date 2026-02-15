@@ -1,23 +1,26 @@
 <template>
   <div class="login">
+    <div class="overlay"></div>
     <div class="card">
-      <h2>DistributionBox</h2>
-      <el-form :model="form" @submit.prevent>
-        <el-form-item label="用户名">
-          <el-input v-model="form.username" />
+      <div class="brand">DistributionBox</div>
+      <div class="subtitle">配电箱管理系统</div>
+
+      <el-form :model="form" label-position="top" @submit.prevent>
+        <el-form-item label="用户名" class="form-item">
+          <el-input v-model="form.username" size="large" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="form.password" type="password" />
+        <el-form-item label="密码" class="form-item">
+          <el-input v-model="form.password" type="password" size="large" show-password placeholder="请输入密码" />
         </el-form-item>
-        <el-button type="primary" class="full" @click="submit">登录</el-button>
-        <el-button class="full" @click="goRegister">注册</el-button>
+        <el-button type="primary" class="full primary" :loading="submitting" :disabled="submitting" @click="submit">登录</el-button>
+        <el-button class="full secondary" @click="goRegister">注册</el-button>
       </el-form>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import http from '@/api/http'
@@ -30,22 +33,29 @@ const form = reactive({
   username: '',
   password: ''
 })
+const submitting = ref(false)
 
 const submit = async () => {
-  const res = await http.post('/login', form)
-  if (res.data.code !== '200') {
-    ElMessage.error(res.data.msg || '登录失败')
-    return
+  if (submitting.value) return
+  submitting.value = true
+  try {
+    const res = await http.post('/login', form)
+    if (res.data.code !== '200') {
+      ElMessage.error(res.data.msg || '登录失败')
+      return
+    }
+    const data = res.data.data
+    const user = {
+      id: data.id,
+      username: data.username,
+      nickname: data.nickname,
+      role: data.role
+    }
+    store.setAuth(data.token, user, data.menus || [])
+    router.push('/box')
+  } finally {
+    submitting.value = false
   }
-  const data = res.data.data
-  const user = {
-    id: data.id,
-    username: data.username,
-    nickname: data.nickname,
-    role: data.role
-  }
-  store.setAuth(data.token, user, data.menus || [])
-  router.push('/box')
 }
 
 const goRegister = () => router.push('/register')
@@ -53,20 +63,69 @@ const goRegister = () => router.push('/register')
 
 <style scoped>
 .login {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0b1f3a, #173f63);
-}
-.card {
-  width: 360px;
-  background: #fff;
   padding: 24px;
-  border-radius: 12px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(80, 143, 255, 0.18), transparent 38%),
+    radial-gradient(circle at 80% 85%, rgba(65, 111, 215, 0.2), transparent 35%),
+    linear-gradient(135deg, #07152b 0%, #0f2e54 50%, #173f63 100%);
 }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px 28px 22px;
+  box-shadow: 0 20px 60px rgba(5, 19, 42, 0.35);
+}
+
+.brand {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f2e54;
+  letter-spacing: 0.2px;
+}
+
+.subtitle {
+  margin-top: 6px;
+  margin-bottom: 16px;
+  color: #6b7a90;
+  font-size: 14px;
+}
+
+.form-item {
+  margin-bottom: 14px;
+}
+
 .full {
   width: 100%;
+  height: 42px;
   margin-top: 8px;
+  border-radius: 8px;
+}
+
+.primary {
+  background: linear-gradient(135deg, #1e5aa8, #2673d6);
+  border: none;
+}
+
+.secondary {
+  color: #1e5aa8;
+  border-color: #c9d9ef;
+  background: #f7fbff;
 }
 </style>
