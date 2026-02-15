@@ -108,18 +108,19 @@ const goRegister = () => router.push('/register')
 
 .full {
   width: 100%;
-  height: 42px;
+  height: 39px;
   margin-top: 8px;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 39px;
   padding: 0;
 }
 
 .full :deep(span) {
   display: inline-flex;
   width: 100%;
+  height: 39px;
   justify-content: center;
   align-items: center;
   line-height: 1;
