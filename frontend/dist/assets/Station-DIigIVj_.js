@@ -1,0 +1,1 @@
+import{_ as t,o,c as r,a as n}from"./index-OWjV_rHx.js";const a={};function s(c,e){return o(),r("div",null,[...e[0]||(e[0]=[n("h3",null,"站点列表",-1),n("p",null,"站点信息可通过首页/配电箱模块维护。",-1)])])}const _=t(a,[["render",s]]);export{_ as default};

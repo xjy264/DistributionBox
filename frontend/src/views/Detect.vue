@@ -119,8 +119,9 @@ const load = async () => {
   const res = await http.get('/detect/page', {
     params: { pageNum: pageNum.value, pageSize: pageSize.value }
   })
-  tableData.value = res.data.data.content
-  total.value = res.data.data.totalElements
+  const pageData = res.data?.data || res.data || {}
+  tableData.value = pageData.records || pageData.content || []
+  total.value = pageData.total || pageData.totalElements || 0
 }
 
 const openDialog = () => {

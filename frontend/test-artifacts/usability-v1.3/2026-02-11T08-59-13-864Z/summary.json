@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-02-11T08:59:13.869Z",
+  "artifactDir": "/Users/xuejiayao/project/distributionBox/frontend/test-artifacts/usability-v1.3/2026-02-11T08-59-13-864Z",
+  "passed": false,
+  "bugCount": 1,
+  "bugs": [
+    "Bug-1 [P1]: 可用性自动化测试失败：listen EPERM: operation not permitted 127.0.0.1:19090"
+  ]
+}

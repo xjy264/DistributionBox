@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8888
 
 spring:
   application:
@@ -7,10 +7,10 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/distributionbox?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
     username: root
-    password: root
+    password: Xjy12345@@
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
-    enabled: true
+    enabled: false
     locations: filesystem:../sql/migrations
     baseline-on-migrate: true
 
@@ -20,7 +20,7 @@ app:
     jwt-expiration-minutes: ${JWT_EXP_MINUTES:720}
   files:
     upload-path: ${FILE_UPLOAD_PATH:../files/}
-    base-url: ${FILE_BASE_URL:http://localhost:8080/files/}
+    base-url: ${FILE_BASE_URL:http://localhost:8888/files/}
 
 logging:
   level:

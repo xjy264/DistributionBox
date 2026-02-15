@@ -2,8 +2,8 @@ package com.xjy.shujia.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
   @TableName("sys_tax")
-@ApiModel(value = "Tax对象", description = "")
+@Schema(name = "Tax对象")
 public class Tax implements Serializable {
 
     private static final long serialVersionUID = 1L;

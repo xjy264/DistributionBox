@@ -1,105 +1,110 @@
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\CourseController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\CourseMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Menu.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Inspection.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\InspectionController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Box.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\RoleController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\common\Result.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\config\InterceptorConfig.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\LoginController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IHomeService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IDictService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\common\Constants.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\RoleMenuMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\RecordMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\ICourseService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\InspectionServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\RoleMenuServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\UserMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\FilesController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Course.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\FixMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\DepartmentMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\RoleServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Home.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\EchartsController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\BoxServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IRecordService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\ComponentsController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\RoleMenu.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\ShujiaApplication.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\common\RoleEnum.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\UserController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\BoxMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IMenuService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\utils\CodeGenerator.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\RoleMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\TaxServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\HomeMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Detect.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Record.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\config\SwaggerConfig.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\CourseServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Files.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\FilesServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\DictServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\CheckController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Maintenance.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\CheckMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\exception\GlobalExceptionHandler.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\FilesMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\MenuMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IRoleService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\config\CorsConfig.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\config\MybatisPlusConfig.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\HomeController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\MaintenanceServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\MaintenanceController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IMaintenanceService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Department.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\UserServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\InspectionMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Components.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\exception\ServiceException.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\utils\JwtUtils.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\MaintenanceMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\config\interceptor\JwtInterceptor.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IDepartmentService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\RecordController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Dict.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IDetectService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\config\PhotoConfig.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IUserService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IInspectionService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\DetectMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IFixService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\CheckServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\ComponentsServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\TaxController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IBoxService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\MenuController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\ComponentsMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IFilesService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\DepartmentServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Tax.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IComponentsService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\ICheckService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Fix.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Check.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\BoxController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\dto\UserDto.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\DictMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\MenuServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\IRoleMenuService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\FixController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\mapper\TaxMapper.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\DetectServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\FixServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\ITaxService.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\DetectController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\HomeServiceImpl.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\controller\DepartmentController.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\User.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\entity\Role.java
-F:\IntelliJ IDEA 2021.1.2\shujia-localhost-7\src\main\java\com\xjy\shujia\service\impl\RecordServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/RecordController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/dto/UserDto.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Maintenance.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/DetectController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/ComponentsMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IHomeService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/RoleMenuServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/DepartmentServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/LocationMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/RoleMenu.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/RoleMenuMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/utils/CodeGenerator.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/MaintenanceController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Menu.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/FixController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IFilesService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/ITaxService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Role.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/MaintenanceMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IDetectService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/ShujiaApplication.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Detect.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Course.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/ComponentsController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Record.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/DepartmentController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/config/InterceptorConfig.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/config/interceptor/JwtInterceptor.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IRoleMenuService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IComponentsService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IRoleService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/RoleController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/DictMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Box.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/CourseController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IDictService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Fix.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IMaintenanceService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/ICheckService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/DetectServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/LoginController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/UserController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IRecordService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Department.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/MaintenanceServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/DictServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Home.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/CheckServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/TaxMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IMenuService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/FixServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Files.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/CheckMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/FilesServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/InspectionServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/UserServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Dict.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/exception/GlobalExceptionHandler.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/config/SwaggerConfig.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/DepartmentMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/common/Constants.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/TaxServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/RoleServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IBoxService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/FilesMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IInspectionService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/ILocationService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/config/PhotoConfig.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/config/CorsConfig.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IFixService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/CourseServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IDepartmentService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/RecordServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/MenuMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/CourseMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/ICourseService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/EchartsController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/LocationServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/RecordMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/InspectionMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/MenuServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/DetectMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/HomeController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Components.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/LocationController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/FixMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/User.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/ComponentsServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Tax.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Check.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/FilesController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/config/MybatisPlusConfig.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/IUserService.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/UserMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/TaxController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/common/Result.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/InspectionController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/HomeMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/MenuController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/HomeServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/utils/JwtUtils.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Inspection.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/entity/Location.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/CheckController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/controller/BoxController.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/RoleMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/mapper/BoxMapper.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/service/impl/BoxServiceImpl.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/common/RoleEnum.java
+/Users/xuejiayao/project/distributionBox/src/main/java/com/xjy/shujia/exception/ServiceException.java

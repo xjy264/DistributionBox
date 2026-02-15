@@ -1,1 +1,0 @@
-import{_ as s,o as t,c as n,a as o}from"./index-CkmIPjxY.js";const a={},c={class:"nf"};function r(_,e){return t(),n("div",c,[...e[0]||(e[0]=[o("h2",null,"404",-1),o("p",null,"页面不存在",-1)])])}const l=s(a,[["render",r],["__scopeId","data-v-c6a570b7"]]);export{l as default};

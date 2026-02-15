@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
   @TableName("sys_maintenance")
-@ApiModel(value = "Maintenance对象", description = "")
+@Schema(name = "Maintenance对象")
 public class Maintenance implements Serializable {
 
     private static final long serialVersionUID = 1L;

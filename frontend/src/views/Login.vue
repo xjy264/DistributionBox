@@ -21,6 +21,7 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import http from '@/api/http'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const store = useUserStore()
@@ -31,9 +32,20 @@ const form = reactive({
 })
 
 const submit = async () => {
-  const res = await http.post('/auth/login', form)
-  store.setAuth(res.data.data.token, res.data.data.user, res.data.data.menus || [])
-  router.push('/home')
+  const res = await http.post('/login', form)
+  if (res.data.code !== '200') {
+    ElMessage.error(res.data.msg || '登录失败')
+    return
+  }
+  const data = res.data.data
+  const user = {
+    id: data.id,
+    username: data.username,
+    nickname: data.nickname,
+    role: data.role
+  }
+  store.setAuth(data.token, user, data.menus || [])
+  router.push('/box')
 }
 
 const goRegister = () => router.push('/register')

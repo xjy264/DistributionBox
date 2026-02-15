@@ -35,8 +35,8 @@ const router = useRouter()
 const store = useUserStore()
 
 const menuConfig = [
-  { label: '首页', path: '/home' },
   { label: '配电箱', path: '/box' },
+  { label: '地点配置', path: '/dict' },
   { label: '元器件', path: '/components' },
   { label: '巡检', path: '/inspection' },
   { label: '检测', path: '/detect' },
@@ -45,15 +45,8 @@ const menuConfig = [
   { label: '维保', path: '/maintenance' },
   { label: '抢修', path: '/fix' },
   { label: '文件', path: '/files' },
-  { label: '课程', path: '/course' },
-  { label: '税务', path: '/tax' },
   { label: '用户', path: '/users' },
-  { label: '角色', path: '/roles' },
-  { label: '菜单', path: '/menus' },
-  { label: '部门', path: '/departments' },
   { label: '图表', path: '/echarts' },
-  { label: '地图', path: '/map' },
-  { label: '站点', path: '/station' },
   { label: '人员', path: '/person' }
 ]
 
@@ -97,11 +90,22 @@ const logout = () => {
   font-size: 18px;
   text-align: center;
   margin-bottom: 16px;
+  color: #fff;
 }
 .menu {
   background: transparent;
-  color: #fff;
   border-right: none;
+}
+.menu :deep(.el-menu-item) {
+  color: #fff;
+}
+.menu :deep(.el-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.menu :deep(.el-menu-item.is-active) {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 .header {
   display: flex;

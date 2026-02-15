@@ -2,8 +2,8 @@ package com.xjy.shujia.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
   @TableName("sys_detect")
-@ApiModel(value = "Detect对象", description = "")
+@Schema(name = "Detect对象")
 public class Detect implements Serializable {
 
     private static final long serialVersionUID = 1L;

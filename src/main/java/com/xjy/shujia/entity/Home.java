@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
   @TableName("sys_home")
-@ApiModel(value = "Home对象", description = "")
+@Schema(name = "Home对象")
 public class Home implements Serializable {
 
     private static final long serialVersionUID = 1L;

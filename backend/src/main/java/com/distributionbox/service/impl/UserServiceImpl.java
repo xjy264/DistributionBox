@@ -15,6 +15,7 @@ import com.distributionbox.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.distributionbox.security.JwtService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
@@ -34,6 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     private static final Log LOG =Log.get();
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     @Resource
     private RoleMapper roleMapper;
@@ -42,15 +44,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     IMenuService menuService;
 
-    public UserServiceImpl(JwtService jwtService) {
+    public UserServiceImpl(JwtService jwtService, PasswordEncoder passwordEncoder) {
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDto login(UserDto userDto) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username",userDto.getUsername());
-        queryWrapper.eq("password",userDto.getPassword());
         User one;
         try {
             one = getOne(queryWrapper);
@@ -58,7 +60,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             LOG.error(e);
             throw new ServiceException(Constants.CODE_500,"系统错误");
         }
-        if (one != null){
+        if (one != null && userDto.getPassword().equals(one.getPassword())){
             BeanUtils.copyProperties(one,userDto);
             String token = jwtService.generateToken(one.getUsername(), java.util.Map.of(
                     "userId", one.getId(),
