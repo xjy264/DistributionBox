@@ -2,8 +2,7 @@
   <div class="login">
     <div class="overlay"></div>
     <div class="card">
-      <div class="brand">DistributionBox</div>
-      <div class="subtitle">配电箱管理系统</div>
+      <div class="brand">配电箱管理系统</div>
 
       <el-form :model="form" label-position="top" @submit.prevent>
         <el-form-item label="用户名" class="form-item">
@@ -94,17 +93,13 @@ const goRegister = () => router.push('/register')
 }
 
 .brand {
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.2;
   color: #0f2e54;
-  letter-spacing: 0.2px;
-}
-
-.subtitle {
-  margin-top: 6px;
-  margin-bottom: 16px;
-  color: #6b7a90;
-  font-size: 14px;
+  letter-spacing: 0.4px;
+  margin-bottom: 18px;
+  text-align: left;
 }
 
 .form-item {
@@ -116,6 +111,15 @@ const goRegister = () => router.push('/register')
   height: 42px;
   margin-top: 8px;
   border-radius: 8px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.full :deep(span) {
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 .primary {
