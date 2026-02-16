@@ -66,15 +66,11 @@
 
       <el-tab-pane label="抢修记录">
         <div class="sub-toolbar">
-          <el-button type="success" @click="openRepairDialog">新增抢修记录</el-button>
+          <el-button type="success" @click="openRepairDialog">新增抢修任务</el-button>
         </div>
         <el-table :data="repairs" border>
-          <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column label="关联配电箱">
-            <template #default="scope">
-              {{ (scope.row.boxIds || []).join(', ') || '-' }}
-            </template>
-          </el-table-column>
+          <el-table-column prop="id" label="明细ID" width="90" />
+          <el-table-column prop="taskNo" label="任务单号" width="180" />
           <el-table-column prop="reportUser" label="报修人" />
           <el-table-column prop="reportTime" label="报修时间" />
           <el-table-column prop="fixUser" label="抢修人" />
@@ -82,8 +78,8 @@
           <el-table-column prop="faultPhenomenon" label="故障现象" />
           <el-table-column label="操作" width="180">
             <template #default="scope">
-              <el-button size="small" @click="editRepair(scope.row)">编辑</el-button>
-              <el-button size="small" type="danger" @click="removeRepair(scope.row.id)">删除</el-button>
+              <el-button size="small" @click="editRepair(scope.row)">编辑任务</el-button>
+              <el-button size="small" type="danger" @click="removeRepair(scope.row.taskId)">删除任务</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -106,7 +102,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="repairDialog" title="抢修记录" width="760px">
+    <el-dialog v-model="repairDialog" title="抢修任务" width="760px">
       <EntityForm v-model="repairForm" :fields="repairFields" />
       <template #footer>
         <el-button @click="repairDialog = false">取消</el-button>
@@ -178,6 +174,7 @@ const inspectionFields = ref<any[]>([
 ])
 
 const repairFields = ref<any[]>([
+  { key: 'taskNo', label: '任务单号（可空自动生成）' },
   { key: 'boxIds', label: '关联配电箱', type: 'multi-select', options: allBoxOptions.value },
   { key: 'reportUser', label: '报修人' },
   { key: 'reportTime', label: '报修时间', type: 'date' },
@@ -223,7 +220,7 @@ const load = async () => {
     http.get(`/box/${id}`),
     http.get(`/components/${id}`),
     http.get('/inspection-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } }),
-    http.get('/emergency-repair/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
+    http.get('/repair-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
   ])
 
   Object.keys(box).forEach((k) => delete box[k])
@@ -327,20 +324,54 @@ const openRepairDialog = () => {
   repairDialog.value = true
 }
 
-const editRepair = (row: any) => {
+const editRepair = async (row: any) => {
+  const detail = await http.get(`/repair-task/${row.taskId}`)
+  const data = detail.data?.data || {}
+  const firstItem = data.items?.[0] || {}
   Object.keys(repairForm).forEach((k) => delete repairForm[k])
-  Object.assign(repairForm, { ...row, boxIds: row.boxIds || [] })
+  Object.assign(repairForm, {
+    id: data.id,
+    taskNo: data.taskNo,
+    reportUser: data.reportUser,
+    reportTime: data.reportTime,
+    fixUser: data.fixUser,
+    fixTime: data.fixTime,
+    remark: data.remark,
+    boxIds: data.boxIds || [],
+    ...firstItem
+  })
   repairDialog.value = true
 }
 
 const saveRepair = async () => {
-  await http.post('/emergency-repair/save', repairForm)
+  const boxIds: number[] = (repairForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
+  const itemTemplate = {
+    components: repairForm.components,
+    faultPhenomenon: repairForm.faultPhenomenon,
+    faultReason: repairForm.faultReason,
+    fixProcess: repairForm.fixProcess,
+    remark: repairForm.remark,
+    firstUrl: repairForm.firstUrl,
+    secondUrl: repairForm.secondUrl,
+    thirdUrl: repairForm.thirdUrl,
+    fourthUrl: repairForm.fourthUrl
+  }
+  await http.post('/repair-task/save', {
+    id: repairForm.id,
+    taskNo: repairForm.taskNo,
+    reportUser: repairForm.reportUser,
+    reportTime: repairForm.reportTime,
+    fixUser: repairForm.fixUser,
+    fixTime: repairForm.fixTime,
+    remark: repairForm.remark,
+    items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
+  })
   repairDialog.value = false
   load()
 }
 
 const removeRepair = async (id: number) => {
-  await http.delete(`/emergency-repair/${id}`)
+  await http.delete(`/repair-task/${id}`)
   load()
 }
 
