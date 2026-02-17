@@ -59,6 +59,12 @@ router.beforeEach((to, _from, next) => {
     return
   }
 
+  const adminOnlyRoutes = ['/users', '/roles', '/menus']
+  if (adminOnlyRoutes.includes(to.path) && store.user.role !== 'ROLE_ADMIN') {
+    next('/box')
+    return
+  }
+
   next()
 })
 

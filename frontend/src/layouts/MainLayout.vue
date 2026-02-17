@@ -46,16 +46,23 @@ const menuConfig = [
   { label: '抢修', path: '/fix' },
   { label: '文件', path: '/files' },
   { label: '用户', path: '/users' },
+  { label: '角色', path: '/roles' },
+  { label: '菜单', path: '/menus' },
   { label: '图表', path: '/echarts' },
   { label: '人员', path: '/person' }
 ]
 
 const active = computed(() => route.path)
 
+const adminOnlyPaths = new Set(['/users', '/roles', '/menus'])
+
 const visibleMenus = computed(() => {
+  const isAdmin = store.user.role === 'ROLE_ADMIN'
+
   if (!store.menus.length) {
-    return menuConfig
+    return menuConfig.filter((item) => isAdmin || !adminOnlyPaths.has(item.path))
   }
+
   const allowedPaths = new Set<string>()
   const collectPaths = (menus: any[]) => {
     menus.forEach((menu) => {
@@ -64,7 +71,12 @@ const visibleMenus = computed(() => {
     })
   }
   collectPaths(store.menus as any[])
-  return menuConfig.filter((item) => allowedPaths.has(item.path))
+
+  return menuConfig.filter((item) => {
+    if (!allowedPaths.has(item.path)) return false
+    if (!isAdmin && adminOnlyPaths.has(item.path)) return false
+    return true
+  })
 })
 
 const userLabel = computed(() => store.user.nickname || store.user.username || '用户')
