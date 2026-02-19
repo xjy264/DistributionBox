@@ -11,12 +11,55 @@
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
-      <el-descriptions-item label="系统图">{{ toDisplay(box.systemUrl) }}</el-descriptions-item>
-      <el-descriptions-item label="图片1">{{ toDisplay(box.firstUrl) }}</el-descriptions-item>
-      <el-descriptions-item label="图片2">{{ toDisplay(box.secondUrl) }}</el-descriptions-item>
-      <el-descriptions-item label="图片3">{{ toDisplay(box.thirdUrl) }}</el-descriptions-item>
-      <el-descriptions-item label="图片4">{{ toDisplay(box.fourthUrl) }}</el-descriptions-item>
+      <el-descriptions-item label="系统图">
+        <el-image v-if="resolvePreviewUrl(box.systemUrl)" :src="resolvePreviewUrl(box.systemUrl)" class="box-image" fit="cover" preview-teleported />
+        <span v-else>-</span>
+      </el-descriptions-item>
+      <el-descriptions-item label="图片1">
+        <el-image v-if="resolvePreviewUrl(box.firstUrl)" :src="resolvePreviewUrl(box.firstUrl)" class="box-image" fit="cover" preview-teleported />
+        <span v-else>-</span>
+      </el-descriptions-item>
+      <el-descriptions-item label="图片2">
+        <el-image v-if="resolvePreviewUrl(box.secondUrl)" :src="resolvePreviewUrl(box.secondUrl)" class="box-image" fit="cover" preview-teleported />
+        <span v-else>-</span>
+      </el-descriptions-item>
+      <el-descriptions-item label="图片3">
+        <el-image v-if="resolvePreviewUrl(box.thirdUrl)" :src="resolvePreviewUrl(box.thirdUrl)" class="box-image" fit="cover" preview-teleported />
+        <span v-else>-</span>
+      </el-descriptions-item>
+      <el-descriptions-item label="图片4">
+        <el-image v-if="resolvePreviewUrl(box.fourthUrl)" :src="resolvePreviewUrl(box.fourthUrl)" class="box-image" fit="cover" preview-teleported />
+        <span v-else>-</span>
+      </el-descriptions-item>
     </el-descriptions>
+
+    <el-divider />
+
+    <el-card shadow="never" class="box-image-editor">
+      <template #header>
+        <div class="editor-header">
+          <span>图片维护</span>
+          <el-button type="primary" @click="saveBoxImages">保存图片</el-button>
+        </div>
+      </template>
+      <el-form :model="boxImageForm" label-width="90px">
+        <el-form-item label="系统图">
+          <ImageUpload v-model="boxImageForm.systemUrl" />
+        </el-form-item>
+        <el-form-item label="图片1">
+          <ImageUpload v-model="boxImageForm.firstUrl" />
+        </el-form-item>
+        <el-form-item label="图片2">
+          <ImageUpload v-model="boxImageForm.secondUrl" />
+        </el-form-item>
+        <el-form-item label="图片3">
+          <ImageUpload v-model="boxImageForm.thirdUrl" />
+        </el-form-item>
+        <el-form-item label="图片4">
+          <ImageUpload v-model="boxImageForm.fourthUrl" />
+        </el-form-item>
+      </el-form>
+    </el-card>
 
     <el-divider />
 
@@ -115,8 +158,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import EntityForm from '@/components/EntityForm.vue'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -134,6 +179,13 @@ const repairDialog = ref(false)
 const componentForm = reactive<any>({})
 const inspectionForm = reactive<any>({ boxIds: [] })
 const repairForm = reactive<any>({ boxIds: [] })
+const boxImageForm = reactive<any>({
+  systemUrl: '',
+  firstUrl: '',
+  secondUrl: '',
+  thirdUrl: '',
+  fourthUrl: ''
+})
 let currentLoadToken = 0
 
 const componentFields = [
@@ -209,6 +261,36 @@ const unwrapPayload = (payload: any) => {
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
 
+const normalizeImageField = (value: unknown) => {
+  if (typeof value !== 'string') return ''
+  return value.trim()
+}
+
+const extractUuid = (value: string) => {
+  const raw = value.split('?')[0].split('#')[0]
+  const previewMatch = raw.match(/\/files\/preview\/([^/]+)$/)
+  if (previewMatch?.[1]) return previewMatch[1]
+  const fileMatch = raw.match(/\/files\/([^/]+)$/)
+  if (fileMatch?.[1]) return fileMatch[1]
+  return ''
+}
+
+const resolvePreviewUrl = (value: unknown) => {
+  const raw = normalizeImageField(value)
+  if (!raw) return ''
+  const uuid = extractUuid(raw)
+  if (uuid) return `/api/files/preview/${uuid}`
+  return raw
+}
+
+const syncBoxImageForm = () => {
+  boxImageForm.systemUrl = normalizeImageField(box.systemUrl)
+  boxImageForm.firstUrl = normalizeImageField(box.firstUrl)
+  boxImageForm.secondUrl = normalizeImageField(box.secondUrl)
+  boxImageForm.thirdUrl = normalizeImageField(box.thirdUrl)
+  boxImageForm.fourthUrl = normalizeImageField(box.fourthUrl)
+}
+
 const refreshBoxOptions = () => {
   inspectionFields.value = inspectionFields.value.map((item) =>
     item.key === 'boxIds' ? { ...item, options: allBoxOptions.value } : item
@@ -236,6 +318,7 @@ const load = async () => {
     components.value = []
     inspections.value = []
     repairs.value = []
+    syncBoxImageForm()
     return
   }
 
@@ -253,6 +336,7 @@ const load = async () => {
 
   const boxData = boxRes.status === 'fulfilled' ? unwrapPayload(boxRes.value.data) : {}
   Object.assign(box, boxData || {})
+  syncBoxImageForm()
 
   if (compRes.status === 'fulfilled') {
     const compData = unwrapPayload(compRes.value.data)
@@ -274,6 +358,22 @@ const load = async () => {
   } else {
     repairs.value = []
   }
+}
+
+const saveBoxImages = async () => {
+  if (!box.id) return
+  const payload = {
+    ...box,
+    id: box.id,
+    systemUrl: normalizeImageField(boxImageForm.systemUrl),
+    firstUrl: normalizeImageField(boxImageForm.firstUrl),
+    secondUrl: normalizeImageField(boxImageForm.secondUrl),
+    thirdUrl: normalizeImageField(boxImageForm.thirdUrl),
+    fourthUrl: normalizeImageField(boxImageForm.fourthUrl)
+  }
+  await http.post('/box/save', payload)
+  Object.assign(box, payload)
+  ElMessage.success('图片保存成功')
 }
 
 const openComponentDialog = () => {
@@ -444,5 +544,22 @@ watch(
 }
 .sub-toolbar {
   margin-bottom: 10px;
+}
+
+.box-image {
+  width: 88px;
+  height: 88px;
+  border-radius: 4px;
+  border: 1px solid #e5e6eb;
+}
+
+.box-image-editor {
+  margin-bottom: 12px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
