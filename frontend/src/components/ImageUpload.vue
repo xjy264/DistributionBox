@@ -2,11 +2,11 @@
   <div class="image-upload">
     <el-upload
       class="uploader"
-      :action="uploadUrl"
-      :headers="headers"
+      :http-request="uploadImage"
       :show-file-list="false"
       :on-success="handleSuccess"
       :before-upload="beforeUpload"
+      :on-error="handleError"
       accept=".jpg,.jpeg,.png,.webp,.gif,.bmp"
     >
       <img v-if="modelValue" :src="previewUrl" class="preview" />
@@ -25,6 +25,8 @@
 import { computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import type { UploadRequestOptions } from 'element-plus'
+import http from '@/api/http'
 import { useUserStore } from '@/stores/user'
 
 const props = defineProps<{
@@ -35,10 +37,9 @@ const emit = defineEmits(['update:modelValue'])
 
 const store = useUserStore()
 
-const uploadUrl = '/api/files/image/upload'
-
 const headers = computed(() => ({
-  Authorization: `Bearer ${store.token}`
+  Authorization: store.token ? `Bearer ${store.token}` : '',
+  token: store.token || ''
 }))
 
 const extractUuid = (value: string) => {
@@ -47,6 +48,7 @@ const extractUuid = (value: string) => {
   if (previewMatch?.[1]) return previewMatch[1]
   const fileMatch = raw.match(/\/files\/([^/]+)$/)
   if (fileMatch?.[1]) return fileMatch[1]
+  if (!raw.includes('/') && /^[a-zA-Z0-9_-]{16,}$/.test(raw)) return raw
   return ''
 }
 
@@ -74,19 +76,59 @@ const beforeUpload = (file: File) => {
   return true
 }
 
+const parseUploadValue = (response: any): string => {
+  const payload = response?.data ?? response
+  if (typeof payload === 'string' && payload.trim()) {
+    const raw = payload.trim()
+    return raw.startsWith('/files/') ? raw : `/files/${raw}`
+  }
+  if (typeof response === 'string' && response.trim()) {
+    const raw = response.trim()
+    return raw.startsWith('/files/') ? raw : `/files/${raw}`
+  }
+  const value = payload?.path || payload?.url || payload?.previewUrl || response?.url
+  return typeof value === 'string' ? value : ''
+}
+
 const handleSuccess = (response: any) => {
   const code = String(response?.code ?? '')
-  const data = response?.data ?? response
-  const url = data?.path || data?.url || data?.previewUrl || response?.url
-  if (code === '200' && url) {
-    emit('update:modelValue', url)
-    return
-  }
-  if (!response?.code && url) {
+  const url = parseUploadValue(response)
+  if ((code === '200' || !response?.code) && url) {
     emit('update:modelValue', url)
     return
   }
   ElMessage.error(response?.msg || '上传失败')
+}
+
+const handleError = () => {
+  ElMessage.error('上传失败')
+}
+
+const uploadImage = async (options: UploadRequestOptions) => {
+  const formData = new FormData()
+  formData.append('file', options.file)
+  const reqHeaders = headers.value
+  try {
+    const res = await http.post('/files/image/upload', formData, {
+      headers: {
+        ...reqHeaders,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    options.onSuccess?.(res.data)
+  } catch (e) {
+    try {
+      const res = await http.post('/files/upload', formData, {
+        headers: {
+          ...reqHeaders,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      options.onSuccess?.(res.data)
+    } catch (err) {
+      options.onError?.(err as Error)
+    }
+  }
 }
 
 const clear = () => {
