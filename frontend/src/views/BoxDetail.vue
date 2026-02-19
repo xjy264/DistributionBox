@@ -13,23 +13,23 @@
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
-        <el-image v-if="resolvePreviewUrl(box.systemUrl)" :src="resolvePreviewUrl(box.systemUrl)" class="box-image" fit="cover" preview-teleported />
+        <el-image v-if="resolvePreviewUrl(box.systemUrl)" :src="resolvePreviewUrl(box.systemUrl)" :preview-src-list="[resolvePreviewUrl(box.systemUrl)]" class="box-image" fit="cover" preview-teleported />
         <span v-else>-</span>
       </el-descriptions-item>
       <el-descriptions-item label="图片1">
-        <el-image v-if="resolvePreviewUrl(box.firstUrl)" :src="resolvePreviewUrl(box.firstUrl)" class="box-image" fit="cover" preview-teleported />
+        <el-image v-if="resolvePreviewUrl(box.firstUrl)" :src="resolvePreviewUrl(box.firstUrl)" :preview-src-list="[resolvePreviewUrl(box.firstUrl)]" class="box-image" fit="cover" preview-teleported />
         <span v-else>-</span>
       </el-descriptions-item>
       <el-descriptions-item label="图片2">
-        <el-image v-if="resolvePreviewUrl(box.secondUrl)" :src="resolvePreviewUrl(box.secondUrl)" class="box-image" fit="cover" preview-teleported />
+        <el-image v-if="resolvePreviewUrl(box.secondUrl)" :src="resolvePreviewUrl(box.secondUrl)" :preview-src-list="[resolvePreviewUrl(box.secondUrl)]" class="box-image" fit="cover" preview-teleported />
         <span v-else>-</span>
       </el-descriptions-item>
       <el-descriptions-item label="图片3">
-        <el-image v-if="resolvePreviewUrl(box.thirdUrl)" :src="resolvePreviewUrl(box.thirdUrl)" class="box-image" fit="cover" preview-teleported />
+        <el-image v-if="resolvePreviewUrl(box.thirdUrl)" :src="resolvePreviewUrl(box.thirdUrl)" :preview-src-list="[resolvePreviewUrl(box.thirdUrl)]" class="box-image" fit="cover" preview-teleported />
         <span v-else>-</span>
       </el-descriptions-item>
       <el-descriptions-item label="图片4">
-        <el-image v-if="resolvePreviewUrl(box.fourthUrl)" :src="resolvePreviewUrl(box.fourthUrl)" class="box-image" fit="cover" preview-teleported />
+        <el-image v-if="resolvePreviewUrl(box.fourthUrl)" :src="resolvePreviewUrl(box.fourthUrl)" :preview-src-list="[resolvePreviewUrl(box.fourthUrl)]" class="box-image" fit="cover" preview-teleported />
         <span v-else>-</span>
       </el-descriptions-item>
     </el-descriptions>
