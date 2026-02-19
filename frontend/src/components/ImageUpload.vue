@@ -93,15 +93,25 @@ const parseUploadValue = (response: any): string => {
 const handleSuccess = (response: any) => {
   const code = String(response?.code ?? '')
   const url = parseUploadValue(response)
-  if ((code === '200' || !response?.code) && url) {
+
+  // 只要拿到可用URL，就判定上传成功，避免后端返回结构差异导致误报
+  if (url) {
     emit('update:modelValue', url)
     return
   }
-  ElMessage.error(response?.msg || '上传失败')
+
+  // 无URL时再根据状态码判断失败
+  if (code && code !== '200') {
+    ElMessage.error(response?.msg || '上传失败')
+    return
+  }
+
+  ElMessage.error('上传失败：未返回可用图片地址')
 }
 
-const handleError = () => {
-  ElMessage.error('上传失败')
+const handleError = (err?: any) => {
+  const msg = err?.message || err?.msg || '上传失败'
+  ElMessage.error(msg)
 }
 
 const uploadImage = async (options: UploadRequestOptions) => {
