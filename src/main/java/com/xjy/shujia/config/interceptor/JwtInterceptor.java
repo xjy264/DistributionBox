@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.xjy.shujia.common.Constants;
+import com.xjy.shujia.common.RoleEnum;
 import com.xjy.shujia.entity.User;
 import com.xjy.shujia.exception.ServiceException;
 import com.xjy.shujia.service.IUserService;
@@ -54,6 +55,18 @@ public class JwtInterceptor implements HandlerInterceptor {
         } catch (JWTVerificationException e) {
             throw new ServiceException(Constants.CODE_401,"token验证失败，请重新登录");
         }
+
+        String requestUri = request.getRequestURI();
+        if (isAdminOnlyPath(requestUri) && !RoleEnum.ROLE_ADMIN.name().equals(user.getRole())) {
+            throw new ServiceException(Constants.CODE_403, "无权限访问该资源");
+        }
+
         return true;
+    }
+
+    private boolean isAdminOnlyPath(String uri) {
+        return uri.startsWith("/user") || uri.startsWith("/users")
+                || uri.startsWith("/role") || uri.startsWith("/roles")
+                || uri.startsWith("/menu") || uri.startsWith("/menus");
     }
 }

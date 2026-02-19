@@ -76,10 +76,10 @@ const fields = ref<any[]>([
   { key: 'fixProcess', label: '维修过程', type: 'textarea' },
   { key: 'components', label: '更换元器件' },
   { key: 'remark', label: '备注', type: 'textarea' },
-  { key: 'firstUrl', label: '图片1URL' },
-  { key: 'secondUrl', label: '图片2URL' },
-  { key: 'thirdUrl', label: '图片3URL' },
-  { key: 'fourthUrl', label: '图片4URL' }
+  { key: 'firstUrl', label: '图片1', type: 'image' },
+  { key: 'secondUrl', label: '图片2', type: 'image' },
+  { key: 'thirdUrl', label: '图片3', type: 'image' },
+  { key: 'fourthUrl', label: '图片4', type: 'image' }
 ])
 
 const refreshFieldOptions = () => {

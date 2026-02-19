@@ -24,6 +24,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import http from '@/api/http'
 import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
 const router = useRouter()
 const store = useUserStore()
@@ -52,6 +53,13 @@ const submit = async () => {
     }
     store.setAuth(data.token, user, data.menus || [])
     router.push('/box')
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      const msg = error.response?.data?.msg || '登录请求失败，请确认后端服务已启动'
+      ElMessage.error(msg)
+    } else {
+      ElMessage.error('登录失败')
+    }
   } finally {
     submitting.value = false
   }

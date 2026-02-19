@@ -12,8 +12,14 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor())
                 .addPathPatterns("/**")
-//                .excludePathPatterns("/login","/register","/**/export","/**/import","/file/**");    // 拦截所有请求，通过判断token是否合法决定是否需要登录
-                .excludePathPatterns("/**");    // 拦截所有请求，通过判断token是否合法决定是否需要登录
+                .excludePathPatterns(
+                        "/login",
+                        "/register",
+                        "/error",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/doc.html"
+                );    // 拦截请求，通过 token 校验登录态与权限
     }
 
     @Bean

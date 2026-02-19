@@ -5,32 +5,23 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
-import com.deepoove.poi.data.Pictures;
-import com.deepoove.poi.data.RowRenderData;
-import com.deepoove.poi.data.TextRenderData;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
+import com.distributionbox.entity.Box;
 import com.distributionbox.entity.Components;
+import com.distributionbox.service.IBoxService;
 import com.distributionbox.service.IComponentsService;
+import jakarta.annotation.Resource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import com.distributionbox.service.IBoxService;
-import com.distributionbox.entity.Box;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -53,22 +44,38 @@ public class BoxController {
     //查找全部
     @GetMapping
     public List<Box> index() {
-        return boxService.list();
+        QueryWrapper<Box> wrapper = new QueryWrapper<>();
+        wrapper.eq("deleted", 0).orderByDesc("id");
+        return boxService.list(wrapper);
     }
 
     @GetMapping("/{id}")
     public Box getById(@PathVariable Integer id) {
-        return boxService.getById(id);
+        Box box = boxService.getById(id);
+        if (box == null || Integer.valueOf(1).equals(box.getDeleted())) {
+            return null;
+        }
+        return box;
     }
 
     @PostMapping("/save")
     public boolean save(@RequestBody Box box) {
+        if (box.getDeleted() == null) {
+            box.setDeleted(0);
+        }
         return boxService.saveOrUpdate(box);
     }
 
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable Integer id) {
-        return boxService.removeById(id);
+        Box box = boxService.getById(id);
+        if (box == null || Integer.valueOf(1).equals(box.getDeleted())) {
+            return false;
+        }
+        box.setDeleted(1);
+        boolean updated = boxService.updateById(box);
+        componentsService.deleteByBoxId(id);
+        return updated;
     }
 
     @PostMapping("/saveById/{id}")
@@ -93,12 +100,17 @@ public class BoxController {
     public IPage<Box> findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String id,
+                               @RequestParam(defaultValue = "") String station,
                                @RequestParam(defaultValue = "") String address,
                                @RequestParam(defaultValue = "") String area) {
         IPage<Box> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Box> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("deleted", 0);
         if (!"".equals(id)) {
             queryWrapper.like("id", id);
+        }
+        if (!"".equals(station)) {
+            queryWrapper.like("station", station);
         }
         if (!"".equals(address)) {
             queryWrapper.like("box_address", address);
@@ -113,6 +125,9 @@ public class BoxController {
     @GetMapping("/print/{id}")
     public ResponseEntity<InputStreamResource> generateWordFile(@PathVariable Integer id) throws IOException {
         Box box = boxService.getById(id);
+        if (box == null || Integer.valueOf(1).equals(box.getDeleted())) {
+            return ResponseEntity.notFound().build();
+        }
 
 //        String filepath = "F:/IntelliJ IDEA 2021.1.2/shujia-localhost-7/src/main/resources/words/template.docx";
         String filepath = "F:/Intel";
@@ -169,4 +184,3 @@ public class BoxController {
 
         return responseEntity;
     }}
-

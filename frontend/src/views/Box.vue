@@ -63,19 +63,19 @@
           <el-input v-model="form.size" />
         </el-form-item>
         <el-form-item label="系统图">
-          <el-input v-model="form.systemUrl" />
+          <ImageUpload v-model="form.systemUrl" />
         </el-form-item>
         <el-form-item label="图片1">
-          <el-input v-model="form.firstUrl" />
+          <ImageUpload v-model="form.firstUrl" />
         </el-form-item>
         <el-form-item label="图片2">
-          <el-input v-model="form.secondUrl" />
+          <ImageUpload v-model="form.secondUrl" />
         </el-form-item>
         <el-form-item label="图片3">
-          <el-input v-model="form.thirdUrl" />
+          <ImageUpload v-model="form.thirdUrl" />
         </el-form-item>
         <el-form-item label="图片4">
-          <el-input v-model="form.fourthUrl" />
+          <ImageUpload v-model="form.fourthUrl" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -91,6 +91,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 type TreeNode = {
   name: string

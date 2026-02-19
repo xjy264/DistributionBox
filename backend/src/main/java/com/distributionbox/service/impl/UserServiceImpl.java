@@ -53,14 +53,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public UserDto login(UserDto userDto) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username",userDto.getUsername());
+        queryWrapper.eq("password", userDto.getPassword());
+        queryWrapper.orderByDesc("id");
         User one;
         try {
-            one = getOne(queryWrapper);
+            List<User> users = list(queryWrapper);
+            one = users.isEmpty() ? null : users.get(0);
         }catch (Exception e){
             LOG.error(e);
             throw new ServiceException(Constants.CODE_500,"系统错误");
         }
-        if (one != null && userDto.getPassword().equals(one.getPassword())){
+        if (one != null){
             BeanUtils.copyProperties(one,userDto);
             String token = jwtService.generateToken(one.getUsername(), java.util.Map.of(
                     "userId", one.getId(),

@@ -21,6 +21,7 @@ app:
   files:
     upload-path: ${FILE_UPLOAD_PATH:../files/}
     base-url: ${FILE_BASE_URL:http://localhost:8888/files/}
+    image-max-size-bytes: ${FILE_IMAGE_MAX_SIZE_BYTES:10485760}
 
 logging:
   level:

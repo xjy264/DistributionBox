@@ -80,14 +80,14 @@ const fields = ref<any[]>([
   { key: 'bRunning', label: 'B运行' },
   { key: 'cStarting', label: 'C起动' },
   { key: 'cRunning', label: 'C运行' },
-  { key: 'appearanceUrl', label: '外观图URL' },
-  { key: 'firstUrl', label: '图片1URL' },
-  { key: 'secondUrl', label: '图片2URL' },
-  { key: 'thirdUrl', label: '图片3URL' },
-  { key: 'fourthUrl', label: '图片4URL' },
-  { key: 'fifthUrl', label: '图片5URL' },
-  { key: 'earlierUrl', label: '前期URL' },
-  { key: 'laterUrl', label: '后期URL' },
+  { key: 'appearanceUrl', label: '外观图', type: 'image' },
+  { key: 'firstUrl', label: '图片1', type: 'image' },
+  { key: 'secondUrl', label: '图片2', type: 'image' },
+  { key: 'thirdUrl', label: '图片3', type: 'image' },
+  { key: 'fourthUrl', label: '图片4', type: 'image' },
+  { key: 'fifthUrl', label: '图片5', type: 'image' },
+  { key: 'earlierUrl', label: '前期', type: 'image' },
+  { key: 'laterUrl', label: '后期', type: 'image' },
   { key: 'remark', label: '备注', type: 'textarea' }
 ])
 

@@ -2,7 +2,7 @@
   <div>
     <div class="toolbar">
       <el-upload
-        action="/api/files/upload"
+        action="/api/files/image/upload"
         :show-file-list="false"
         :on-success="onUploadSuccess"
       >
@@ -53,8 +53,9 @@ const load = async () => {
   const res = await http.get('/files/page', {
     params: { pageNum: pageNum.value, pageSize: pageSize.value, name: name.value }
   })
-  tableData.value = res.data.data.content
-  total.value = res.data.data.totalElements
+  const pageData = res.data?.data || {}
+  tableData.value = pageData.records || pageData.content || []
+  total.value = pageData.total || pageData.totalElements || 0
 }
 
 const onUploadSuccess = () => {

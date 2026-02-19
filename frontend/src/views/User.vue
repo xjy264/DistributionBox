@@ -65,7 +65,7 @@ const fields = [
   { key: 'email', label: '邮箱' },
   { key: 'phone', label: '电话' },
   { key: 'address', label: '地址' },
-  { key: 'avatarUrl', label: '头像URL' },
+  { key: 'avatarUrl', label: '头像', type: 'image' },
   { key: 'role', label: '角色' }
 ]
 
