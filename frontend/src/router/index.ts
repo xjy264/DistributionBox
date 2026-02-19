@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import { useUserStore } from '@/stores/user'
 import MainLayout from '@/layouts/MainLayout.vue'
-import { pinia } from '@/stores'
 
 const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('@/views/Login.vue') },
@@ -42,29 +40,8 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, _from, next) => {
-  const store = useUserStore(pinia)
-
-  if (to.path === '/login' || to.path === '/register') {
-    if (to.path === '/login' && store.token) {
-      next('/box')
-      return
-    }
-    next()
-    return
-  }
-
-  if (!store.token) {
-    next('/login')
-    return
-  }
-
-  const adminOnlyRoutes = ['/users', '/roles', '/menus']
-  if (adminOnlyRoutes.includes(to.path) && store.user.role !== 'ROLE_ADMIN') {
-    next('/box')
-    return
-  }
-
+router.beforeEach((_to, _from, next) => {
+  // 演示模式：临时放开前端登录/权限拦截
   next()
 })
 
