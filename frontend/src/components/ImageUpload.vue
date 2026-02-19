@@ -35,6 +35,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
+let uploadedThisTurn = false
+
 const store = useUserStore()
 
 const headers = computed(() => ({
@@ -96,6 +98,7 @@ const handleSuccess = (response: any) => {
 
   // 只要拿到可用URL，就判定上传成功
   if (url) {
+    uploadedThisTurn = true
     emit('update:modelValue', url)
     return
   }
@@ -115,6 +118,11 @@ const handleSuccess = (response: any) => {
 }
 
 const handleError = (err?: any) => {
+  // 若本次已成功回填并回显，则忽略后续误触发的 error 回调
+  if (uploadedThisTurn || (props.modelValue && props.modelValue.trim())) {
+    uploadedThisTurn = false
+    return
+  }
   const msg = err?.message || err?.msg || '上传失败'
   ElMessage.error(msg)
 }
