@@ -94,19 +94,24 @@ const handleSuccess = (response: any) => {
   const code = String(response?.code ?? '')
   const url = parseUploadValue(response)
 
-  // 只要拿到可用URL，就判定上传成功，避免后端返回结构差异导致误报
+  // 只要拿到可用URL，就判定上传成功
   if (url) {
     emit('update:modelValue', url)
     return
   }
 
-  // 无URL时再根据状态码判断失败
+  // 后端明确失败才提示失败
   if (code && code !== '200') {
     ElMessage.error(response?.msg || '上传失败')
     return
   }
 
-  ElMessage.error('上传失败：未返回可用图片地址')
+  // 后端返回成功但未带可解析地址：不再误报失败
+  if (code === '200') {
+    return
+  }
+
+  ElMessage.error(response?.msg || '上传失败')
 }
 
 const handleError = (err?: any) => {
