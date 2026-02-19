@@ -2,20 +2,20 @@
   <div>
     <div class="toolbar">
       <el-button @click="goBack">返回列表</el-button>
-      <el-tag type="success">配电箱ID：{{ box.id || '-' }}</el-tag>
-      <el-tag type="warning">台帐号：{{ box.boxId || '-' }}</el-tag>
-      <el-tag>车间：{{ box.station || '-' }}</el-tag>
-      <el-tag>工区：{{ box.area || '-' }}</el-tag>
+      <el-tag type="success">配电箱ID：{{ toDisplay(box.id) }}</el-tag>
+      <el-tag type="warning">台帐号：{{ toDisplay(box.boxId) }}</el-tag>
+      <el-tag>车间：{{ toDisplay(box.station) }}</el-tag>
+      <el-tag>工区：{{ toDisplay(box.area) }}</el-tag>
     </div>
 
     <el-descriptions title="配电箱基础信息" :column="2" border>
-      <el-descriptions-item label="安装地点">{{ box.boxAddress || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="规格">{{ box.size || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="系统图">{{ box.systemUrl || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="图片1">{{ box.firstUrl || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="图片2">{{ box.secondUrl || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="图片3">{{ box.thirdUrl || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="图片4">{{ box.fourthUrl || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
+      <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
+      <el-descriptions-item label="系统图">{{ toDisplay(box.systemUrl) }}</el-descriptions-item>
+      <el-descriptions-item label="图片1">{{ toDisplay(box.firstUrl) }}</el-descriptions-item>
+      <el-descriptions-item label="图片2">{{ toDisplay(box.secondUrl) }}</el-descriptions-item>
+      <el-descriptions-item label="图片3">{{ toDisplay(box.thirdUrl) }}</el-descriptions-item>
+      <el-descriptions-item label="图片4">{{ toDisplay(box.fourthUrl) }}</el-descriptions-item>
     </el-descriptions>
 
     <el-divider />
@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import http from '@/api/http'
 import EntityForm from '@/components/EntityForm.vue'
@@ -134,6 +134,7 @@ const repairDialog = ref(false)
 const componentForm = reactive<any>({})
 const inspectionForm = reactive<any>({ boxIds: [] })
 const repairForm = reactive<any>({ boxIds: [] })
+let currentLoadToken = 0
 
 const componentFields = [
   { key: 'componentsName', label: '元件' },
@@ -162,14 +163,14 @@ const inspectionFields = ref<any[]>([
   { key: 'bRunning', label: 'B运行' },
   { key: 'cStarting', label: 'C起动' },
   { key: 'cRunning', label: 'C运行' },
-  { key: 'appearanceUrl', label: '外观图URL' },
-  { key: 'firstUrl', label: '图片1URL' },
-  { key: 'secondUrl', label: '图片2URL' },
-  { key: 'thirdUrl', label: '图片3URL' },
-  { key: 'fourthUrl', label: '图片4URL' },
-  { key: 'fifthUrl', label: '图片5URL' },
-  { key: 'earlierUrl', label: '前期URL' },
-  { key: 'laterUrl', label: '后期URL' },
+  { key: 'appearanceUrl', label: '外观图', type: 'image' },
+  { key: 'firstUrl', label: '图片1', type: 'image' },
+  { key: 'secondUrl', label: '图片2', type: 'image' },
+  { key: 'thirdUrl', label: '图片3', type: 'image' },
+  { key: 'fourthUrl', label: '图片4', type: 'image' },
+  { key: 'fifthUrl', label: '图片5', type: 'image' },
+  { key: 'earlierUrl', label: '前期', type: 'image' },
+  { key: 'laterUrl', label: '后期', type: 'image' },
   { key: 'remark', label: '备注', type: 'textarea' }
 ])
 
@@ -185,13 +186,28 @@ const repairFields = ref<any[]>([
   { key: 'fixProcess', label: '维修过程', type: 'textarea' },
   { key: 'components', label: '更换元器件' },
   { key: 'remark', label: '备注', type: 'textarea' },
-  { key: 'firstUrl', label: '图片1URL' },
-  { key: 'secondUrl', label: '图片2URL' },
-  { key: 'thirdUrl', label: '图片3URL' },
-  { key: 'fourthUrl', label: '图片4URL' }
+  { key: 'firstUrl', label: '图片1', type: 'image' },
+  { key: 'secondUrl', label: '图片2', type: 'image' },
+  { key: 'thirdUrl', label: '图片3', type: 'image' },
+  { key: 'fourthUrl', label: '图片4', type: 'image' }
 ])
 
 const goBack = () => router.push('/box')
+
+const toDisplay = (value: unknown) => {
+  if (value === null || value === undefined) return '-'
+  if (typeof value === 'string' && !value.trim()) return '-'
+  return String(value)
+}
+
+const unwrapPayload = (payload: any) => {
+  if (payload && typeof payload === 'object' && 'data' in payload) {
+    return payload.data
+  }
+  return payload
+}
+
+const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
 
 const refreshBoxOptions = () => {
   inspectionFields.value = inspectionFields.value.map((item) =>
@@ -204,9 +220,10 @@ const refreshBoxOptions = () => {
 
 const loadBoxOptions = async () => {
   const res = await http.get('/box/page', { params: { pageNum: 1, pageSize: 1000 } })
-  const rows = res.data?.records || []
+  const pageData = unwrapPayload(res.data) || {}
+  const rows = safeArray(pageData.records)
   allBoxOptions.value = rows.map((row: any) => ({
-    label: `${row.id} / ${row.boxId || '-'} / ${row.boxAddress || '-'}`,
+    label: `${toDisplay(row.id)} / ${toDisplay(row.boxId)} / ${toDisplay(row.boxAddress)}`,
     value: row.id
   }))
   refreshBoxOptions()
@@ -214,20 +231,49 @@ const loadBoxOptions = async () => {
 
 const load = async () => {
   const id = Number(route.params.id)
-  if (!id) return
+  if (!id) {
+    Object.keys(box).forEach((k) => delete box[k])
+    components.value = []
+    inspections.value = []
+    repairs.value = []
+    return
+  }
 
-  const [boxRes, compRes, inspectRes, repairRes] = await Promise.all([
+  const token = ++currentLoadToken
+  Object.keys(box).forEach((k) => delete box[k])
+
+  const [boxRes, compRes, inspectRes, repairRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
     http.get(`/components/${id}`),
     http.get('/inspection-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } }),
     http.get('/repair-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
   ])
 
-  Object.keys(box).forEach((k) => delete box[k])
-  Object.assign(box, boxRes.data || {})
-  components.value = Array.isArray(compRes.data?.data) ? compRes.data.data : Array.isArray(compRes.data) ? compRes.data : []
-  inspections.value = inspectRes.data?.data?.records || []
-  repairs.value = repairRes.data?.data?.records || []
+  if (token !== currentLoadToken) return
+
+  const boxData = boxRes.status === 'fulfilled' ? unwrapPayload(boxRes.value.data) : {}
+  Object.assign(box, boxData || {})
+
+  if (compRes.status === 'fulfilled') {
+    const compData = unwrapPayload(compRes.value.data)
+    components.value = safeArray(compData)
+  } else {
+    components.value = []
+  }
+
+  if (inspectRes.status === 'fulfilled') {
+    const inspectData = unwrapPayload(inspectRes.value.data) || {}
+    inspections.value = safeArray(inspectData.records)
+  } else {
+    inspections.value = []
+  }
+
+  if (repairRes.status === 'fulfilled') {
+    const repairData = unwrapPayload(repairRes.value.data) || {}
+    repairs.value = safeArray(repairData.records)
+  } else {
+    repairs.value = []
+  }
 }
 
 const openComponentDialog = () => {
@@ -379,6 +425,13 @@ onMounted(async () => {
   await loadBoxOptions()
   await load()
 })
+
+watch(
+  () => route.params.id,
+  async () => {
+    await load()
+  }
+)
 </script>
 
 <style scoped>
