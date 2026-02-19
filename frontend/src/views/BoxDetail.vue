@@ -2,6 +2,7 @@
   <div>
     <div class="toolbar">
       <el-button @click="goBack">返回列表</el-button>
+      <el-button type="primary" @click="openBoxEditDialog">编辑基础信息</el-button>
       <el-tag type="success">配电箱ID：{{ toDisplay(box.id) }}</el-tag>
       <el-tag type="warning">台帐号：{{ toDisplay(box.boxId) }}</el-tag>
       <el-tag>车间：{{ toDisplay(box.station) }}</el-tag>
@@ -129,6 +130,30 @@
       </el-tab-pane>
     </el-tabs>
 
+    <el-dialog v-model="boxEditDialog" title="编辑配电箱基础信息" width="700px">
+      <el-form :model="boxEditForm" label-width="110px">
+        <el-form-item label="台账号">
+          <el-input v-model="boxEditForm.boxId" disabled />
+        </el-form-item>
+        <el-form-item label="车间">
+          <el-input v-model="boxEditForm.station" />
+        </el-form-item>
+        <el-form-item label="工区">
+          <el-input v-model="boxEditForm.area" />
+        </el-form-item>
+        <el-form-item label="安装地点">
+          <el-input v-model="boxEditForm.boxAddress" />
+        </el-form-item>
+        <el-form-item label="规格">
+          <el-input v-model="boxEditForm.size" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="boxEditDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveBoxBaseInfo">保存</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="componentDialog" title="元器件" width="700px">
       <EntityForm v-model="componentForm" :fields="componentFields" />
       <template #footer>
@@ -175,8 +200,16 @@ const allBoxOptions = ref<{ label: string; value: number }[]>([])
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
 const repairDialog = ref(false)
+const boxEditDialog = ref(false)
 
 const componentForm = reactive<any>({})
+const boxEditForm = reactive<any>({
+  boxId: '',
+  station: '',
+  area: '',
+  boxAddress: '',
+  size: ''
+})
 const inspectionForm = reactive<any>({ boxIds: [] })
 const repairForm = reactive<any>({ boxIds: [] })
 const boxImageForm = reactive<any>({
@@ -374,6 +407,32 @@ const saveBoxImages = async () => {
   await http.post('/box/save', payload)
   Object.assign(box, payload)
   ElMessage.success('图片保存成功')
+}
+
+const openBoxEditDialog = () => {
+  boxEditForm.boxId = box.boxId || ''
+  boxEditForm.station = box.station || ''
+  boxEditForm.area = box.area || ''
+  boxEditForm.boxAddress = box.boxAddress || ''
+  boxEditForm.size = box.size || ''
+  boxEditDialog.value = true
+}
+
+const saveBoxBaseInfo = async () => {
+  if (!box.id) return
+  const payload = {
+    ...box,
+    id: box.id,
+    boxId: box.boxId,
+    station: boxEditForm.station,
+    area: boxEditForm.area,
+    boxAddress: boxEditForm.boxAddress,
+    size: boxEditForm.size
+  }
+  await http.post('/box/save', payload)
+  boxEditDialog.value = false
+  await load()
+  ElMessage.success('基础信息保存成功')
 }
 
 const openComponentDialog = () => {
