@@ -36,34 +36,6 @@
 
     <el-divider />
 
-    <el-card shadow="never" class="box-image-editor">
-      <template #header>
-        <div class="editor-header">
-          <span>图片维护</span>
-          <el-button type="primary" @click="saveBoxImages">保存图片</el-button>
-        </div>
-      </template>
-      <el-form :model="boxImageForm" label-width="90px">
-        <el-form-item label="系统图">
-          <ImageUpload v-model="boxImageForm.systemUrl" />
-        </el-form-item>
-        <el-form-item label="图片1">
-          <ImageUpload v-model="boxImageForm.firstUrl" />
-        </el-form-item>
-        <el-form-item label="图片2">
-          <ImageUpload v-model="boxImageForm.secondUrl" />
-        </el-form-item>
-        <el-form-item label="图片3">
-          <ImageUpload v-model="boxImageForm.thirdUrl" />
-        </el-form-item>
-        <el-form-item label="图片4">
-          <ImageUpload v-model="boxImageForm.fourthUrl" />
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <el-divider />
-
     <el-tabs>
       <el-tab-pane label="元器件">
         <div class="sub-toolbar">
@@ -146,6 +118,21 @@
         </el-form-item>
         <el-form-item label="规格">
           <el-input v-model="boxEditForm.size" />
+        </el-form-item>
+        <el-form-item label="系统图">
+          <ImageUpload v-model="boxImageForm.systemUrl" />
+        </el-form-item>
+        <el-form-item label="图片1">
+          <ImageUpload v-model="boxImageForm.firstUrl" />
+        </el-form-item>
+        <el-form-item label="图片2">
+          <ImageUpload v-model="boxImageForm.secondUrl" />
+        </el-form-item>
+        <el-form-item label="图片3">
+          <ImageUpload v-model="boxImageForm.thirdUrl" />
+        </el-form-item>
+        <el-form-item label="图片4">
+          <ImageUpload v-model="boxImageForm.fourthUrl" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -393,22 +380,6 @@ const load = async () => {
   }
 }
 
-const saveBoxImages = async () => {
-  if (!box.id) return
-  const payload = {
-    ...box,
-    id: box.id,
-    systemUrl: normalizeImageField(boxImageForm.systemUrl),
-    firstUrl: normalizeImageField(boxImageForm.firstUrl),
-    secondUrl: normalizeImageField(boxImageForm.secondUrl),
-    thirdUrl: normalizeImageField(boxImageForm.thirdUrl),
-    fourthUrl: normalizeImageField(boxImageForm.fourthUrl)
-  }
-  await http.post('/box/save', payload)
-  Object.assign(box, payload)
-  ElMessage.success('图片保存成功')
-}
-
 const openBoxEditDialog = () => {
   boxEditForm.boxId = box.boxId || ''
   boxEditForm.station = box.station || ''
@@ -427,7 +398,12 @@ const saveBoxBaseInfo = async () => {
     station: boxEditForm.station,
     area: boxEditForm.area,
     boxAddress: boxEditForm.boxAddress,
-    size: boxEditForm.size
+    size: boxEditForm.size,
+    systemUrl: normalizeImageField(boxImageForm.systemUrl),
+    firstUrl: normalizeImageField(boxImageForm.firstUrl),
+    secondUrl: normalizeImageField(boxImageForm.secondUrl),
+    thirdUrl: normalizeImageField(boxImageForm.thirdUrl),
+    fourthUrl: normalizeImageField(boxImageForm.fourthUrl)
   }
   await http.post('/box/save', payload)
   boxEditDialog.value = false
@@ -612,13 +588,5 @@ watch(
   border: 1px solid #e5e6eb;
 }
 
-.box-image-editor {
-  margin-bottom: 12px;
-}
-
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* image edit section moved into base info dialog */
 </style>
