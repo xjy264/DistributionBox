@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 
 const router = useRouter()
@@ -37,7 +38,8 @@ const form = reactive({
 })
 
 const submit = async () => {
-  await http.post('/auth/register', form)
+  await http.post('/register', form)
+  ElMessage.success('注册成功，请登录')
   router.push('/login')
 }
 

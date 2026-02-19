@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import { useUserStore } from '@/stores/user'
 import MainLayout from '@/layouts/MainLayout.vue'
 
 const routes: RouteRecordRaw[] = [
@@ -9,9 +8,10 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: MainLayout,
     children: [
-      { path: '', redirect: '/home' },
-      { path: 'home', component: () => import('@/views/Home.vue') },
+      { path: '', redirect: '/box' },
       { path: 'box', component: () => import('@/views/Box.vue') },
+      { path: 'box-detail/:id', component: () => import('@/views/BoxDetail.vue') },
+      { path: 'dict', component: () => import('@/views/Dict.vue') },
       { path: 'components', component: () => import('@/views/Components.vue') },
       { path: 'inspection', component: () => import('@/views/Inspection.vue') },
       { path: 'detect', component: () => import('@/views/Detect.vue') },
@@ -40,16 +40,8 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, _from, next) => {
-  const store = useUserStore()
-  if (to.path === '/login' || to.path === '/register') {
-    next()
-    return
-  }
-  if (!store.token) {
-    next('/login')
-    return
-  }
+router.beforeEach((_to, _from, next) => {
+  // 演示模式：临时放开前端登录/权限拦截
   next()
 })
 

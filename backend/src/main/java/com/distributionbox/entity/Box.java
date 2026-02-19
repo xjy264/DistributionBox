@@ -45,4 +45,6 @@ public class Box implements Serializable {
     private String fourthUrl;
 
     private String size;
+
+    private Integer deleted;
 }

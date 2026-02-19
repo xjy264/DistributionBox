@@ -16,7 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -93,12 +93,16 @@ public class BoxController {
     public IPage<Box> findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String id,
+                               @RequestParam(defaultValue = "") String station,
                                @RequestParam(defaultValue = "") String address,
                                @RequestParam(defaultValue = "") String area) {
         IPage<Box> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Box> queryWrapper = new QueryWrapper<>();
         if (!"".equals(id)) {
             queryWrapper.like("id", id);
+        }
+        if (!"".equals(station)) {
+            queryWrapper.like("station", station);
         }
         if (!"".equals(address)) {
             queryWrapper.like("box_address", address);
@@ -169,4 +173,3 @@ public class BoxController {
 
         return responseEntity;
     }}
-

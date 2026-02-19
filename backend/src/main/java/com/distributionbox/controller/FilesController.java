@@ -7,8 +7,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.distributionbox.common.Constants;
 import com.distributionbox.mapper.FilesMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
@@ -17,32 +19,32 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import com.distributionbox.common.Result;
 
 import com.distributionbox.service.IFilesService;
 import com.distributionbox.entity.Files;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * <p>
- *  前端控制器
- * </p>
- *
- * @author xjy
- * @since 2022-07-22
- */
 @RestController
 @RequestMapping("/files")
 public class FilesController {
+    private static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif", "bmp");
+
     @Value("${app.files.upload-path}")
     private String fileUploadPath;
 
     @Value("${app.files.base-url}")
     private String baseUrl;
+
+    @Value("${app.files.image-max-size-bytes:10485760}")
+    private long imageMaxSizeBytes;
+
+    private static final String FILES_PATH_PREFIX = "/files/";
 
     @Resource
     private IFilesService filesService;
@@ -50,69 +52,79 @@ public class FilesController {
     @Resource
     FilesMapper filesMapper;
 
-    /**
-     * 文件上传接口
-     * @param file
-     * @return
-     * @throws IOException
-     */
     @PostMapping("/upload")
     public Result upload(@RequestParam("file") MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            return Result.error("400", "上传失败，请选择文件");
+        return uploadImage(file);
+    }
+
+    @PostMapping("/image/upload")
+    public Result uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return Result.error(Constants.CODE_400, "上传失败，请选择图片文件");
         }
+
         String originalFilename = file.getOriginalFilename();
-        String type = FileNameUtil.extName(originalFilename);//扩展名
+        String extension = FileNameUtil.extName(originalFilename).toLowerCase();
+        if (StrUtil.isBlank(extension) || !ALLOWED_IMAGE_EXTENSIONS.contains(extension)) {
+            return Result.error(Constants.CODE_400, "仅支持 jpg/jpeg/png/webp/gif/bmp 图片格式");
+        }
+
+        String contentType = file.getContentType();
+        if (StrUtil.isBlank(contentType) || !contentType.toLowerCase().startsWith("image/")) {
+            return Result.error(Constants.CODE_400, "非法文件类型，仅允许上传图片");
+        }
+
         long size = file.getSize();
+        if (size <= 0 || size > imageMaxSizeBytes) {
+            return Result.error(Constants.CODE_400, "图片大小超限，最大允许 " + (imageMaxSizeBytes / 1024 / 1024) + "MB");
+        }
 
-        //定义唯一的标识码
-        String uuid = IdUtil.fastSimpleUUID() + StrUtil.DOT + type;
-        File uploadFile = new File(fileUploadPath + uuid);
-
-        //判断文件目录是否存在，不存在创建一个新的文件目录
-        if (!uploadFile.getParentFile().exists()){
+        String uuid = IdUtil.fastSimpleUUID() + StrUtil.DOT + extension;
+        File uploadFile = new File(fileUploadPath, uuid);
+        if (!uploadFile.getParentFile().exists()) {
             uploadFile.getParentFile().mkdirs();
         }
 
-        String url;
-        // 获取文件的md5
         String md5 = SecureUtil.md5(file.getInputStream());
-        // 从数据库查询是否存在相同的记录
         Files dbFiles = getFileMd5(md5);
-        if (dbFiles != null) { // 文件已存在
-            url = dbFiles.getUrl();
+        String storedPath;
+        if (dbFiles != null) {
             uuid = dbFiles.getUuid();
+            storedPath = FILES_PATH_PREFIX + uuid;
         } else {
-            // 上传文件到磁盘
             file.transferTo(uploadFile);
-            // 数据库若不存在重复文件，则不删除刚才上传的文件
-            url = baseUrl + uuid;
+            storedPath = FILES_PATH_PREFIX + uuid;
         }
 
-        //存储数据库
         Files saveFile = new Files();
         saveFile.setName(originalFilename);
-        saveFile.setType(type);
-        saveFile.setSize(size/1024);
-        saveFile.setUrl(url);
+        saveFile.setType(extension);
+        saveFile.setSize(size);
+        saveFile.setUrl(storedPath);
         saveFile.setUuid(uuid);
         saveFile.setMd5(md5);
-
         filesService.save(saveFile);
-        return Result.success(saveFile);
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("path", storedPath);
+        payload.put("url", storedPath);
+        payload.put("accessUrl", normalizeBaseUrl(baseUrl) + uuid);
+        payload.put("filename", originalFilename);
+        payload.put("size", size);
+        payload.put("contentType", contentType);
+        payload.put("extension", extension);
+        payload.put("uuid", uuid);
+        payload.put("previewUrl", FILES_PATH_PREFIX + "preview/" + uuid);
+
+        return Result.success(payload);
     }
 
     @GetMapping("/{uuid}")
     public void downLoad(@PathVariable String uuid, HttpServletResponse response) throws IOException {
-        //根据文件的唯一标识码获取文件
-        File uploadFile = new File(fileUploadPath + uuid);
-        // 设置输出流的格式
+        File uploadFile = new File(fileUploadPath, uuid);
         ServletOutputStream os = response.getOutputStream();
-        response.addHeader("Content-Disposition",
-                "attachment;filename=" + URLEncoder.encode(uuid, StandardCharsets.UTF_8));
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(uuid, StandardCharsets.UTF_8));
         response.setContentType("application/octet-stream");
-
-        // 读取文件的字节流
         os.write(FileUtil.readBytes(uploadFile));
         os.flush();
         os.close();
@@ -120,25 +132,26 @@ public class FilesController {
 
     @GetMapping("/preview/{uuid}")
     public void preview(@PathVariable String uuid, HttpServletResponse response) throws IOException {
-        File uploadFile = new File(fileUploadPath + uuid);
+        File uploadFile = new File(fileUploadPath, uuid);
         ServletOutputStream os = response.getOutputStream();
-        response.setContentType(FileUtil.getMimeType(uuid));
+        String mimeType = FileUtil.getMimeType(uuid);
+        response.setContentType(StrUtil.isBlank(mimeType) ? MediaType.APPLICATION_OCTET_STREAM_VALUE : mimeType);
         os.write(FileUtil.readBytes(uploadFile));
         os.flush();
         os.close();
     }
 
-    /**
-     * 通过md5查询文件是否重复
-     * @param md5
-     * @return
-     */
+    private String normalizeBaseUrl(String url) {
+        if (StrUtil.isBlank(url)) {
+            return FILES_PATH_PREFIX;
+        }
+        return url.endsWith("/") ? url : url + "/";
+    }
+
     private Files getFileMd5(String md5){
-        //根据md5查询
         QueryWrapper<Files> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("md5",md5);
         List<Files> list = filesService.list(queryWrapper);
-
         return list.size() == 0 ? null : list.get(0);
     }
 

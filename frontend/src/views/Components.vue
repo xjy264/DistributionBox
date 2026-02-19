@@ -57,10 +57,10 @@ const fields = [
 const load = async () => {
   if (filters.boxId) {
     const res = await http.get(`/components/${filters.boxId}`)
-    tableData.value = res.data.data
+    tableData.value = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : []
   } else {
     const res = await http.get('/components/getAll')
-    tableData.value = res.data.data
+    tableData.value = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : []
   }
 }
 

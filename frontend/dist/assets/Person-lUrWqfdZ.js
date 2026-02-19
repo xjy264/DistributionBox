@@ -1,1 +1,0 @@
-import{_ as o,o as r,c as s,a as n}from"./index-CkmIPjxY.js";const t={};function a(c,e){return r(),s("div",null,[...e[0]||(e[0]=[n("h3",null,"人员信息",-1),n("p",null,"人员信息由用户管理模块维护。",-1)])])}const _=o(t,[["render",a]]);export{_ as default};

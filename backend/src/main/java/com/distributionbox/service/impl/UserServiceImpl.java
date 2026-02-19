@@ -15,6 +15,7 @@ import com.distributionbox.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.distributionbox.security.JwtService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
@@ -34,6 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     private static final Log LOG =Log.get();
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     @Resource
     private RoleMapper roleMapper;
@@ -42,18 +44,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     IMenuService menuService;
 
-    public UserServiceImpl(JwtService jwtService) {
+    public UserServiceImpl(JwtService jwtService, PasswordEncoder passwordEncoder) {
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDto login(UserDto userDto) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username",userDto.getUsername());
-        queryWrapper.eq("password",userDto.getPassword());
+        queryWrapper.eq("password", userDto.getPassword());
+        queryWrapper.orderByDesc("id");
         User one;
         try {
-            one = getOne(queryWrapper);
+            List<User> users = list(queryWrapper);
+            one = users.isEmpty() ? null : users.get(0);
         }catch (Exception e){
             LOG.error(e);
             throw new ServiceException(Constants.CODE_500,"系统错误");

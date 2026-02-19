@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjy.shujia.mapper.CourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xjy.shujia.entity.Course">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="score" property="score" />
+        <result column="times" property="times" />
+        <result column="state" property="state" />
+        <result column="teacher_id" property="teacherId" />
+    </resultMap>
+
+    <!--    <select id="findPage" resultType="com.xjy.shujia.entity.Course">-->
+<!--        select course.*,sys_user.nickname as teacher from course,sys_user-->
+<!--        <where>-->
+<!--            course.teacher_id=sys_user.id-->
+<!--            <if test="name != null and name !=''">-->
+<!--                and name like concat('%',#{name},'%')-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+    <select id="findPage" resultType="com.xjy.shujia.entity.Course">
+        select course.*,sys_user.nickname as teacher from course
+        left join sys_user
+        on course.teacher_id = sys_user.id
+        <where>
+            <if test="name != null and name !=''">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findTeacherCourses" resultType="com.xjy.shujia.entity.Course">
+        select name,score from course
+        where teacher_id = #{id}
+    </select>
+
+    <select id="selectCourse" resultType="java.lang.Boolean">
+        insert into student_course (student_id,course_id) values (#{studentId},#{courseId});
+    </select>
+
+    <delete id="deleteCourse">
+        delete from student_course where student_id=#{studentId} and course_id=#{courseId}
+    </delete>
+
+    <select id="findStudentCourses" resultType="com.xjy.shujia.entity.Course">
+        select course.*,sys_user.nickname as teacher
+        from course
+        INNER JOIN student_course ON student_course.course_id = course.id
+        INNER JOIN sys_user ON sys_user.id = course.teacher_id
+        where student_course.student_id = #{id};
+    </select>
+
+<!--    select *
+        from course,student_course
+        where course.id = student_course.course_id
+        and student_course.student_id = #{id};
+        -->
+</mapper>

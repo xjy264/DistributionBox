@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,31 +21,31 @@ import lombok.Setter;
 @Getter
 @Setter
   @TableName("sys_fix")
-@ApiModel(value = "Fix对象", description = "")
+@Schema(name = "Fix对象")
 public class Fix implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty("ID")
+  @Schema(description = "ID")
   @TableId(value = "id", type = IdType.AUTO)
   private Integer id;
 
-      @ApiModelProperty("设备编码")
+      @Schema(description = "设备编码")
       private String code;
 
-      @ApiModelProperty("巡检时间")
+      @Schema(description = "巡检时间")
       private LocalDateTime time;
 
-      @ApiModelProperty("安装地点")
+      @Schema(description = "安装地点")
       private String address;
 
-      @ApiModelProperty("巡检结果")
+      @Schema(description = "巡检结果")
       private String result;
 
-      @ApiModelProperty("巡检员")
+      @Schema(description = "巡检员")
       private String user;
 
-      @ApiModelProperty("备注")
+      @Schema(description = "备注")
       private String remark;
 
       private Integer boxId;

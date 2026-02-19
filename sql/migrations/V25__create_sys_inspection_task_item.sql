@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS sys_inspection_task (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  task_no VARCHAR(64) NOT NULL,
+  inspection_user VARCHAR(100),
+  guardian_user VARCHAR(100),
+  inspection_time DATETIME,
+  remark VARCHAR(255),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_inspection_task_task_no (task_no)
+);
+
+CREATE TABLE IF NOT EXISTS sys_inspection_item (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  task_id INT NOT NULL,
+  box_id INT NOT NULL,
+  first_url VARCHAR(500),
+  second_url VARCHAR(500),
+  third_url VARCHAR(500),
+  fourth_url VARCHAR(500),
+  fifth_url VARCHAR(500),
+  appearance_url VARCHAR(500),
+  earlier_url VARCHAR(500),
+  later_url VARCHAR(500),
+  switch_model VARCHAR(100),
+  current_rating VARCHAR(100),
+  traverse_section VARCHAR(100),
+  supply_voltage VARCHAR(100),
+  a_starting VARCHAR(100),
+  a_running VARCHAR(100),
+  b_starting VARCHAR(100),
+  b_running VARCHAR(100),
+  c_starting VARCHAR(100),
+  c_running VARCHAR(100),
+  remark VARCHAR(255),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_inspection_item_task_box (task_id, box_id),
+  KEY idx_inspection_item_box_id (box_id),
+  CONSTRAINT fk_inspection_item_task FOREIGN KEY (task_id) REFERENCES sys_inspection_task(id),
+  CONSTRAINT fk_inspection_item_box FOREIGN KEY (box_id) REFERENCES sys_box(id)
+);

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xjy.shujia.entity.Components;
 import com.xjy.shujia.entity.Home;
 import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import com.xjy.shujia.common.Result;
 

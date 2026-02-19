@@ -2,8 +2,8 @@ package com.xjy.shujia.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,17 +18,17 @@ import lombok.Setter;
 @Getter
 @Setter
   @TableName("sys_department")
-@ApiModel(value = "Department对象", description = "")
+@Schema(name = "Department对象")
 public class Department implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
       private Integer id;
 
-      @ApiModelProperty("部门")
+      @Schema(description = "部门")
       private String department;
 
-      @ApiModelProperty("地址")
+      @Schema(description = "地址")
       private String address;
 
 

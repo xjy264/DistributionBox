@@ -3,6 +3,7 @@ package com.distributionbox.mapper;
 import com.distributionbox.entity.Components;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -18,6 +19,9 @@ import java.util.List;
 @Mapper
 public interface ComponentsMapper extends BaseMapper<Components> {
 
-    @Select("select * from sys_components where `box_id`=#{id} ;")
+    @Select("select * from sys_components where `box_id`=#{id} order by id desc")
     List<Components> byBoxId(Integer id);
+
+    @Delete("delete from sys_components where `box_id`=#{boxId}")
+    int deleteByBoxId(Integer boxId);
 }

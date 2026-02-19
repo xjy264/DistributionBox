@@ -16,4 +16,6 @@ import java.util.List;
 public interface IComponentsService extends IService<Components> {
 
     List<Components> byBoxId(Integer id);
+
+    int deleteByBoxId(Integer boxId);
 }

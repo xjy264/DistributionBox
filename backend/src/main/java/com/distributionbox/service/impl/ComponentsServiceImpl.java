@@ -27,4 +27,9 @@ public class ComponentsServiceImpl extends ServiceImpl<ComponentsMapper, Compone
     public List<Components> byBoxId(Integer id) {
         return componentsMapper.byBoxId(id);
     }
+
+    @Override
+    public int deleteByBoxId(Integer boxId) {
+        return componentsMapper.deleteByBoxId(boxId);
+    }
 }
