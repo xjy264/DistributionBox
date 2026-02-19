@@ -59,16 +59,16 @@
         </el-table>
       </el-tab-pane>
 
-      <el-tab-pane label="巡检明细历史">
+      <el-tab-pane label="维保记录">
         <div class="sub-toolbar">
-          <el-button type="success" @click="openInspectionDialog">新增巡检任务</el-button>
+          <el-button type="success" @click="openInspectionDialog">新增维保任务</el-button>
         </div>
         <el-table :data="inspections" border>
           <el-table-column prop="id" label="明细ID" width="90" />
           <el-table-column prop="taskNo" label="任务单号" width="180" />
-          <el-table-column prop="inspectionUser" label="巡检人" />
+          <el-table-column prop="inspectionUser" label="维保人" />
           <el-table-column prop="guardianUser" label="监护人" />
-          <el-table-column prop="inspectionTime" label="巡检时间" />
+          <el-table-column prop="inspectionTime" label="维保时间" />
           <el-table-column prop="switchModel" label="开关型号" />
           <el-table-column prop="remark" label="明细备注" />
           <el-table-column label="操作" width="180">
@@ -80,9 +80,9 @@
         </el-table>
       </el-tab-pane>
 
-      <el-tab-pane label="抢修记录">
+      <el-tab-pane label="检修记录">
         <div class="sub-toolbar">
-          <el-button type="success" @click="openRepairDialog">新增抢修任务</el-button>
+          <el-button type="success" @click="openRepairDialog">新增检修任务</el-button>
         </div>
         <el-table :data="repairs" border>
           <el-table-column prop="id" label="明细ID" width="90" />
@@ -149,7 +149,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="inspectionDialog" title="巡检记录" width="760px">
+    <el-dialog v-model="inspectionDialog" title="维保记录" width="760px">
       <EntityForm v-model="inspectionForm" :fields="inspectionFields" />
       <template #footer>
         <el-button @click="inspectionDialog = false">取消</el-button>
@@ -157,7 +157,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="repairDialog" title="抢修任务" width="760px">
+    <el-dialog v-model="repairDialog" title="检修任务" width="760px">
       <EntityForm v-model="repairForm" :fields="repairFields" />
       <template #footer>
         <el-button @click="repairDialog = false">取消</el-button>
@@ -222,9 +222,9 @@ const componentFields = [
 const inspectionFields = ref<any[]>([
   { key: 'taskNo', label: '任务单号（可空自动生成）' },
   { key: 'boxIds', label: '关联配电箱', type: 'multi-select', options: allBoxOptions.value },
-  { key: 'inspectionUser', label: '巡检人' },
+  { key: 'inspectionUser', label: '维保人' },
   { key: 'guardianUser', label: '监护人' },
-  { key: 'inspectionTime', label: '巡检时间', type: 'datetime' },
+  { key: 'inspectionTime', label: '维保时间', type: 'datetime' },
   { key: 'switchModel', label: '开关型号' },
   { key: 'currentRating', label: '额定电流' },
   { key: 'traverseSection', label: '截面积' },
@@ -249,10 +249,10 @@ const inspectionFields = ref<any[]>([
 const repairFields = ref<any[]>([
   { key: 'taskNo', label: '任务单号（可空自动生成）' },
   { key: 'boxIds', label: '关联配电箱', type: 'multi-select', options: allBoxOptions.value },
-  { key: 'reportUser', label: '报修人' },
+  { key: 'reportUser', label: '提报人' },
   { key: 'reportTime', label: '报修时间', type: 'date' },
-  { key: 'fixUser', label: '抢修人' },
-  { key: 'fixTime', label: '抢修时间', type: 'date' },
+  { key: 'fixUser', label: '检修人' },
+  { key: 'fixTime', label: '检修时间', type: 'date' },
   { key: 'faultPhenomenon', label: '故障现象' },
   { key: 'faultReason', label: '故障原因' },
   { key: 'fixProcess', label: '维修过程', type: 'textarea' },
@@ -348,8 +348,8 @@ const load = async () => {
   const [boxRes, compRes, inspectRes, repairRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
     http.get(`/components/${id}`),
-    http.get('/inspection-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } }),
-    http.get('/repair-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
+    http.get('/maintenance-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } }),
+    http.get('/overhaul-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
   ])
 
   if (token !== currentLoadToken) return
@@ -435,13 +435,17 @@ const removeComponent = async (id: number) => {
 }
 
 const openInspectionDialog = () => {
-  Object.keys(inspectionForm).forEach((k) => delete inspectionForm[k])
-  Object.assign(inspectionForm, { boxIds: box.id ? [box.id] : [] })
-  inspectionDialog.value = true
+  try {
+    Object.keys(inspectionForm).forEach((k) => delete inspectionForm[k])
+    Object.assign(inspectionForm, { boxIds: box.id ? [box.id] : [] })
+    inspectionDialog.value = true
+  } catch (error: any) {
+    ElMessage.error(error?.message || '打开维保弹窗失败')
+  }
 }
 
 const editInspection = async (row: any) => {
-  const detail = await http.get(`/inspection-task/${row.taskId}`)
+  const detail = await http.get(`/maintenance-task/${row.taskId}`)
   const data = detail.data?.data || {}
   const firstItem = data.items?.[0] || {}
   Object.keys(inspectionForm).forEach((k) => delete inspectionForm[k])
@@ -459,54 +463,63 @@ const editInspection = async (row: any) => {
 }
 
 const saveInspection = async () => {
-  const boxIds: number[] = (inspectionForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
-  const itemTemplate = {
-    switchModel: inspectionForm.switchModel,
-    currentRating: inspectionForm.currentRating,
-    traverseSection: inspectionForm.traverseSection,
-    supplyVoltage: inspectionForm.supplyVoltage,
-    aStarting: inspectionForm.aStarting,
-    aRunning: inspectionForm.aRunning,
-    bStarting: inspectionForm.bStarting,
-    bRunning: inspectionForm.bRunning,
-    cStarting: inspectionForm.cStarting,
-    cRunning: inspectionForm.cRunning,
-    appearanceUrl: inspectionForm.appearanceUrl,
-    firstUrl: inspectionForm.firstUrl,
-    secondUrl: inspectionForm.secondUrl,
-    thirdUrl: inspectionForm.thirdUrl,
-    fourthUrl: inspectionForm.fourthUrl,
-    fifthUrl: inspectionForm.fifthUrl,
-    earlierUrl: inspectionForm.earlierUrl,
-    laterUrl: inspectionForm.laterUrl,
-    remark: inspectionForm.remark
+  try {
+    const boxIds: number[] = (inspectionForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
+    const itemTemplate = {
+      switchModel: inspectionForm.switchModel,
+      currentRating: inspectionForm.currentRating,
+      traverseSection: inspectionForm.traverseSection,
+      supplyVoltage: inspectionForm.supplyVoltage,
+      aStarting: inspectionForm.aStarting,
+      aRunning: inspectionForm.aRunning,
+      bStarting: inspectionForm.bStarting,
+      bRunning: inspectionForm.bRunning,
+      cStarting: inspectionForm.cStarting,
+      cRunning: inspectionForm.cRunning,
+      appearanceUrl: inspectionForm.appearanceUrl,
+      firstUrl: inspectionForm.firstUrl,
+      secondUrl: inspectionForm.secondUrl,
+      thirdUrl: inspectionForm.thirdUrl,
+      fourthUrl: inspectionForm.fourthUrl,
+      fifthUrl: inspectionForm.fifthUrl,
+      earlierUrl: inspectionForm.earlierUrl,
+      laterUrl: inspectionForm.laterUrl,
+      remark: inspectionForm.remark
+    }
+    await http.post('/maintenance-task/save', {
+      id: inspectionForm.id,
+      taskNo: inspectionForm.taskNo,
+      inspectionUser: inspectionForm.inspectionUser,
+      guardianUser: inspectionForm.guardianUser,
+      inspectionTime: inspectionForm.inspectionTime,
+      remark: inspectionForm.remark,
+      items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
+    })
+    inspectionDialog.value = false
+    await load()
+    ElMessage.success('维保任务保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.message || '维保任务保存失败')
   }
-  await http.post('/inspection-task/save', {
-    id: inspectionForm.id,
-    taskNo: inspectionForm.taskNo,
-    inspectionUser: inspectionForm.inspectionUser,
-    guardianUser: inspectionForm.guardianUser,
-    inspectionTime: inspectionForm.inspectionTime,
-    remark: inspectionForm.remark,
-    items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
-  })
-  inspectionDialog.value = false
-  load()
 }
 
 const removeInspection = async (id: number) => {
-  await http.delete(`/inspection-task/${id}`)
+  await http.delete(`/maintenance-task/${id}`)
   load()
 }
 
 const openRepairDialog = () => {
-  Object.keys(repairForm).forEach((k) => delete repairForm[k])
-  Object.assign(repairForm, { boxIds: box.id ? [box.id] : [] })
-  repairDialog.value = true
+  try {
+    Object.keys(repairForm).forEach((k) => delete repairForm[k])
+    Object.assign(repairForm, { boxIds: box.id ? [box.id] : [] })
+    repairDialog.value = true
+  } catch (error: any) {
+    ElMessage.error(error?.message || '打开检修弹窗失败')
+  }
 }
 
 const editRepair = async (row: any) => {
-  const detail = await http.get(`/repair-task/${row.taskId}`)
+  const detail = await http.get(`/overhaul-task/${row.taskId}`)
   const data = detail.data?.data || {}
   const firstItem = data.items?.[0] || {}
   Object.keys(repairForm).forEach((k) => delete repairForm[k])
@@ -525,34 +538,39 @@ const editRepair = async (row: any) => {
 }
 
 const saveRepair = async () => {
-  const boxIds: number[] = (repairForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
-  const itemTemplate = {
-    components: repairForm.components,
-    faultPhenomenon: repairForm.faultPhenomenon,
-    faultReason: repairForm.faultReason,
-    fixProcess: repairForm.fixProcess,
-    remark: repairForm.remark,
-    firstUrl: repairForm.firstUrl,
-    secondUrl: repairForm.secondUrl,
-    thirdUrl: repairForm.thirdUrl,
-    fourthUrl: repairForm.fourthUrl
+  try {
+    const boxIds: number[] = (repairForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
+    const itemTemplate = {
+      components: repairForm.components,
+      faultPhenomenon: repairForm.faultPhenomenon,
+      faultReason: repairForm.faultReason,
+      fixProcess: repairForm.fixProcess,
+      remark: repairForm.remark,
+      firstUrl: repairForm.firstUrl,
+      secondUrl: repairForm.secondUrl,
+      thirdUrl: repairForm.thirdUrl,
+      fourthUrl: repairForm.fourthUrl
+    }
+    await http.post('/overhaul-task/save', {
+      id: repairForm.id,
+      taskNo: repairForm.taskNo,
+      reportUser: repairForm.reportUser,
+      reportTime: repairForm.reportTime,
+      fixUser: repairForm.fixUser,
+      fixTime: repairForm.fixTime,
+      remark: repairForm.remark,
+      items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
+    })
+    repairDialog.value = false
+    await load()
+    ElMessage.success('检修任务保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.message || '检修任务保存失败')
   }
-  await http.post('/repair-task/save', {
-    id: repairForm.id,
-    taskNo: repairForm.taskNo,
-    reportUser: repairForm.reportUser,
-    reportTime: repairForm.reportTime,
-    fixUser: repairForm.fixUser,
-    fixTime: repairForm.fixTime,
-    remark: repairForm.remark,
-    items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
-  })
-  repairDialog.value = false
-  load()
 }
 
 const removeRepair = async (id: number) => {
-  await http.delete(`/repair-task/${id}`)
+  await http.delete(`/overhaul-task/${id}`)
   load()
 }
 

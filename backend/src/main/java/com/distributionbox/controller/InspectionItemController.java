@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/inspection-item")
+@RequestMapping({"/maintenance-item", "/inspection-item"})
 public class InspectionItemController {
 
     @Resource
