@@ -37,7 +37,6 @@ const store = useUserStore()
 const menuConfig = [
   { label: '配电箱', path: '/box' },
   { label: '地点配置', path: '/dict' },
-  { label: '元器件', path: '/components' },
   { label: '维保记录', path: '/maintenance' },
   { label: '检修记录', path: '/overhaul' },
 
