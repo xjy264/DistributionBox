@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@TableName("sys_emergency_repair_item")
+@TableName("sys_overhaul_item")
 public class RepairItem implements Serializable {
 
     private static final long serialVersionUID = 1L;

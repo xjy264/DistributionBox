@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@TableName("sys_emergency_repair_task")
+@TableName("sys_overhaul_task")
 public class RepairTask implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@TableName("sys_inspection_task")
+@TableName("sys_maintenance_task")
 public class InspectionTask implements Serializable {
 
     private static final long serialVersionUID = 1L;

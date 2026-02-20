@@ -12,16 +12,16 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface RepairItemMapper extends BaseMapper<RepairItem> {
 
-    @Delete("delete from sys_emergency_repair_item where task_id = #{taskId}")
+    @Delete("delete from sys_overhaul_item where task_id = #{taskId}")
     int deleteByTaskId(Integer taskId);
 
-    @Select("select box_id from sys_emergency_repair_item where task_id = #{taskId} order by box_id")
+    @Select("select box_id from sys_overhaul_item where task_id = #{taskId} order by box_id")
     List<Integer> selectBoxIdsByTaskId(Integer taskId);
 
     @Select("""
         select i.*, t.task_no, t.report_user, t.report_time, t.fix_user, t.fix_time, t.remark as task_remark
-        from sys_emergency_repair_item i
-        left join sys_emergency_repair_task t on t.id = i.task_id
+        from sys_overhaul_item i
+        left join sys_overhaul_task t on t.id = i.task_id
         where i.box_id = #{boxId}
         order by t.fix_time desc, t.report_time desc, i.id desc
         limit #{offset}, #{pageSize}
@@ -32,11 +32,11 @@ public interface RepairItemMapper extends BaseMapper<RepairItem> {
 
     @Select("""
         select count(1)
-        from sys_emergency_repair_item i
+        from sys_overhaul_item i
         where i.box_id = #{boxId}
         """)
     Long countItemHistoryByBoxId(@Param("boxId") Integer boxId);
 
-    @Select("select * from sys_emergency_repair_item where task_id = #{taskId} order by id asc")
+    @Select("select * from sys_overhaul_item where task_id = #{taskId} order by id asc")
     List<RepairItem> selectByTaskId(Integer taskId);
 }
