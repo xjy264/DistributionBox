@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,28 +42,26 @@ public class InspectionTaskController {
     @PostMapping("/save")
     @Transactional(rollbackFor = Exception.class)
     public Result save(@RequestBody InspectionTaskSaveDto dto) {
-        if (dto.getItems() == null || dto.getItems().isEmpty()) {
-            return Result.error("400", "items不能为空");
-        }
-
         InspectionTask task = new InspectionTask();
         BeanUtils.copyProperties(dto, task);
         if (task.getInspectionTime() == null) {
             task.setInspectionTime(LocalDateTime.now());
         }
         if (task.getTaskNo() == null || task.getTaskNo().isBlank()) {
-            task.setTaskNo("IT" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+            return Result.error("400", "taskNo不能为空（手动填写）");
         }
         inspectionTaskService.saveOrUpdate(task);
 
-        inspectionItemMapper.deleteByTaskId(task.getId());
-        List<InspectionItem> validItems = deduplicateItems(dto.getItems());
-        for (InspectionItem item : validItems) {
-            item.setId(null);
-            item.setTaskId(task.getId());
-            inspectionItemMapper.insert(item);
+        if (dto.getItems() != null) {
+            inspectionItemMapper.deleteByTaskId(task.getId());
+            List<InspectionItem> validItems = normalizeItems(dto.getItems());
+            for (InspectionItem item : validItems) {
+                item.setId(null);
+                item.setTaskId(task.getId());
+                inspectionItemMapper.insert(item);
+            }
         }
-        return Result.success(true);
+        return Result.success(task.getId());
     }
 
     @DeleteMapping("/{id}")
@@ -122,19 +118,16 @@ public class InspectionTaskController {
         return Result.success(view);
     }
 
-    private List<InspectionItem> deduplicateItems(List<InspectionItem> items) {
+    private List<InspectionItem> normalizeItems(List<InspectionItem> items) {
         if (items == null || items.isEmpty()) {
             return Collections.emptyList();
         }
-        Set<Integer> seen = new LinkedHashSet<>();
         List<InspectionItem> result = new ArrayList<>();
         for (InspectionItem item : items) {
             if (item == null || item.getBoxId() == null || item.getBoxId() <= 0) {
                 continue;
             }
-            if (seen.add(item.getBoxId())) {
-                result.add(item);
-            }
+            result.add(item);
         }
         return result;
     }

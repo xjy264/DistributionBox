@@ -14,6 +14,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'dict', component: () => import('@/views/Dict.vue') },
       { path: 'components', component: () => import('@/views/Components.vue') },
       { path: 'maintenance', component: () => import('@/views/MaintenanceRecord.vue') },
+      { path: 'maintenance-task/:id', component: () => import('@/views/MaintenanceTaskDetail.vue') },
       { path: 'overhaul', component: () => import('@/views/OverhaulRecord.vue') },
       { path: 'files', component: () => import('@/views/Files.vue') },
       { path: 'users', component: () => import('@/views/User.vue') },

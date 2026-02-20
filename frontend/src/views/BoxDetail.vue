@@ -71,8 +71,9 @@
           <el-table-column prop="inspectionTime" label="维保时间" />
           <el-table-column prop="switchModel" label="开关型号" />
           <el-table-column prop="remark" label="明细备注" />
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="260">
             <template #default="scope">
+              <el-button size="small" type="primary" @click="goMaintenanceTask(scope.row.taskId)">进入工单</el-button>
               <el-button size="small" @click="editInspection(scope.row)">编辑任务</el-button>
               <el-button size="small" type="danger" @click="removeInspection(scope.row.taskId)">删除任务</el-button>
             </template>
@@ -506,6 +507,11 @@ const saveInspection = async () => {
 const removeInspection = async (id: number) => {
   await http.delete(`/maintenance-task/${id}`)
   load()
+}
+
+const goMaintenanceTask = (taskId: number) => {
+  if (!taskId) return
+  router.push(`/maintenance-task/${taskId}`)
 }
 
 const openRepairDialog = () => {
