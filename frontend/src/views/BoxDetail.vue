@@ -3,13 +3,13 @@
     <div class="toolbar">
       <el-button @click="goBack">返回列表</el-button>
       <el-button type="primary" @click="openBoxEditDialog">编辑基础信息</el-button>
-      <el-tag type="success">配电箱ID：{{ toDisplay(box.id) }}</el-tag>
-      <el-tag type="warning">台帐号：{{ toDisplay(box.boxId) }}</el-tag>
-      <el-tag>车间：{{ toDisplay(box.station) }}</el-tag>
-      <el-tag>工区：{{ toDisplay(box.area) }}</el-tag>
     </div>
 
     <el-descriptions title="配电箱基础信息" :column="2" border>
+      <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
+      <el-descriptions-item label="台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
+      <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
