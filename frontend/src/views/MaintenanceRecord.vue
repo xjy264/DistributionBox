@@ -34,9 +34,10 @@
         <template #default="scope">{{ typeLabel(scope.row.maintenanceType) }}</template>
       </el-table-column>
       <el-table-column prop="maintenanceLocation" label="维保地点" min-width="160"/>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="230">
         <template #default="scope">
           <el-button size="small" type="primary" @click="goTaskDetail(scope.row.id)">进入工单</el-button>
+          <el-button size="small" type="danger" @click="removeTask(scope.row.id)">删除工单</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,7 +83,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '@/api/http'
 
 const router = useRouter()
@@ -144,6 +145,17 @@ const typeLabel = (value?: string) => {
 
 const goTaskDetail = (id: number) => {
   router.push(`/maintenance-task/${id}`)
+}
+
+const removeTask = async (id: number) => {
+  try {
+    await ElMessageBox.confirm('确认删除该维保工单？', '提示', { type: 'warning' })
+    await http.delete(`/maintenance-task/${id}`)
+    ElMessage.success('删除成功')
+    await load()
+  } catch {
+    // cancel or failed
+  }
 }
 
 const openCreateDialog = () => {

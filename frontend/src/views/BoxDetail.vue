@@ -326,10 +326,9 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes, inspectRes, repairRes] = await Promise.allSettled([
+  const [boxRes, compRes, repairRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
     http.get(`/components/${id}`),
-    http.get('/maintenance-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } }),
     http.get('/overhaul-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
   ])
 
@@ -346,12 +345,7 @@ const load = async () => {
     components.value = []
   }
 
-  if (inspectRes.status === 'fulfilled') {
-    const inspectData = unwrapPayload(inspectRes.value.data) || {}
-    inspections.value = safeArray(inspectData.records)
-  } else {
-    inspections.value = []
-  }
+  inspections.value = []
 
   if (repairRes.status === 'fulfilled') {
     const repairData = unwrapPayload(repairRes.value.data) || {}

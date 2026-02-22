@@ -8,21 +8,17 @@
 
     <el-tabs>
       <el-tab-pane label="维保工作记录表">
-        <el-form :model="task" label-width="110px" style="max-width:900px">
-          <el-form-item label="工单编号"><el-input v-model="task.taskNo" placeholder="手动填写"/></el-form-item>
-          <el-form-item label="维保类型">
-            <el-select v-model="task.maintenanceType" style="width:100%">
-              <el-option label="月度维保" value="MONTHLY"/>
-              <el-option label="季度维保" value="QUARTERLY"/>
-              <el-option label="年度维保" value="YEARLY"/>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="维保地点"><el-input v-model="task.maintenanceLocation"/></el-form-item>
-          <el-form-item label="维保时间"><el-date-picker v-model="task.inspectionTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width:100%"/></el-form-item>
-          <el-form-item label="维保工作内容"><el-input v-model="task.maintenanceContent" type="textarea" :rows="4"/></el-form-item>
-          <el-form-item label="维保工作小结"><el-input v-model="task.maintenanceSummary" type="textarea" :rows="4"/></el-form-item>
-          <el-form-item><el-button type="primary" @click="saveTask">保存工单</el-button></el-form-item>
-        </el-form>
+        <div class="toolbar">
+          <el-button type="primary" @click="openTaskEdit">修改</el-button>
+        </div>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="工单编号">{{ task.taskNo || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="维保类型">{{ typeLabel(task.maintenanceType) }}</el-descriptions-item>
+          <el-descriptions-item label="维保地点">{{ task.maintenanceLocation || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="维保时间">{{ task.inspectionTime || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="维保工作内容" :span="2">{{ task.maintenanceContent || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="维保工作小结" :span="2">{{ task.maintenanceSummary || '-' }}</el-descriptions-item>
+        </el-descriptions>
       </el-tab-pane>
 
       <el-tab-pane label="维保病害及处置记录">
@@ -58,6 +54,24 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
+
+    <el-dialog v-model="taskEditDialog" title="修改维保工作记录" width="760px">
+      <el-form :model="taskEditForm" label-width="110px">
+        <el-form-item label="工单编号"><el-input v-model="taskEditForm.taskNo" placeholder="手动填写"/></el-form-item>
+        <el-form-item label="维保类型">
+          <el-select v-model="taskEditForm.maintenanceType" style="width:100%">
+            <el-option label="月度维保" value="MONTHLY"/>
+            <el-option label="季度维保" value="QUARTERLY"/>
+            <el-option label="年度维保" value="YEARLY"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="维保地点"><el-input v-model="taskEditForm.maintenanceLocation"/></el-form-item>
+        <el-form-item label="维保时间"><el-date-picker v-model="taskEditForm.inspectionTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width:100%"/></el-form-item>
+        <el-form-item label="维保工作内容"><el-input v-model="taskEditForm.maintenanceContent" type="textarea" :rows="4"/></el-form-item>
+        <el-form-item label="维保工作小结"><el-input v-model="taskEditForm.maintenanceSummary" type="textarea" :rows="4"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="taskEditDialog=false">取消</el-button><el-button type="primary" @click="saveTask">保存</el-button></template>
+    </el-dialog>
 
     <el-dialog v-model="diseaseDialog" title="病害记录" width="680px">
       <el-form :model="diseaseForm" label-width="110px">
@@ -102,21 +116,36 @@ const route = useRoute(); const router = useRouter();
 const id = Number(route.params.id)
 const task = reactive<any>({ id, taskNo:'', maintenanceType:'MONTHLY', maintenanceLocation:'', inspectionTime:'', maintenanceContent:'', maintenanceSummary:'' })
 const diseases = ref<any[]>([]); const compares = ref<any[]>([]); const processes = ref<any[]>([])
+const taskEditDialog = ref(false)
 const diseaseDialog = ref(false); const compareDialog = ref(false); const processDialog = ref(false)
+const taskEditForm = reactive<any>({ id, taskNo:'', maintenanceType:'MONTHLY', maintenanceLocation:'', inspectionTime:'', maintenanceContent:'', maintenanceSummary:'' })
 const diseaseForm = reactive<any>({ id:null, taskId:id, seqNo:1, diseaseLocation:'', diseaseDesc:'', quantity:0, disposalMethod:'', remark:'' })
 const compareForm = reactive<any>({ id:null, taskId:id, diseaseLocation:'', beforeImageUrl:'', diseaseNote:'', afterImageUrl:'', disposalNote:'' })
 const processForm = reactive<any>({ id:null, taskId:id, imageUrl:'' })
 
 const preview = (u:string)=> u ? (u.startsWith('/files/') ? `/api${u}` : u) : ''
 const goBack = ()=>router.push('/maintenance')
+const typeLabel = (v?: string) => v === 'MONTHLY' ? '月度维保' : v === 'QUARTERLY' ? '季度维保' : v === 'YEARLY' ? '年度维保' : '-'
 
-const loadTask = async()=>{ const r=await http.get(`/maintenance-task/${id}`); Object.assign(task, r.data?.data||{}) }
+const loadTask = async()=>{
+  const r=await http.get(`/maintenance-task/${id}`)
+  const data = r.data?.data || {}
+  Object.assign(task, data)
+  Object.assign(taskEditForm, data)
+}
+const openTaskEdit = ()=>{ Object.assign(taskEditForm, task); taskEditDialog.value = true }
 const loadModules = async()=>{
   diseases.value = (await http.get('/maintenance-module/disease',{params:{taskId:id}})).data?.data||[]
   compares.value = (await http.get('/maintenance-module/compare',{params:{taskId:id}})).data?.data||[]
   processes.value = (await http.get('/maintenance-module/process',{params:{taskId:id}})).data?.data||[]
 }
-const saveTask = async()=>{ if(!task.taskNo) return ElMessage.error('工单号必填'); await http.post('/maintenance-task/save', task); ElMessage.success('保存成功'); await loadTask() }
+const saveTask = async()=>{
+  if(!taskEditForm.taskNo) return ElMessage.error('工单号必填')
+  await http.post('/maintenance-task/save', { ...taskEditForm, id })
+  taskEditDialog.value = false
+  ElMessage.success('保存成功')
+  await loadTask()
+}
 
 const openDisease = ()=>{ Object.assign(diseaseForm,{id:null,taskId:id,seqNo:diseases.value.length+1,diseaseLocation:'',diseaseDesc:'',quantity:0,disposalMethod:'',remark:''}); diseaseDialog.value=true }
 const editDisease = (r:any)=>{ Object.assign(diseaseForm,r); diseaseDialog.value=true }
