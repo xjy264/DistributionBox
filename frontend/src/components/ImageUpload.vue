@@ -2,14 +2,16 @@
   <div class="image-upload">
     <el-upload
       class="uploader"
-      :action="uploadUrl"
-      :headers="headers"
+      :http-request="uploadImage"
       :show-file-list="false"
       :on-success="handleSuccess"
       :before-upload="beforeUpload"
+      :on-error="handleError"
       accept=".jpg,.jpeg,.png,.webp,.gif,.bmp"
     >
-      <img v-if="modelValue" :src="previewUrl" class="preview" />
+      <div v-if="modelValue" class="preview-wrap">
+        <PreviewImage :src="previewUrl" width="148px" height="148px" />
+      </div>
       <div v-else class="placeholder">
         <el-icon class="icon"><Plus /></el-icon>
         <span class="text">点击上传</span>
@@ -25,7 +27,11 @@
 import { computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import type { UploadRequestOptions } from 'element-plus'
+import http from '@/api/http'
 import { useUserStore } from '@/stores/user'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { resolvePreviewUrl } from '@/utils/image'
 
 const props = defineProps<{
   modelValue: string
@@ -33,30 +39,16 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
+let uploadedThisTurn = false
+
 const store = useUserStore()
 
-const uploadUrl = '/api/files/image/upload'
-
 const headers = computed(() => ({
-  Authorization: `Bearer ${store.token}`
+  Authorization: store.token ? `Bearer ${store.token}` : '',
+  token: store.token || ''
 }))
 
-const extractUuid = (value: string) => {
-  const raw = value.split('?')[0].split('#')[0]
-  const previewMatch = raw.match(/\/files\/preview\/([^/]+)$/)
-  if (previewMatch?.[1]) return previewMatch[1]
-  const fileMatch = raw.match(/\/files\/([^/]+)$/)
-  if (fileMatch?.[1]) return fileMatch[1]
-  return ''
-}
-
-const previewUrl = computed(() => {
-  const value = (props.modelValue || '').trim()
-  if (!value) return ''
-  const uuid = extractUuid(value)
-  if (uuid) return `/api/files/preview/${uuid}`
-  return value
-})
+const previewUrl = computed(() => resolvePreviewUrl(props.modelValue))
 
 const beforeUpload = (file: File) => {
   const ext = (file.name.split('.').pop() || '').toLowerCase()
@@ -74,19 +66,80 @@ const beforeUpload = (file: File) => {
   return true
 }
 
+const parseUploadValue = (response: any): string => {
+  const payload = response?.data ?? response
+  if (typeof payload === 'string' && payload.trim()) {
+    const raw = payload.trim()
+    return raw.startsWith('/files/') ? raw : `/files/${raw}`
+  }
+  if (typeof response === 'string' && response.trim()) {
+    const raw = response.trim()
+    return raw.startsWith('/files/') ? raw : `/files/${raw}`
+  }
+  const value = payload?.path || payload?.url || payload?.previewUrl || response?.url
+  return typeof value === 'string' ? value : ''
+}
+
 const handleSuccess = (response: any) => {
   const code = String(response?.code ?? '')
-  const data = response?.data ?? response
-  const url = data?.path || data?.url || data?.previewUrl || response?.url
-  if (code === '200' && url) {
+  const url = parseUploadValue(response)
+
+  // 只要拿到可用URL，就判定上传成功
+  if (url) {
+    uploadedThisTurn = true
     emit('update:modelValue', url)
     return
   }
-  if (!response?.code && url) {
-    emit('update:modelValue', url)
+
+  // 后端明确失败才提示失败
+  if (code && code !== '200') {
+    ElMessage.error(response?.msg || '上传失败')
     return
   }
+
+  // 后端返回成功但未带可解析地址：不再误报失败
+  if (code === '200') {
+    return
+  }
+
   ElMessage.error(response?.msg || '上传失败')
+}
+
+const handleError = (err?: any) => {
+  // 若本次已成功回填并回显，则忽略后续误触发的 error 回调
+  if (uploadedThisTurn || (props.modelValue && props.modelValue.trim())) {
+    uploadedThisTurn = false
+    return
+  }
+  const msg = err?.message || err?.msg || '上传失败'
+  ElMessage.error(msg)
+}
+
+const uploadImage = async (options: UploadRequestOptions) => {
+  const formData = new FormData()
+  formData.append('file', options.file)
+  const reqHeaders = headers.value
+  try {
+    const res = await http.post('/files/image/upload', formData, {
+      headers: {
+        ...reqHeaders,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    options.onSuccess?.(res.data)
+  } catch (e) {
+    try {
+      const res = await http.post('/files/upload', formData, {
+        headers: {
+          ...reqHeaders,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      options.onSuccess?.(res.data)
+    } catch (err) {
+      options.onError?.(err as Error)
+    }
+  }
 }
 
 const clear = () => {
@@ -108,11 +161,12 @@ const clear = () => {
 .uploader:hover {
   border-color: #409eff;
 }
-.preview {
+.preview-wrap {
   width: 148px;
   height: 148px;
-  object-fit: cover;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .placeholder {
   width: 148px;

@@ -2,64 +2,32 @@
   <div>
     <div class="toolbar">
       <el-button @click="goBack">返回列表</el-button>
-      <el-tag type="success">配电箱ID：{{ toDisplay(box.id) }}</el-tag>
-      <el-tag type="warning">台帐号：{{ toDisplay(box.boxId) }}</el-tag>
-      <el-tag>车间：{{ toDisplay(box.station) }}</el-tag>
-      <el-tag>工区：{{ toDisplay(box.area) }}</el-tag>
+      <el-button type="primary" @click="openBoxEditDialog">编辑基础信息</el-button>
     </div>
 
     <el-descriptions title="配电箱基础信息" :column="2" border>
+      <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
+      <el-descriptions-item label="台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
+      <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
-        <el-image v-if="resolvePreviewUrl(box.systemUrl)" :src="resolvePreviewUrl(box.systemUrl)" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片1">
-        <el-image v-if="resolvePreviewUrl(box.firstUrl)" :src="resolvePreviewUrl(box.firstUrl)" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.firstUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片2">
-        <el-image v-if="resolvePreviewUrl(box.secondUrl)" :src="resolvePreviewUrl(box.secondUrl)" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.secondUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片3">
-        <el-image v-if="resolvePreviewUrl(box.thirdUrl)" :src="resolvePreviewUrl(box.thirdUrl)" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.thirdUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片4">
-        <el-image v-if="resolvePreviewUrl(box.fourthUrl)" :src="resolvePreviewUrl(box.fourthUrl)" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.fourthUrl)" width="220px" height="160px" />
       </el-descriptions-item>
     </el-descriptions>
-
-    <el-divider />
-
-    <el-card shadow="never" class="box-image-editor">
-      <template #header>
-        <div class="editor-header">
-          <span>图片维护</span>
-          <el-button type="primary" @click="saveBoxImages">保存图片</el-button>
-        </div>
-      </template>
-      <el-form :model="boxImageForm" label-width="90px">
-        <el-form-item label="系统图">
-          <ImageUpload v-model="boxImageForm.systemUrl" />
-        </el-form-item>
-        <el-form-item label="图片1">
-          <ImageUpload v-model="boxImageForm.firstUrl" />
-        </el-form-item>
-        <el-form-item label="图片2">
-          <ImageUpload v-model="boxImageForm.secondUrl" />
-        </el-form-item>
-        <el-form-item label="图片3">
-          <ImageUpload v-model="boxImageForm.thirdUrl" />
-        </el-form-item>
-        <el-form-item label="图片4">
-          <ImageUpload v-model="boxImageForm.fourthUrl" />
-        </el-form-item>
-      </el-form>
-    </el-card>
 
     <el-divider />
 
@@ -86,48 +54,48 @@
         </el-table>
       </el-tab-pane>
 
-      <el-tab-pane label="巡检明细历史">
-        <div class="sub-toolbar">
-          <el-button type="success" @click="openInspectionDialog">新增巡检任务</el-button>
-        </div>
-        <el-table :data="inspections" border>
-          <el-table-column prop="id" label="明细ID" width="90" />
-          <el-table-column prop="taskNo" label="任务单号" width="180" />
-          <el-table-column prop="inspectionUser" label="巡检人" />
-          <el-table-column prop="guardianUser" label="监护人" />
-          <el-table-column prop="inspectionTime" label="巡检时间" />
-          <el-table-column prop="switchModel" label="开关型号" />
-          <el-table-column prop="remark" label="明细备注" />
-          <el-table-column label="操作" width="180">
-            <template #default="scope">
-              <el-button size="small" @click="editInspection(scope.row)">编辑任务</el-button>
-              <el-button size="small" type="danger" @click="removeInspection(scope.row.taskId)">删除任务</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
+      <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
-      <el-tab-pane label="抢修记录">
-        <div class="sub-toolbar">
-          <el-button type="success" @click="openRepairDialog">新增抢修任务</el-button>
-        </div>
-        <el-table :data="repairs" border>
-          <el-table-column prop="id" label="明细ID" width="90" />
-          <el-table-column prop="taskNo" label="任务单号" width="180" />
-          <el-table-column prop="reportUser" label="报修人" />
-          <el-table-column prop="reportTime" label="报修时间" />
-          <el-table-column prop="fixUser" label="抢修人" />
-          <el-table-column prop="fixTime" label="抢修时间" />
-          <el-table-column prop="faultPhenomenon" label="故障现象" />
-          <el-table-column label="操作" width="180">
-            <template #default="scope">
-              <el-button size="small" @click="editRepair(scope.row)">编辑任务</el-button>
-              <el-button size="small" type="danger" @click="removeRepair(scope.row.taskId)">删除任务</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
     </el-tabs>
+
+    <el-dialog v-model="boxEditDialog" title="编辑配电箱基础信息" width="700px">
+      <el-form :model="boxEditForm" label-width="110px">
+        <el-form-item label="台账号">
+          <el-input v-model="boxEditForm.boxId" disabled />
+        </el-form-item>
+        <el-form-item label="车间">
+          <el-input v-model="boxEditForm.station" />
+        </el-form-item>
+        <el-form-item label="工区">
+          <el-input v-model="boxEditForm.area" />
+        </el-form-item>
+        <el-form-item label="安装地点">
+          <el-input v-model="boxEditForm.boxAddress" />
+        </el-form-item>
+        <el-form-item label="规格">
+          <el-input v-model="boxEditForm.size" />
+        </el-form-item>
+        <el-form-item label="系统图">
+          <ImageUpload v-model="boxImageForm.systemUrl" />
+        </el-form-item>
+        <el-form-item label="图片1">
+          <ImageUpload v-model="boxImageForm.firstUrl" />
+        </el-form-item>
+        <el-form-item label="图片2">
+          <ImageUpload v-model="boxImageForm.secondUrl" />
+        </el-form-item>
+        <el-form-item label="图片3">
+          <ImageUpload v-model="boxImageForm.thirdUrl" />
+        </el-form-item>
+        <el-form-item label="图片4">
+          <ImageUpload v-model="boxImageForm.fourthUrl" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="boxEditDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveBoxBaseInfo">保存</el-button>
+      </template>
+    </el-dialog>
 
     <el-dialog v-model="componentDialog" title="元器件" width="700px">
       <EntityForm v-model="componentForm" :fields="componentFields" />
@@ -137,7 +105,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="inspectionDialog" title="巡检记录" width="760px">
+    <el-dialog v-model="inspectionDialog" title="维保记录" width="760px">
       <EntityForm v-model="inspectionForm" :fields="inspectionFields" />
       <template #footer>
         <el-button @click="inspectionDialog = false">取消</el-button>
@@ -145,13 +113,6 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="repairDialog" title="抢修任务" width="760px">
-      <EntityForm v-model="repairForm" :fields="repairFields" />
-      <template #footer>
-        <el-button @click="repairDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveRepair">保存</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -162,6 +123,8 @@ import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import EntityForm from '@/components/EntityForm.vue'
 import ImageUpload from '@/components/ImageUpload.vue'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { normalizeImageField, resolvePreviewUrl } from '@/utils/image'
 
 const route = useRoute()
 const router = useRouter()
@@ -169,16 +132,21 @@ const router = useRouter()
 const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
-const repairs = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
-const repairDialog = ref(false)
+const boxEditDialog = ref(false)
 
 const componentForm = reactive<any>({})
+const boxEditForm = reactive<any>({
+  boxId: '',
+  station: '',
+  area: '',
+  boxAddress: '',
+  size: ''
+})
 const inspectionForm = reactive<any>({ boxIds: [] })
-const repairForm = reactive<any>({ boxIds: [] })
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -202,9 +170,9 @@ const componentFields = [
 const inspectionFields = ref<any[]>([
   { key: 'taskNo', label: '任务单号（可空自动生成）' },
   { key: 'boxIds', label: '关联配电箱', type: 'multi-select', options: allBoxOptions.value },
-  { key: 'inspectionUser', label: '巡检人' },
+  { key: 'inspectionUser', label: '维保人' },
   { key: 'guardianUser', label: '监护人' },
-  { key: 'inspectionTime', label: '巡检时间', type: 'datetime' },
+  { key: 'inspectionTime', label: '维保时间', type: 'datetime' },
   { key: 'switchModel', label: '开关型号' },
   { key: 'currentRating', label: '额定电流' },
   { key: 'traverseSection', label: '截面积' },
@@ -226,24 +194,6 @@ const inspectionFields = ref<any[]>([
   { key: 'remark', label: '备注', type: 'textarea' }
 ])
 
-const repairFields = ref<any[]>([
-  { key: 'taskNo', label: '任务单号（可空自动生成）' },
-  { key: 'boxIds', label: '关联配电箱', type: 'multi-select', options: allBoxOptions.value },
-  { key: 'reportUser', label: '报修人' },
-  { key: 'reportTime', label: '报修时间', type: 'date' },
-  { key: 'fixUser', label: '抢修人' },
-  { key: 'fixTime', label: '抢修时间', type: 'date' },
-  { key: 'faultPhenomenon', label: '故障现象' },
-  { key: 'faultReason', label: '故障原因' },
-  { key: 'fixProcess', label: '维修过程', type: 'textarea' },
-  { key: 'components', label: '更换元器件' },
-  { key: 'remark', label: '备注', type: 'textarea' },
-  { key: 'firstUrl', label: '图片1', type: 'image' },
-  { key: 'secondUrl', label: '图片2', type: 'image' },
-  { key: 'thirdUrl', label: '图片3', type: 'image' },
-  { key: 'fourthUrl', label: '图片4', type: 'image' }
-])
-
 const goBack = () => router.push('/box')
 
 const toDisplay = (value: unknown) => {
@@ -261,27 +211,7 @@ const unwrapPayload = (payload: any) => {
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
 
-const normalizeImageField = (value: unknown) => {
-  if (typeof value !== 'string') return ''
-  return value.trim()
-}
-
-const extractUuid = (value: string) => {
-  const raw = value.split('?')[0].split('#')[0]
-  const previewMatch = raw.match(/\/files\/preview\/([^/]+)$/)
-  if (previewMatch?.[1]) return previewMatch[1]
-  const fileMatch = raw.match(/\/files\/([^/]+)$/)
-  if (fileMatch?.[1]) return fileMatch[1]
-  return ''
-}
-
-const resolvePreviewUrl = (value: unknown) => {
-  const raw = normalizeImageField(value)
-  if (!raw) return ''
-  const uuid = extractUuid(raw)
-  if (uuid) return `/api/files/preview/${uuid}`
-  return raw
-}
+// image utils moved to @/utils/image
 
 const syncBoxImageForm = () => {
   boxImageForm.systemUrl = normalizeImageField(box.systemUrl)
@@ -293,9 +223,6 @@ const syncBoxImageForm = () => {
 
 const refreshBoxOptions = () => {
   inspectionFields.value = inspectionFields.value.map((item) =>
-    item.key === 'boxIds' ? { ...item, options: allBoxOptions.value } : item
-  )
-  repairFields.value = repairFields.value.map((item) =>
     item.key === 'boxIds' ? { ...item, options: allBoxOptions.value } : item
   )
 }
@@ -317,7 +244,6 @@ const load = async () => {
     Object.keys(box).forEach((k) => delete box[k])
     components.value = []
     inspections.value = []
-    repairs.value = []
     syncBoxImageForm()
     return
   }
@@ -325,11 +251,9 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes, inspectRes, repairRes] = await Promise.allSettled([
+  const [boxRes, compRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
-    http.get(`/components/${id}`),
-    http.get('/inspection-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } }),
-    http.get('/repair-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
+    http.get(`/components/${id}`)
   ])
 
   if (token !== currentLoadToken) return
@@ -345,26 +269,29 @@ const load = async () => {
     components.value = []
   }
 
-  if (inspectRes.status === 'fulfilled') {
-    const inspectData = unwrapPayload(inspectRes.value.data) || {}
-    inspections.value = safeArray(inspectData.records)
-  } else {
-    inspections.value = []
-  }
+  inspections.value = []
 
-  if (repairRes.status === 'fulfilled') {
-    const repairData = unwrapPayload(repairRes.value.data) || {}
-    repairs.value = safeArray(repairData.records)
-  } else {
-    repairs.value = []
-  }
 }
 
-const saveBoxImages = async () => {
+const openBoxEditDialog = () => {
+  boxEditForm.boxId = box.boxId || ''
+  boxEditForm.station = box.station || ''
+  boxEditForm.area = box.area || ''
+  boxEditForm.boxAddress = box.boxAddress || ''
+  boxEditForm.size = box.size || ''
+  boxEditDialog.value = true
+}
+
+const saveBoxBaseInfo = async () => {
   if (!box.id) return
   const payload = {
     ...box,
     id: box.id,
+    boxId: box.boxId,
+    station: boxEditForm.station,
+    area: boxEditForm.area,
+    boxAddress: boxEditForm.boxAddress,
+    size: boxEditForm.size,
     systemUrl: normalizeImageField(boxImageForm.systemUrl),
     firstUrl: normalizeImageField(boxImageForm.firstUrl),
     secondUrl: normalizeImageField(boxImageForm.secondUrl),
@@ -372,8 +299,9 @@ const saveBoxImages = async () => {
     fourthUrl: normalizeImageField(boxImageForm.fourthUrl)
   }
   await http.post('/box/save', payload)
-  Object.assign(box, payload)
-  ElMessage.success('图片保存成功')
+  boxEditDialog.value = false
+  await load()
+  ElMessage.success('基础信息保存成功')
 }
 
 const openComponentDialog = () => {
@@ -400,13 +328,17 @@ const removeComponent = async (id: number) => {
 }
 
 const openInspectionDialog = () => {
-  Object.keys(inspectionForm).forEach((k) => delete inspectionForm[k])
-  Object.assign(inspectionForm, { boxIds: box.id ? [box.id] : [] })
-  inspectionDialog.value = true
+  try {
+    Object.keys(inspectionForm).forEach((k) => delete inspectionForm[k])
+    Object.assign(inspectionForm, { boxIds: box.id ? [box.id] : [] })
+    inspectionDialog.value = true
+  } catch (error: any) {
+    ElMessage.error(error?.message || '打开维保弹窗失败')
+  }
 }
 
 const editInspection = async (row: any) => {
-  const detail = await http.get(`/inspection-task/${row.taskId}`)
+  const detail = await http.get(`/maintenance-task/${row.taskId}`)
   const data = detail.data?.data || {}
   const firstItem = data.items?.[0] || {}
   Object.keys(inspectionForm).forEach((k) => delete inspectionForm[k])
@@ -424,101 +356,54 @@ const editInspection = async (row: any) => {
 }
 
 const saveInspection = async () => {
-  const boxIds: number[] = (inspectionForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
-  const itemTemplate = {
-    switchModel: inspectionForm.switchModel,
-    currentRating: inspectionForm.currentRating,
-    traverseSection: inspectionForm.traverseSection,
-    supplyVoltage: inspectionForm.supplyVoltage,
-    aStarting: inspectionForm.aStarting,
-    aRunning: inspectionForm.aRunning,
-    bStarting: inspectionForm.bStarting,
-    bRunning: inspectionForm.bRunning,
-    cStarting: inspectionForm.cStarting,
-    cRunning: inspectionForm.cRunning,
-    appearanceUrl: inspectionForm.appearanceUrl,
-    firstUrl: inspectionForm.firstUrl,
-    secondUrl: inspectionForm.secondUrl,
-    thirdUrl: inspectionForm.thirdUrl,
-    fourthUrl: inspectionForm.fourthUrl,
-    fifthUrl: inspectionForm.fifthUrl,
-    earlierUrl: inspectionForm.earlierUrl,
-    laterUrl: inspectionForm.laterUrl,
-    remark: inspectionForm.remark
+  try {
+    const boxIds: number[] = (inspectionForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
+    const itemTemplate = {
+      switchModel: inspectionForm.switchModel,
+      currentRating: inspectionForm.currentRating,
+      traverseSection: inspectionForm.traverseSection,
+      supplyVoltage: inspectionForm.supplyVoltage,
+      aStarting: inspectionForm.aStarting,
+      aRunning: inspectionForm.aRunning,
+      bStarting: inspectionForm.bStarting,
+      bRunning: inspectionForm.bRunning,
+      cStarting: inspectionForm.cStarting,
+      cRunning: inspectionForm.cRunning,
+      appearanceUrl: inspectionForm.appearanceUrl,
+      firstUrl: inspectionForm.firstUrl,
+      secondUrl: inspectionForm.secondUrl,
+      thirdUrl: inspectionForm.thirdUrl,
+      fourthUrl: inspectionForm.fourthUrl,
+      fifthUrl: inspectionForm.fifthUrl,
+      earlierUrl: inspectionForm.earlierUrl,
+      laterUrl: inspectionForm.laterUrl,
+      remark: inspectionForm.remark
+    }
+    await http.post('/maintenance-task/save', {
+      id: inspectionForm.id,
+      taskNo: inspectionForm.taskNo,
+      inspectionUser: inspectionForm.inspectionUser,
+      guardianUser: inspectionForm.guardianUser,
+      inspectionTime: inspectionForm.inspectionTime,
+      remark: inspectionForm.remark,
+      items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
+    })
+    inspectionDialog.value = false
+    await load()
+    ElMessage.success('维保任务保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.message || '维保任务保存失败')
   }
-  await http.post('/inspection-task/save', {
-    id: inspectionForm.id,
-    taskNo: inspectionForm.taskNo,
-    inspectionUser: inspectionForm.inspectionUser,
-    guardianUser: inspectionForm.guardianUser,
-    inspectionTime: inspectionForm.inspectionTime,
-    remark: inspectionForm.remark,
-    items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
-  })
-  inspectionDialog.value = false
-  load()
 }
 
 const removeInspection = async (id: number) => {
-  await http.delete(`/inspection-task/${id}`)
+  await http.delete(`/maintenance-task/${id}`)
   load()
 }
 
-const openRepairDialog = () => {
-  Object.keys(repairForm).forEach((k) => delete repairForm[k])
-  Object.assign(repairForm, { boxIds: box.id ? [box.id] : [] })
-  repairDialog.value = true
-}
-
-const editRepair = async (row: any) => {
-  const detail = await http.get(`/repair-task/${row.taskId}`)
-  const data = detail.data?.data || {}
-  const firstItem = data.items?.[0] || {}
-  Object.keys(repairForm).forEach((k) => delete repairForm[k])
-  Object.assign(repairForm, {
-    id: data.id,
-    taskNo: data.taskNo,
-    reportUser: data.reportUser,
-    reportTime: data.reportTime,
-    fixUser: data.fixUser,
-    fixTime: data.fixTime,
-    remark: data.remark,
-    boxIds: data.boxIds || [],
-    ...firstItem
-  })
-  repairDialog.value = true
-}
-
-const saveRepair = async () => {
-  const boxIds: number[] = (repairForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
-  const itemTemplate = {
-    components: repairForm.components,
-    faultPhenomenon: repairForm.faultPhenomenon,
-    faultReason: repairForm.faultReason,
-    fixProcess: repairForm.fixProcess,
-    remark: repairForm.remark,
-    firstUrl: repairForm.firstUrl,
-    secondUrl: repairForm.secondUrl,
-    thirdUrl: repairForm.thirdUrl,
-    fourthUrl: repairForm.fourthUrl
-  }
-  await http.post('/repair-task/save', {
-    id: repairForm.id,
-    taskNo: repairForm.taskNo,
-    reportUser: repairForm.reportUser,
-    reportTime: repairForm.reportTime,
-    fixUser: repairForm.fixUser,
-    fixTime: repairForm.fixTime,
-    remark: repairForm.remark,
-    items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
-  })
-  repairDialog.value = false
-  load()
-}
-
-const removeRepair = async (id: number) => {
-  await http.delete(`/repair-task/${id}`)
-  load()
+const goMaintenanceTask = (taskId: number) => {
+  if (!taskId) return
+  router.push(`/maintenance-task/${taskId}`)
 }
 
 onMounted(async () => {
@@ -546,20 +431,6 @@ watch(
   margin-bottom: 10px;
 }
 
-.box-image {
-  width: 88px;
-  height: 88px;
-  border-radius: 4px;
-  border: 1px solid #e5e6eb;
-}
 
-.box-image-editor {
-  margin-bottom: 12px;
-}
-
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* image edit section moved into base info dialog */
 </style>

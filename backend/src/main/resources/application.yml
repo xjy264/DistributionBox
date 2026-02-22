@@ -19,7 +19,7 @@ app:
     jwt-secret: ${JWT_SECRET:distributionbox-dev-secret-key-please-change}
     jwt-expiration-minutes: ${JWT_EXP_MINUTES:720}
   files:
-    upload-path: ${FILE_UPLOAD_PATH:../files/}
+    upload-path: ${FILE_UPLOAD_PATH:/Users/xuejiayao/project/distributionBox/files}
     base-url: ${FILE_BASE_URL:http://localhost:8888/files/}
     image-max-size-bytes: ${FILE_IMAGE_MAX_SIZE_BYTES:10485760}
 

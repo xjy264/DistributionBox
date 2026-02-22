@@ -12,5 +12,6 @@ public class InspectionTaskViewDto extends InspectionTask {
 
     private Integer boxCount;
     private List<Integer> boxIds;
+    private List<String> boxAccounts;
     private List<InspectionItem> items;
 }

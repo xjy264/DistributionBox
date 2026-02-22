@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@TableName("sys_inspection_task")
+@TableName("sys_maintenance_task")
 public class InspectionTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +27,14 @@ public class InspectionTask implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime inspectionTime;
+
+    private String maintenanceType;
+
+    private String maintenanceLocation;
+
+    private String maintenanceContent;
+
+    private String maintenanceSummary;
 
     private String remark;
 

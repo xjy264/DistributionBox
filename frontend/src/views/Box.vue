@@ -21,7 +21,6 @@
       <el-table-column prop="size" label="规格" />
       <el-table-column label="操作" width="340">
         <template #default="scope">
-          <el-button size="small" @click="edit(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="remove(scope.row.id)">删除</el-button>
           <el-button size="small" type="primary" @click="print(scope.row.id)">打印</el-button>
           <el-button size="small" type="success" @click="viewDetail(scope.row)">查看详细信息</el-button>
@@ -186,12 +185,6 @@ const onFilterAreaChange = () => {}
 
 const openDialog = () => {
   Object.keys(form).forEach((k) => delete form[k])
-  dialogVisible.value = true
-}
-
-const edit = (row: any) => {
-  Object.keys(form).forEach((k) => delete form[k])
-  Object.assign(form, row)
   dialogVisible.value = true
 }
 

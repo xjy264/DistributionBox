@@ -15,6 +15,10 @@ public class InspectionTaskSaveDto {
     private String inspectionUser;
     private String guardianUser;
     private LocalDateTime inspectionTime;
+    private String maintenanceType;
+    private String maintenanceLocation;
+    private String maintenanceContent;
+    private String maintenanceSummary;
     private String remark;
     private List<InspectionItem> items;
 }

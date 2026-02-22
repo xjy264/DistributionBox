@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@TableName("sys_emergency_repair_task")
+@TableName("sys_overhaul_task")
 public class RepairTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -21,18 +21,18 @@ public class RepairTask implements Serializable {
     private Integer id;
 
     private String taskNo;
-
+    private String reportUnit;
     private String reportUser;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date reportTime;
 
-    private String fixUser;
-
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date fixTime;
-
-    private String remark;
+    private String acceptUser;
+    private String supervisionUser;
+    private String rescueUsers;
+    private String faultPhenomenon;
+    private String faultReason;
+    private String rescueSituation;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createdAt;
