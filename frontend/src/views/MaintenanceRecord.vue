@@ -2,7 +2,15 @@
   <div>
     <div class="toolbar">
       <el-input v-model="taskNo" placeholder="任务单号" class="field" clearable />
-      <el-input v-model="inspectionTime" placeholder="维保时间(支持模糊)" class="field" clearable />
+      <el-date-picker
+        v-model="inspectionTimeRange"
+        type="datetimerange"
+        range-separator="至"
+        start-placeholder="维保开始时间"
+        end-placeholder="维保结束时间"
+        value-format="YYYY-MM-DD HH:mm:ss"
+        class="field-range"
+      />
       <el-input v-model="boxAccount" placeholder="配电箱台账号" class="field" clearable />
       <el-input v-model="inspectionUser" placeholder="维保人" class="field" clearable />
       <el-button type="primary" @click="load">搜索</el-button>
@@ -16,8 +24,12 @@
       <el-table-column prop="inspectionUser" label="维保人" />
       <el-table-column prop="guardianUser" label="监护人" />
       <el-table-column prop="inspectionTime" label="维保时间" />
-      <el-table-column label="关联配电箱台账号">
-        <template #default="scope">{{ (scope.row.boxAccounts || []).join(', ') || '-' }}</template>
+      <el-table-column label="关联配电箱台账号" min-width="220">
+        <template #default="scope">
+          <el-tooltip :content="(scope.row.boxAccounts || []).join(', ') || '-'" placement="top">
+            <span>{{ shortBoxAccounts(scope.row.boxAccounts) }}</span>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column label="操作" width="150">
         <template #default="scope">
@@ -73,7 +85,7 @@ import http from '@/api/http'
 const router = useRouter()
 
 const taskNo = ref('')
-const inspectionTime = ref('')
+const inspectionTimeRange = ref<string[]>([])
 const boxAccount = ref('')
 const inspectionUser = ref('')
 const list = ref<any[]>([])
@@ -91,7 +103,8 @@ const load = async () => {
       pageSize: pageSize.value,
       inspectionUser: inspectionUser.value,
       taskNo: taskNo.value,
-      inspectionTime: inspectionTime.value,
+      inspectionTimeStart: inspectionTimeRange.value?.[0] || '',
+      inspectionTimeEnd: inspectionTimeRange.value?.[1] || '',
       boxAccount: boxAccount.value
     }
   })
@@ -102,7 +115,7 @@ const load = async () => {
 
 const reset = () => {
   taskNo.value = ''
-  inspectionTime.value = ''
+  inspectionTimeRange.value = []
   boxAccount.value = ''
   inspectionUser.value = ''
   pageNum.value = 1
@@ -117,6 +130,13 @@ const onSizeChange = (size: number) => {
 const onCurrentChange = (current: number) => {
   pageNum.value = current
   load()
+}
+
+const shortBoxAccounts = (accounts?: string[]) => {
+  const arr = Array.isArray(accounts) ? accounts.filter(Boolean) : []
+  if (!arr.length) return '-'
+  if (arr.length <= 2) return arr.join(', ')
+  return `${arr.slice(0, 2).join(', ')} ...`
 }
 
 const goTaskDetail = (id: number) => {
@@ -154,6 +174,7 @@ onMounted(load)
 
 <style scoped>
 .toolbar { margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
-.field { width: 200px; }
+.field { width: 180px; }
+.field-range { width: 360px; }
 .pager { margin-top: 12px; display: flex; justify-content: flex-end; }
 </style>

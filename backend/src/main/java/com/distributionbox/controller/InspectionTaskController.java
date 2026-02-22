@@ -77,6 +77,8 @@ public class InspectionTaskController {
                        @RequestParam(defaultValue = "") String inspectionUser,
                        @RequestParam(defaultValue = "") String taskNo,
                        @RequestParam(defaultValue = "") String inspectionTime,
+                       @RequestParam(defaultValue = "") String inspectionTimeStart,
+                       @RequestParam(defaultValue = "") String inspectionTimeEnd,
                        @RequestParam(defaultValue = "") String boxAccount) {
         QueryWrapper<InspectionTask> queryWrapper = new QueryWrapper<>();
         if (!inspectionUser.isBlank()) {
@@ -87,6 +89,12 @@ public class InspectionTaskController {
         }
         if (!inspectionTime.isBlank()) {
             queryWrapper.like("inspection_time", inspectionTime.trim());
+        }
+        if (!inspectionTimeStart.isBlank()) {
+            queryWrapper.ge("inspection_time", inspectionTimeStart.trim());
+        }
+        if (!inspectionTimeEnd.isBlank()) {
+            queryWrapper.le("inspection_time", inspectionTimeEnd.trim());
         }
         if (!boxAccount.isBlank()) {
             List<Integer> taskIds = inspectionItemMapper.selectTaskIdsByBoxAccount(boxAccount.trim());
