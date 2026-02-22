@@ -43,6 +43,24 @@ public class InspectionTaskController {
         return Result.success(task.getId());
     }
 
+    @PostMapping("/update")
+    @Transactional(rollbackFor = Exception.class)
+    public Result update(@RequestBody InspectionTaskSaveDto dto) {
+        if (dto.getId() == null) {
+            return Result.error("400", "id不能为空");
+        }
+        InspectionTask task = new InspectionTask();
+        BeanUtils.copyProperties(dto, task);
+        if (task.getTaskNo() == null || task.getTaskNo().isBlank()) {
+            return Result.error("400", "taskNo不能为空（手动填写）");
+        }
+        boolean updated = inspectionTaskService.updateById(task);
+        if (!updated) {
+            return Result.error("404", "维保工单不存在或更新失败");
+        }
+        return Result.success(task.getId());
+    }
+
     @DeleteMapping("/{id}")
     @Transactional(rollbackFor = Exception.class)
     public Result delete(@PathVariable Integer id) {

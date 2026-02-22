@@ -140,11 +140,21 @@ const loadModules = async()=>{
   processes.value = (await http.get('/maintenance-module/process',{params:{taskId:id}})).data?.data||[]
 }
 const saveTask = async()=>{
-  if(!taskEditForm.taskNo) return ElMessage.error('工单号必填')
-  await http.post('/maintenance-task/save', { ...taskEditForm, id })
-  taskEditDialog.value = false
-  ElMessage.success('保存成功')
-  await loadTask()
+  const taskNo = (taskEditForm.taskNo || '').trim()
+  if(!taskNo) return ElMessage.error('工单号必填')
+  try {
+    await http.post('/maintenance-task/update', {
+      ...taskEditForm,
+      id,
+      taskNo,
+      inspectionTime: taskEditForm.inspectionTime || null
+    })
+    taskEditDialog.value = false
+    ElMessage.success('保存成功')
+    await loadTask()
+  } catch (e: any) {
+    ElMessage.error(e?.message || '保存失败')
+  }
 }
 
 const openDisease = ()=>{ Object.assign(diseaseForm,{id:null,taskId:id,seqNo:diseases.value.length+1,diseaseLocation:'',diseaseDesc:'',quantity:0,disposalMethod:'',remark:''}); diseaseDialog.value=true }
