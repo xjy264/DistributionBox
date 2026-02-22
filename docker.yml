@@ -28,7 +28,7 @@ services:
     container_name: distributionbox-backend
     restart: unless-stopped
     working_dir: /app
-    command: bash -lc "chmod +x ./run.py && ./run.py"
+    command: bash -lc "chmod +x ./run.sh && ./run.sh"
     volumes:
       - ./:/app
       - ./files:/app/files
