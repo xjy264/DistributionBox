@@ -4,12 +4,12 @@
       <el-button type="primary" @click="load">刷新</el-button>
     </div>
 
-    <el-table :data="list" border>
-      <el-table-column prop="id" label="任务ID" width="90" />
-      <el-table-column prop="taskNo" label="任务单号" width="180" />
-      <el-table-column prop="reportTime" label="报修时间" width="180" />
-      <el-table-column prop="reportUser" label="报修人" width="140" />
-      <el-table-column label="操作" width="140" fixed="right">
+    <el-table :data="list" border class="full-table">
+      <el-table-column prop="id" label="任务ID" width="100" />
+      <el-table-column prop="taskNo" label="任务单号" min-width="260" />
+      <el-table-column prop="reportTime" label="报修时间" min-width="260" />
+      <el-table-column prop="reportUser" label="报修人" min-width="220" />
+      <el-table-column label="操作" width="160" fixed="right">
         <template #default="scope">
           <el-button size="small" type="primary" @click="goDetail(scope.row.id)">进入工单</el-button>
         </template>
@@ -57,5 +57,6 @@ onMounted(load)
 
 <style scoped>
 .toolbar { margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
+.full-table { width: 100%; }
 .pager { margin-top: 12px; display: flex; justify-content: flex-end; }
 </style>
