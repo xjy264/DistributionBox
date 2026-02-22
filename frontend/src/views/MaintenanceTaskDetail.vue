@@ -38,9 +38,9 @@
         <div class="toolbar"><el-button type="primary" @click="openCompare">新增对比记录</el-button></div>
         <el-table :data="compares" border>
           <el-table-column prop="diseaseLocation" label="病害位置"/>
-          <el-table-column label="维保前图片"><template #default="s"><img v-if="s.row.beforeImageUrl" :src="preview(s.row.beforeImageUrl)" class="thumb"/></template></el-table-column>
+          <el-table-column label="维保前图片"><template #default="s"><PreviewImage :src="resolvePreviewUrl(s.row.beforeImageUrl)" width="72px" height="72px" /></template></el-table-column>
           <el-table-column prop="diseaseNote" label="病害说明"/>
-          <el-table-column label="维保后图片"><template #default="s"><img v-if="s.row.afterImageUrl" :src="preview(s.row.afterImageUrl)" class="thumb"/></template></el-table-column>
+          <el-table-column label="维保后图片"><template #default="s"><PreviewImage :src="resolvePreviewUrl(s.row.afterImageUrl)" width="72px" height="72px" /></template></el-table-column>
           <el-table-column prop="disposalNote" label="处置说明"/>
           <el-table-column label="操作" width="160"><template #default="s"><el-button size="small" @click="editCompare(s.row)">编辑</el-button><el-button size="small" type="danger" @click="delCompare(s.row.id)">删除</el-button></template></el-table-column>
         </el-table>
@@ -49,7 +49,7 @@
       <el-tab-pane label="维保过程图片">
         <div class="toolbar"><el-button type="primary" @click="openProcess">新增过程图片</el-button></div>
         <el-table :data="processes" border>
-          <el-table-column label="图片"><template #default="s"><img v-if="s.row.imageUrl" :src="preview(s.row.imageUrl)" class="thumb"/></template></el-table-column>
+          <el-table-column label="图片"><template #default="s"><PreviewImage :src="resolvePreviewUrl(s.row.imageUrl)" width="72px" height="72px" /></template></el-table-column>
           <el-table-column label="操作" width="120"><template #default="s"><el-button size="small" type="danger" @click="delProcess(s.row.id)">删除</el-button></template></el-table-column>
         </el-table>
       </el-tab-pane>
@@ -110,6 +110,8 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import ImageUpload from '@/components/ImageUpload.vue'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { resolvePreviewUrl } from '@/utils/image'
 import http from '@/api/http'
 
 const route = useRoute(); const router = useRouter();
@@ -123,7 +125,6 @@ const diseaseForm = reactive<any>({ id:null, taskId:id, seqNo:1, diseaseLocation
 const compareForm = reactive<any>({ id:null, taskId:id, diseaseLocation:'', beforeImageUrl:'', diseaseNote:'', afterImageUrl:'', disposalNote:'' })
 const processForm = reactive<any>({ id:null, taskId:id, imageUrl:'' })
 
-const preview = (u:string)=> u ? (u.startsWith('/files/') ? `/api${u}` : u) : ''
 const goBack = ()=>router.push('/maintenance')
 const typeLabel = (v?: string) => v === 'MONTHLY' ? '月度维保' : v === 'QUARTERLY' ? '季度维保' : v === 'YEARLY' ? '年度维保' : '-'
 
@@ -191,5 +192,4 @@ onMounted(async()=>{ await loadTask(); await loadModules() })
 
 <style scoped>
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-.thumb{width:72px;height:72px;object-fit:cover;border-radius:4px;border:1px solid #eee}
 </style>

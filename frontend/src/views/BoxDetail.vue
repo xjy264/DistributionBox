@@ -13,24 +13,19 @@
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
-        <el-image v-if="resolvePreviewUrl(box.systemUrl)" :src="resolvePreviewUrl(box.systemUrl)" :preview-src-list="[resolvePreviewUrl(box.systemUrl)]" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片1">
-        <el-image v-if="resolvePreviewUrl(box.firstUrl)" :src="resolvePreviewUrl(box.firstUrl)" :preview-src-list="[resolvePreviewUrl(box.firstUrl)]" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.firstUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片2">
-        <el-image v-if="resolvePreviewUrl(box.secondUrl)" :src="resolvePreviewUrl(box.secondUrl)" :preview-src-list="[resolvePreviewUrl(box.secondUrl)]" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.secondUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片3">
-        <el-image v-if="resolvePreviewUrl(box.thirdUrl)" :src="resolvePreviewUrl(box.thirdUrl)" :preview-src-list="[resolvePreviewUrl(box.thirdUrl)]" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.thirdUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片4">
-        <el-image v-if="resolvePreviewUrl(box.fourthUrl)" :src="resolvePreviewUrl(box.fourthUrl)" :preview-src-list="[resolvePreviewUrl(box.fourthUrl)]" class="box-image" fit="cover" preview-teleported />
-        <span v-else>-</span>
+        <PreviewImage :src="resolvePreviewUrl(box.fourthUrl)" width="220px" height="160px" />
       </el-descriptions-item>
     </el-descriptions>
 
@@ -155,6 +150,8 @@ import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import EntityForm from '@/components/EntityForm.vue'
 import ImageUpload from '@/components/ImageUpload.vue'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { normalizeImageField, resolvePreviewUrl } from '@/utils/image'
 
 const route = useRoute()
 const router = useRouter()
@@ -262,27 +259,7 @@ const unwrapPayload = (payload: any) => {
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
 
-const normalizeImageField = (value: unknown) => {
-  if (typeof value !== 'string') return ''
-  return value.trim()
-}
-
-const extractUuid = (value: string) => {
-  const raw = value.split('?')[0].split('#')[0]
-  const previewMatch = raw.match(/\/files\/preview\/([^/]+)$/)
-  if (previewMatch?.[1]) return previewMatch[1]
-  const fileMatch = raw.match(/\/files\/([^/]+)$/)
-  if (fileMatch?.[1]) return fileMatch[1]
-  return ''
-}
-
-const resolvePreviewUrl = (value: unknown) => {
-  const raw = normalizeImageField(value)
-  if (!raw) return ''
-  const uuid = extractUuid(raw)
-  if (uuid) return `/api/files/preview/${uuid}`
-  return raw
-}
+// image utils moved to @/utils/image
 
 const syncBoxImageForm = () => {
   boxImageForm.systemUrl = normalizeImageField(box.systemUrl)

@@ -9,7 +9,9 @@
       :on-error="handleError"
       accept=".jpg,.jpeg,.png,.webp,.gif,.bmp"
     >
-      <img v-if="modelValue" :src="previewUrl" class="preview" />
+      <div v-if="modelValue" class="preview-wrap">
+        <PreviewImage :src="previewUrl" width="148px" height="148px" />
+      </div>
       <div v-else class="placeholder">
         <el-icon class="icon"><Plus /></el-icon>
         <span class="text">点击上传</span>
@@ -28,6 +30,8 @@ import { ElMessage } from 'element-plus'
 import type { UploadRequestOptions } from 'element-plus'
 import http from '@/api/http'
 import { useUserStore } from '@/stores/user'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { resolvePreviewUrl } from '@/utils/image'
 
 const props = defineProps<{
   modelValue: string
@@ -44,23 +48,7 @@ const headers = computed(() => ({
   token: store.token || ''
 }))
 
-const extractUuid = (value: string) => {
-  const raw = value.split('?')[0].split('#')[0]
-  const previewMatch = raw.match(/\/files\/preview\/([^/]+)$/)
-  if (previewMatch?.[1]) return previewMatch[1]
-  const fileMatch = raw.match(/\/files\/([^/]+)$/)
-  if (fileMatch?.[1]) return fileMatch[1]
-  if (!raw.includes('/') && /^[a-zA-Z0-9_-]{16,}$/.test(raw)) return raw
-  return ''
-}
-
-const previewUrl = computed(() => {
-  const value = (props.modelValue || '').trim()
-  if (!value) return ''
-  const uuid = extractUuid(value)
-  if (uuid) return `/api/files/preview/${uuid}`
-  return value
-})
+const previewUrl = computed(() => resolvePreviewUrl(props.modelValue))
 
 const beforeUpload = (file: File) => {
   const ext = (file.name.split('.').pop() || '').toLowerCase()
@@ -173,11 +161,12 @@ const clear = () => {
 .uploader:hover {
   border-color: #409eff;
 }
-.preview {
+.preview-wrap {
   width: 148px;
   height: 148px;
-  object-fit: cover;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .placeholder {
   width: 148px;

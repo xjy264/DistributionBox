@@ -16,6 +16,12 @@
       <el-table-column prop="name" label="名称" />
       <el-table-column prop="type" label="类型" />
       <el-table-column prop="size" label="大小(KB)" />
+      <el-table-column label="预览" width="100">
+        <template #default="scope">
+          <PreviewImage v-if="isImageRow(scope.row)" :src="resolvePreviewUrl(scope.row.url)" width="72px" height="72px" />
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="url" label="链接" />
       <el-table-column label="操作" width="200">
         <template #default="scope">
@@ -42,6 +48,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import http from '@/api/http'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { isImageUrl, resolvePreviewUrl } from '@/utils/image'
 
 const tableData = ref<any[]>([])
 const pageNum = ref(1)
@@ -60,6 +68,11 @@ const load = async () => {
 
 const onUploadSuccess = () => {
   load()
+}
+
+const isImageRow = (row: any) => {
+  const type = String(row?.type || '').toLowerCase()
+  return type.includes('image') || isImageUrl(row?.url)
 }
 
 const download = (uuid: string) => {
