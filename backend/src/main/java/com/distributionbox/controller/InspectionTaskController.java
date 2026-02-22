@@ -74,10 +74,31 @@ public class InspectionTaskController {
     @GetMapping("/page")
     public Result page(@RequestParam Integer pageNum,
                        @RequestParam Integer pageSize,
-                       @RequestParam(defaultValue = "") String inspectionUser) {
+                       @RequestParam(defaultValue = "") String inspectionUser,
+                       @RequestParam(defaultValue = "") String taskNo,
+                       @RequestParam(defaultValue = "") String inspectionTime,
+                       @RequestParam(defaultValue = "") String boxAccount) {
         QueryWrapper<InspectionTask> queryWrapper = new QueryWrapper<>();
         if (!inspectionUser.isBlank()) {
             queryWrapper.like("inspection_user", inspectionUser.trim());
+        }
+        if (!taskNo.isBlank()) {
+            queryWrapper.like("task_no", taskNo.trim());
+        }
+        if (!inspectionTime.isBlank()) {
+            queryWrapper.like("inspection_time", inspectionTime.trim());
+        }
+        if (!boxAccount.isBlank()) {
+            List<Integer> taskIds = inspectionItemMapper.selectTaskIdsByBoxAccount(boxAccount.trim());
+            if (taskIds == null || taskIds.isEmpty()) {
+                return Result.success(Map.of(
+                        "records", Collections.emptyList(),
+                        "total", 0,
+                        "current", pageNum,
+                        "size", pageSize
+                ));
+            }
+            queryWrapper.in("id", taskIds);
         }
         queryWrapper.orderByDesc("id");
         IPage<InspectionTask> page = inspectionTaskService.page(new Page<>(pageNum, pageSize), queryWrapper);
@@ -88,6 +109,7 @@ public class InspectionTaskController {
             List<Integer> boxIds = inspectionItemMapper.selectBoxIdsByTaskId(task.getId());
             view.setBoxIds(boxIds);
             view.setBoxCount(boxIds.size());
+            view.setBoxAccounts(inspectionItemMapper.selectBoxAccountsByTaskId(task.getId()));
             return view;
         }).collect(Collectors.toList());
 
@@ -115,6 +137,7 @@ public class InspectionTaskController {
         List<Integer> boxIds = items.stream().map(InspectionItem::getBoxId).toList();
         view.setBoxIds(boxIds);
         view.setBoxCount(boxIds.size());
+        view.setBoxAccounts(inspectionItemMapper.selectBoxAccountsByTaskId(id));
         return Result.success(view);
     }
 

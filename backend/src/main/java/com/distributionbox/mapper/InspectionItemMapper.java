@@ -22,6 +22,23 @@ public interface InspectionItemMapper extends BaseMapper<InspectionItem> {
     List<Integer> selectTaskIdsByBoxId(Integer boxId);
 
     @Select("""
+        select b.box_id
+        from sys_maintenance_item i
+        join sys_box b on b.id = i.box_id
+        where i.task_id = #{taskId}
+        order by i.id asc
+        """)
+    List<String> selectBoxAccountsByTaskId(@Param("taskId") Integer taskId);
+
+    @Select("""
+        select distinct i.task_id
+        from sys_maintenance_item i
+        join sys_box b on b.id = i.box_id
+        where b.box_id like concat('%', #{boxAccount}, '%')
+        """)
+    List<Integer> selectTaskIdsByBoxAccount(@Param("boxAccount") String boxAccount);
+
+    @Select("""
         select i.*, t.task_no, t.inspection_user, t.guardian_user, t.inspection_time, t.remark as task_remark
         from sys_maintenance_item i
         left join sys_maintenance_task t on t.id = i.task_id

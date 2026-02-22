@@ -1,6 +1,9 @@
 <template>
   <div>
     <div class="toolbar">
+      <el-input v-model="taskNo" placeholder="任务单号" class="field" clearable />
+      <el-input v-model="inspectionTime" placeholder="维保时间(支持模糊)" class="field" clearable />
+      <el-input v-model="boxAccount" placeholder="配电箱台账号" class="field" clearable />
       <el-input v-model="inspectionUser" placeholder="维保人" class="field" clearable />
       <el-button type="primary" @click="load">搜索</el-button>
       <el-button @click="reset">重置</el-button>
@@ -13,8 +16,8 @@
       <el-table-column prop="inspectionUser" label="维保人" />
       <el-table-column prop="guardianUser" label="监护人" />
       <el-table-column prop="inspectionTime" label="维保时间" />
-      <el-table-column label="关联配电箱">
-        <template #default="scope">{{ (scope.row.boxIds || []).join(', ') || '-' }}</template>
+      <el-table-column label="关联配电箱台账号">
+        <template #default="scope">{{ (scope.row.boxAccounts || []).join(', ') || '-' }}</template>
       </el-table-column>
       <el-table-column label="操作" width="150">
         <template #default="scope">
@@ -69,6 +72,9 @@ import http from '@/api/http'
 
 const router = useRouter()
 
+const taskNo = ref('')
+const inspectionTime = ref('')
+const boxAccount = ref('')
 const inspectionUser = ref('')
 const list = ref<any[]>([])
 const pageNum = ref(1)
@@ -80,7 +86,14 @@ const createForm = reactive<any>({ taskNo: '', inspectionUser: '', guardianUser:
 
 const load = async () => {
   const res = await http.get('/maintenance-task/page', {
-    params: { pageNum: pageNum.value, pageSize: pageSize.value, inspectionUser: inspectionUser.value }
+    params: {
+      pageNum: pageNum.value,
+      pageSize: pageSize.value,
+      inspectionUser: inspectionUser.value,
+      taskNo: taskNo.value,
+      inspectionTime: inspectionTime.value,
+      boxAccount: boxAccount.value
+    }
   })
   const page = res.data?.data || {}
   list.value = page.records || []
@@ -88,6 +101,9 @@ const load = async () => {
 }
 
 const reset = () => {
+  taskNo.value = ''
+  inspectionTime.value = ''
+  boxAccount.value = ''
   inspectionUser.value = ''
   pageNum.value = 1
   load()
