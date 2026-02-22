@@ -59,27 +59,7 @@
         </el-table>
       </el-tab-pane>
 
-      <el-tab-pane label="维保记录">
-        <div class="sub-toolbar">
-          <el-button type="success" @click="openInspectionDialog">新增维保任务</el-button>
-        </div>
-        <el-table :data="inspections" border>
-          <el-table-column prop="id" label="明细ID" width="90" />
-          <el-table-column prop="taskNo" label="任务单号" width="180" />
-          <el-table-column prop="inspectionUser" label="维保人" />
-          <el-table-column prop="guardianUser" label="监护人" />
-          <el-table-column prop="inspectionTime" label="维保时间" />
-          <el-table-column prop="switchModel" label="开关型号" />
-          <el-table-column prop="remark" label="明细备注" />
-          <el-table-column label="操作" width="260">
-            <template #default="scope">
-              <el-button size="small" type="primary" @click="goMaintenanceTask(scope.row.taskId)">进入工单</el-button>
-              <el-button size="small" @click="editInspection(scope.row)">编辑任务</el-button>
-              <el-button size="small" type="danger" @click="removeInspection(scope.row.taskId)">删除任务</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
+      <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
       <el-tab-pane label="检修记录">
         <div class="sub-toolbar">

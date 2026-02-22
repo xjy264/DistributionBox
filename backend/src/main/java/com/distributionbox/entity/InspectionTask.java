@@ -28,6 +28,14 @@ public class InspectionTask implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime inspectionTime;
 
+    private String maintenanceType;
+
+    private String maintenanceLocation;
+
+    private String maintenanceContent;
+
+    private String maintenanceSummary;
+
     private String remark;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

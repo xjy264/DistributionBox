@@ -1,0 +1,8 @@
+package com.distributionbox.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.distributionbox.entity.MaintenanceProcessImage;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface MaintenanceProcessImageMapper extends BaseMapper<MaintenanceProcessImage> {}

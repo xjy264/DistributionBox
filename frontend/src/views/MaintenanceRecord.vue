@@ -13,7 +13,11 @@
         clearable
         unlink-panels
       />
-      <el-input v-model="boxAccount" placeholder="配电箱台账号" class="field" clearable />
+      <el-select v-model="maintenanceType" placeholder="维保类型" class="field" clearable>
+        <el-option label="月度维保" value="MONTHLY"/>
+        <el-option label="季度维保" value="QUARTERLY"/>
+        <el-option label="年度维保" value="YEARLY"/>
+      </el-select>
       <el-input v-model="inspectionUser" placeholder="维保人" class="field" clearable />
       <el-button type="primary" @click="load">搜索</el-button>
       <el-button @click="reset">重置</el-button>
@@ -26,13 +30,10 @@
       <el-table-column prop="inspectionUser" label="维保人" />
       <el-table-column prop="guardianUser" label="监护人" />
       <el-table-column prop="inspectionTime" label="维保时间" />
-      <el-table-column label="关联配电箱台账号" min-width="220">
-        <template #default="scope">
-          <el-tooltip :content="resolveBoxAccounts(scope.row).join(', ') || '-'" placement="top">
-            <span>{{ shortBoxAccounts(resolveBoxAccounts(scope.row)) }}</span>
-          </el-tooltip>
-        </template>
+      <el-table-column prop="maintenanceType" label="维保类型" width="120">
+        <template #default="scope">{{ typeLabel(scope.row.maintenanceType) }}</template>
       </el-table-column>
+      <el-table-column prop="maintenanceLocation" label="维保地点" min-width="160"/>
       <el-table-column label="操作" width="150">
         <template #default="scope">
           <el-button size="small" type="primary" @click="goTaskDetail(scope.row.id)">进入工单</el-button>
@@ -88,24 +89,15 @@ const router = useRouter()
 
 const taskNo = ref('')
 const inspectionTimeRange = ref<string[]>([])
-const boxAccount = ref('')
+const maintenanceType = ref('')
 const inspectionUser = ref('')
 const list = ref<any[]>([])
-const boxIdToAccount = ref<Record<number, string>>({})
 const pageNum = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
 const createDialog = ref(false)
 const createForm = reactive<any>({ taskNo: '', inspectionUser: '', guardianUser: '', inspectionTime: '', remark: '' })
-
-const loadBoxes = async () => {
-  const res = await http.get('/box/page', { params: { pageNum: 1, pageSize: 1000 } })
-  const rows = res.data?.data?.records || []
-  const map: Record<number, string> = {}
-  rows.forEach((r: any) => { map[Number(r.id)] = r.boxId || '' })
-  boxIdToAccount.value = map
-}
 
 const load = async () => {
   const res = await http.get('/maintenance-task/page', {
@@ -116,7 +108,7 @@ const load = async () => {
       taskNo: taskNo.value,
       inspectionTimeStart: inspectionTimeRange.value?.[0] || '',
       inspectionTimeEnd: inspectionTimeRange.value?.[1] || '',
-      boxAccount: boxAccount.value
+      maintenanceType: maintenanceType.value
     }
   })
   const page = res.data?.data || {}
@@ -127,7 +119,7 @@ const load = async () => {
 const reset = () => {
   taskNo.value = ''
   inspectionTimeRange.value = []
-  boxAccount.value = ''
+  maintenanceType.value = ''
   inspectionUser.value = ''
   pageNum.value = 1
   load()
@@ -143,18 +135,11 @@ const onCurrentChange = (current: number) => {
   load()
 }
 
-const resolveBoxAccounts = (row: any): string[] => {
-  const fromApi = Array.isArray(row?.boxAccounts) ? row.boxAccounts.filter(Boolean) : []
-  if (fromApi.length) return fromApi
-  const ids = Array.isArray(row?.boxIds) ? row.boxIds : []
-  return ids.map((id: number) => boxIdToAccount.value[Number(id)]).filter(Boolean)
-}
-
-const shortBoxAccounts = (accounts?: string[]) => {
-  const arr = Array.isArray(accounts) ? accounts.filter(Boolean) : []
-  if (!arr.length) return '-'
-  if (arr.length <= 2) return arr.join(', ')
-  return `${arr.slice(0, 2).join(', ')} ...`
+const typeLabel = (value?: string) => {
+  if (value === 'MONTHLY') return '月度维保'
+  if (value === 'QUARTERLY') return '季度维保'
+  if (value === 'YEARLY') return '年度维保'
+  return '-'
 }
 
 const goTaskDetail = (id: number) => {
@@ -171,26 +156,32 @@ const createTask = async () => {
     ElMessage.error('工单编号必填（手动填写）')
     return
   }
-  const res = await http.post('/maintenance-task/save', {
-    taskNo: createForm.taskNo,
-    inspectionUser: createForm.inspectionUser,
-    guardianUser: createForm.guardianUser,
-    inspectionTime: createForm.inspectionTime,
-    remark: createForm.remark
-  })
-  const id = res.data?.data
-  createDialog.value = false
-  if (id) {
-    router.push(`/maintenance-task/${id}`)
-  } else {
+  try {
+    const payload: any = {
+      taskNo: createForm.taskNo.trim(),
+      inspectionUser: createForm.inspectionUser,
+      guardianUser: createForm.guardianUser,
+      remark: createForm.remark
+    }
+    if (createForm.inspectionTime) {
+      payload.inspectionTime = createForm.inspectionTime
+    }
+
+    const res = await http.post('/maintenance-task/save', payload)
+    const id = res?.data?.data ?? res?.data
+    createDialog.value = false
+    if (id) {
+      router.push(`/maintenance-task/${id}`)
+      return
+    }
     await load()
+    ElMessage.success('工单创建成功')
+  } catch (error: any) {
+    ElMessage.error(error?.message || '创建工单失败，请检查时间格式和必填项')
   }
 }
 
-onMounted(async () => {
-  await loadBoxes()
-  await load()
-})
+onMounted(load)
 </script>
 
 <style scoped>
