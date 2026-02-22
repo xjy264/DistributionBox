@@ -10,6 +10,8 @@
         end-placeholder="维保结束时间"
         value-format="YYYY-MM-DD HH:mm:ss"
         class="field-range"
+        clearable
+        unlink-panels
       />
       <el-input v-model="boxAccount" placeholder="配电箱台账号" class="field" clearable />
       <el-input v-model="inspectionUser" placeholder="维保人" class="field" clearable />
@@ -26,8 +28,8 @@
       <el-table-column prop="inspectionTime" label="维保时间" />
       <el-table-column label="关联配电箱台账号" min-width="220">
         <template #default="scope">
-          <el-tooltip :content="(scope.row.boxAccounts || []).join(', ') || '-'" placement="top">
-            <span>{{ shortBoxAccounts(scope.row.boxAccounts) }}</span>
+          <el-tooltip :content="resolveBoxAccounts(scope.row).join(', ') || '-'" placement="top">
+            <span>{{ shortBoxAccounts(resolveBoxAccounts(scope.row)) }}</span>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -89,12 +91,21 @@ const inspectionTimeRange = ref<string[]>([])
 const boxAccount = ref('')
 const inspectionUser = ref('')
 const list = ref<any[]>([])
+const boxIdToAccount = ref<Record<number, string>>({})
 const pageNum = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
 const createDialog = ref(false)
 const createForm = reactive<any>({ taskNo: '', inspectionUser: '', guardianUser: '', inspectionTime: '', remark: '' })
+
+const loadBoxes = async () => {
+  const res = await http.get('/box/page', { params: { pageNum: 1, pageSize: 1000 } })
+  const rows = res.data?.data?.records || []
+  const map: Record<number, string> = {}
+  rows.forEach((r: any) => { map[Number(r.id)] = r.boxId || '' })
+  boxIdToAccount.value = map
+}
 
 const load = async () => {
   const res = await http.get('/maintenance-task/page', {
@@ -130,6 +141,13 @@ const onSizeChange = (size: number) => {
 const onCurrentChange = (current: number) => {
   pageNum.value = current
   load()
+}
+
+const resolveBoxAccounts = (row: any): string[] => {
+  const fromApi = Array.isArray(row?.boxAccounts) ? row.boxAccounts.filter(Boolean) : []
+  if (fromApi.length) return fromApi
+  const ids = Array.isArray(row?.boxIds) ? row.boxIds : []
+  return ids.map((id: number) => boxIdToAccount.value[Number(id)]).filter(Boolean)
 }
 
 const shortBoxAccounts = (accounts?: string[]) => {
@@ -169,7 +187,10 @@ const createTask = async () => {
   }
 }
 
-onMounted(load)
+onMounted(async () => {
+  await loadBoxes()
+  await load()
+})
 </script>
 
 <style scoped>
