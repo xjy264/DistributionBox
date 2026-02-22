@@ -4,6 +4,9 @@
       <el-button @click="goBack">返回维保记录</el-button>
       <el-tag type="success">工单ID：{{ task.id || '-' }}</el-tag>
       <el-tag>工单号：{{ task.taskNo || '-' }}</el-tag>
+      <el-tag>维保类型：{{ typeLabel(task.maintenanceType) }}</el-tag>
+      <el-tag>维保地点：{{ task.maintenanceLocation || '-' }}</el-tag>
+      <el-tag>维保时间：{{ task.inspectionTime || '-' }}</el-tag>
     </div>
 
     <el-tabs>
