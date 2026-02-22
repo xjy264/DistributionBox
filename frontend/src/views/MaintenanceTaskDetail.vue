@@ -139,6 +139,13 @@ const loadModules = async()=>{
   compares.value = (await http.get('/maintenance-module/compare',{params:{taskId:id}})).data?.data||[]
   processes.value = (await http.get('/maintenance-module/process',{params:{taskId:id}})).data?.data||[]
 }
+const toBackendDateTime = (v:any)=>{
+  if(!v) return null
+  const s = String(v).trim()
+  if(!s) return null
+  return s.includes('T') ? s : s.replace(' ', 'T')
+}
+
 const saveTask = async()=>{
   const taskNo = (taskEditForm.taskNo || '').trim()
   if(!taskNo) return ElMessage.error('工单号必填')
@@ -146,7 +153,7 @@ const saveTask = async()=>{
     ...taskEditForm,
     id,
     taskNo,
-    inspectionTime: taskEditForm.inspectionTime || null
+    inspectionTime: toBackendDateTime(taskEditForm.inspectionTime)
   }
   try {
     await http.post('/maintenance-task/update', payload)
