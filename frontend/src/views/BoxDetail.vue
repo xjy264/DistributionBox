@@ -56,26 +56,6 @@
 
       <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
-      <el-tab-pane label="检修记录">
-        <div class="sub-toolbar">
-          <el-button type="success" @click="openRepairDialog">新增检修任务</el-button>
-        </div>
-        <el-table :data="repairs" border>
-          <el-table-column prop="id" label="明细ID" width="90" />
-          <el-table-column prop="taskNo" label="任务单号" width="180" />
-          <el-table-column prop="reportUser" label="报修人" />
-          <el-table-column prop="reportTime" label="报修时间" />
-          <el-table-column prop="fixUser" label="抢修人" />
-          <el-table-column prop="fixTime" label="抢修时间" />
-          <el-table-column prop="faultPhenomenon" label="故障现象" />
-          <el-table-column label="操作" width="180">
-            <template #default="scope">
-              <el-button size="small" @click="editRepair(scope.row)">编辑任务</el-button>
-              <el-button size="small" type="danger" @click="removeRepair(scope.row.taskId)">删除任务</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
     </el-tabs>
 
     <el-dialog v-model="boxEditDialog" title="编辑配电箱基础信息" width="700px">
@@ -133,13 +113,6 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="repairDialog" title="检修任务" width="760px">
-      <EntityForm v-model="repairForm" :fields="repairFields" />
-      <template #footer>
-        <el-button @click="repairDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveRepair">保存</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -159,12 +132,10 @@ const router = useRouter()
 const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
-const repairs = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
-const repairDialog = ref(false)
 const boxEditDialog = ref(false)
 
 const componentForm = reactive<any>({})
@@ -176,7 +147,6 @@ const boxEditForm = reactive<any>({
   size: ''
 })
 const inspectionForm = reactive<any>({ boxIds: [] })
-const repairForm = reactive<any>({ boxIds: [] })
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -224,24 +194,6 @@ const inspectionFields = ref<any[]>([
   { key: 'remark', label: '备注', type: 'textarea' }
 ])
 
-const repairFields = ref<any[]>([
-  { key: 'taskNo', label: '任务单号（可空自动生成）' },
-  { key: 'boxIds', label: '关联配电箱', type: 'multi-select', options: allBoxOptions.value },
-  { key: 'reportUser', label: '提报人' },
-  { key: 'reportTime', label: '报修时间', type: 'date' },
-  { key: 'fixUser', label: '检修人' },
-  { key: 'fixTime', label: '检修时间', type: 'date' },
-  { key: 'faultPhenomenon', label: '故障现象' },
-  { key: 'faultReason', label: '故障原因' },
-  { key: 'fixProcess', label: '维修过程', type: 'textarea' },
-  { key: 'components', label: '更换元器件' },
-  { key: 'remark', label: '备注', type: 'textarea' },
-  { key: 'firstUrl', label: '图片1', type: 'image' },
-  { key: 'secondUrl', label: '图片2', type: 'image' },
-  { key: 'thirdUrl', label: '图片3', type: 'image' },
-  { key: 'fourthUrl', label: '图片4', type: 'image' }
-])
-
 const goBack = () => router.push('/box')
 
 const toDisplay = (value: unknown) => {
@@ -273,9 +225,6 @@ const refreshBoxOptions = () => {
   inspectionFields.value = inspectionFields.value.map((item) =>
     item.key === 'boxIds' ? { ...item, options: allBoxOptions.value } : item
   )
-  repairFields.value = repairFields.value.map((item) =>
-    item.key === 'boxIds' ? { ...item, options: allBoxOptions.value } : item
-  )
 }
 
 const loadBoxOptions = async () => {
@@ -295,7 +244,6 @@ const load = async () => {
     Object.keys(box).forEach((k) => delete box[k])
     components.value = []
     inspections.value = []
-    repairs.value = []
     syncBoxImageForm()
     return
   }
@@ -303,10 +251,9 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes, repairRes] = await Promise.allSettled([
+  const [boxRes, compRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
-    http.get(`/components/${id}`),
-    http.get('/overhaul-item/page', { params: { pageNum: 1, pageSize: 200, boxId: id } })
+    http.get(`/components/${id}`)
   ])
 
   if (token !== currentLoadToken) return
@@ -324,12 +271,6 @@ const load = async () => {
 
   inspections.value = []
 
-  if (repairRes.status === 'fulfilled') {
-    const repairData = unwrapPayload(repairRes.value.data) || {}
-    repairs.value = safeArray(repairData.records)
-  } else {
-    repairs.value = []
-  }
 }
 
 const openBoxEditDialog = () => {
@@ -465,72 +406,6 @@ const goMaintenanceTask = (taskId: number) => {
   router.push(`/maintenance-task/${taskId}`)
 }
 
-const openRepairDialog = () => {
-  try {
-    Object.keys(repairForm).forEach((k) => delete repairForm[k])
-    Object.assign(repairForm, { boxIds: box.id ? [box.id] : [] })
-    repairDialog.value = true
-  } catch (error: any) {
-    ElMessage.error(error?.message || '打开检修弹窗失败')
-  }
-}
-
-const editRepair = async (row: any) => {
-  const detail = await http.get(`/overhaul-task/${row.taskId}`)
-  const data = detail.data?.data || {}
-  const firstItem = data.items?.[0] || {}
-  Object.keys(repairForm).forEach((k) => delete repairForm[k])
-  Object.assign(repairForm, {
-    id: data.id,
-    taskNo: data.taskNo,
-    reportUser: data.reportUser,
-    reportTime: data.reportTime,
-    fixUser: data.fixUser,
-    fixTime: data.fixTime,
-    remark: data.remark,
-    boxIds: data.boxIds || [],
-    ...firstItem
-  })
-  repairDialog.value = true
-}
-
-const saveRepair = async () => {
-  try {
-    const boxIds: number[] = (repairForm.boxIds || []).map((v: any) => Number(v)).filter((v: number) => v > 0)
-    const itemTemplate = {
-      components: repairForm.components,
-      faultPhenomenon: repairForm.faultPhenomenon,
-      faultReason: repairForm.faultReason,
-      fixProcess: repairForm.fixProcess,
-      remark: repairForm.remark,
-      firstUrl: repairForm.firstUrl,
-      secondUrl: repairForm.secondUrl,
-      thirdUrl: repairForm.thirdUrl,
-      fourthUrl: repairForm.fourthUrl
-    }
-    await http.post('/overhaul-task/save', {
-      id: repairForm.id,
-      taskNo: repairForm.taskNo,
-      reportUser: repairForm.reportUser,
-      reportTime: repairForm.reportTime,
-      fixUser: repairForm.fixUser,
-      fixTime: repairForm.fixTime,
-      remark: repairForm.remark,
-      items: boxIds.map((boxId) => ({ boxId, ...itemTemplate }))
-    })
-    repairDialog.value = false
-    await load()
-    ElMessage.success('检修任务保存成功')
-  } catch (error: any) {
-    ElMessage.error(error?.message || '检修任务保存失败')
-  }
-}
-
-const removeRepair = async (id: number) => {
-  await http.delete(`/overhaul-task/${id}`)
-  load()
-}
-
 onMounted(async () => {
   await loadBoxOptions()
   await load()
@@ -556,12 +431,6 @@ watch(
   margin-bottom: 10px;
 }
 
-.box-image {
-  width: 88px;
-  height: 88px;
-  border-radius: 4px;
-  border: 1px solid #e5e6eb;
-}
 
 /* image edit section moved into base info dialog */
 </style>
