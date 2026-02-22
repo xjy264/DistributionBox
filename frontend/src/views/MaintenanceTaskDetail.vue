@@ -142,18 +142,26 @@ const loadModules = async()=>{
 const saveTask = async()=>{
   const taskNo = (taskEditForm.taskNo || '').trim()
   if(!taskNo) return ElMessage.error('工单号必填')
+  const payload = {
+    ...taskEditForm,
+    id,
+    taskNo,
+    inspectionTime: taskEditForm.inspectionTime || null
+  }
   try {
-    await http.post('/maintenance-task/update', {
-      ...taskEditForm,
-      id,
-      taskNo,
-      inspectionTime: taskEditForm.inspectionTime || null
-    })
+    await http.post('/maintenance-task/update', payload)
     taskEditDialog.value = false
     ElMessage.success('保存成功')
     await loadTask()
   } catch (e: any) {
-    ElMessage.error(e?.message || '保存失败')
+    if (e?.response?.status === 405) {
+      await http.post('/maintenance-task/save', payload)
+      taskEditDialog.value = false
+      ElMessage.success('保存成功（兼容旧后端）')
+      await loadTask()
+      return
+    }
+    ElMessage.error(e?.response?.data?.msg || e?.message || '保存失败')
   }
 }
 
