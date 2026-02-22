@@ -1,35 +1,141 @@
-# DistributionBox
+# 配电箱管理系统（DistributionBox）
 
-Distribution Panel (配电箱) Management System.
+一个面向配电箱运维场景的前后端系统，支持：
 
-## Goals
-- Asset registry for panels (location, model, capacity, photos)
-- Circuit/breaker inventory & labeling
-- Maintenance logs, inspections, fault history
-- Permissions and audit trail
+- 配电箱基础信息管理（含图片上传与预览）
+- 元器件管理
+- 维保工单管理（主单 + 模块化记录）
+- 检修工单管理（主单模式）
+- 文件上传与管理
+- 用户/角色/菜单管理（演示阶段可放开鉴权）
 
-## Structure
-- `backend/` Spring Boot 3 (Java 21) API
-- `frontend/` Vue 3 + Vite + TS UI
-- `files/` uploaded files (local storage root)
-- `sql/migrations/` Flyway migrations
-- `docs/` specifications & dev logs
-- `scripts/` utilities
+---
 
-## Quick Start
-1. Start MySQL 8
-   - `docker compose up -d`
-2. Run backend
-   - `cd backend`
-   - `mvn clean package`
-   - `mvn spring-boot:run`
-3. Run frontend
-   - `cd frontend`
-   - `npm install`
-   - `npm run dev`
+## 系统做了什么
 
-## Notes
-- Backend default DB: `distributionbox` (user `root` / password `root`).
-- Flyway migrations are stored in `sql/migrations/` and applied on startup.
-- Uploads are stored under `./files` by default.
-- Admin user should be inserted manually (password must be BCrypt-encoded).
+### 1) 配电箱管理
+- 维护配电箱台账号、车间、工区、安装地点、规格等基础信息
+- 支持多图片上传与点击放大预览
+
+### 2) 维保管理
+- 维保记录按工单主单组织
+- 详情页按模块管理：
+  - 维保工作记录
+  - 病害及处置记录
+  - 前后对比图
+  - 过程图片
+
+### 3) 检修管理
+- 检修记录改为主单模式（不再与配电箱 item 关联）
+- 工单字段包含：
+  - 报修单位、报修时间、报修人
+  - 报修接受人、盯控人员、抢修人员
+  - 故障现象、故障原因、抢修情况
+
+### 4) 图片与文件
+- 统一上传入口
+- 文件与业务图片支持本地存储
+- 前端统一点击放大预览交互（黑色遮罩点击关闭）
+
+---
+
+## 技术栈
+
+- 前端：Vue 3 + Vite + Element Plus + Pinia + Vue Router
+- 后端：Spring Boot + MyBatis-Plus
+- 数据库：MySQL
+- 缓存：Redis（可选）
+
+---
+
+## 项目结构
+
+```text
+DistributionBox/
+├── frontend/                 # 前端项目
+├── backend/                  # 后端项目
+├── sql/                      # SQL 初始化与迁移脚本
+│   ├── 2.22.sql              # 一份可用初始化 SQL（按实际版本使用）
+│   └── migrations/           # 增量迁移脚本
+├── files/                    # 图片/文件存储目录（可挂载）
+└── docs/                     # 需求与完成记录
+```
+
+---
+
+## 快速开始（本地）
+
+### 1. 准备环境
+- Node.js 18+
+- JDK 21
+- Maven 3.9+
+- MySQL 8.x
+
+### 2. 初始化数据库
+1. 创建数据库（例如 `distributionbox`）
+2. 执行 SQL（按你的版本选择）
+   - 可先用：`sql/2.22.sql`
+   - 如有新增改动，再执行 `sql/migrations` 中对应版本脚本
+
+### 3. 启动后端
+```bash
+cd backend
+mvn spring-boot:run
+```
+默认端口：`8888`
+
+### 4. 启动前端
+```bash
+cd frontend
+npm install
+npm run dev -- --host 0.0.0.0 --port 5173
+```
+默认访问：`http://127.0.0.1:5173`
+
+---
+
+## Docker 快速启动（推荐服务器）
+
+可用 `docker compose` 同时启动：
+- mysql
+- redis
+- backend
+- frontend
+
+> 建议把 `files/` 目录挂载到宿主机，避免容器重建导致文件丢失。
+
+---
+
+## 常见问题
+
+1. **后端 8888 端口被占用**
+   - 换端口或释放占用进程后重启。
+
+2. **前端保存“没反应”**
+   - 打开浏览器控制台看接口状态码；
+   - 核对后端版本是否包含对应接口改动。
+
+3. **图片上传后不显示**
+   - 检查 `files/` 目录权限与挂载路径；
+   - 检查前端预览 URL 与后端文件预览接口。
+
+---
+
+## 版本与文档
+
+系统需求和实施记录按版本沉淀在：
+
+- `docs/demands/vX.Y.md`
+- `docs/done/vX.Y.md`
+
+便于追踪每次改动的目标、实现与回滚方案。
+
+---
+
+## 备注
+
+当前仓库以“快速迭代 + 演示可用”为优先，若用于生产请补齐：
+- 正式鉴权策略
+- HTTPS 与反向代理
+- 日志与监控
+- 备份与容灾
