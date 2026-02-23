@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
+import { useUserStore } from '@/stores/user'
+import { pinia } from '@/stores'
 
 const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('@/views/Login.vue') },
@@ -36,8 +38,17 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((_to, _from, next) => {
-  // 演示模式：临时放开前端登录/权限拦截
+router.beforeEach((to, _from, next) => {
+  const whiteList = ['/login', '/register']
+  const store = useUserStore(pinia)
+  if (whiteList.includes(to.path)) {
+    next()
+    return
+  }
+  if (!store.token) {
+    next('/login')
+    return
+  }
   next()
 })
 
