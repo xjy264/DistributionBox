@@ -47,7 +47,9 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import EntityForm from '@/components/EntityForm.vue'
 
 const filters = reactive({ username: '', email: '', address: '' })
@@ -110,6 +112,7 @@ const save = async () => {
 }
 
 const remove = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`${USER_API_BASE}/${id}`)
   load()
 }

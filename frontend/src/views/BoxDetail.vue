@@ -119,8 +119,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import EntityForm from '@/components/EntityForm.vue'
 import ImageUpload from '@/components/ImageUpload.vue'
 import PreviewImage from '@/components/PreviewImage.vue'
@@ -323,6 +324,7 @@ const saveComponent = async () => {
 }
 
 const removeComponent = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`/components/${id}`)
   load()
 }
@@ -397,6 +399,7 @@ const saveInspection = async () => {
 }
 
 const removeInspection = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`/maintenance-task/${id}`)
   load()
 }
