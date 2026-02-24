@@ -44,53 +44,53 @@
     <el-dialog v-model="dialogVisible" title="配电箱" width="700px">
       <el-form :model="form" label-width="150px" class="compact-form">
         <el-form-item label="台帐号">
-          <el-input v-model="form.boxId" style="width: 320px" />
+          <el-input v-model="form.boxId" style="width: 390px" />
         </el-form-item>
         <el-form-item label="车间">
-          <el-select v-model="form.station" style="width: 320px" filterable @change="onFormStationChange">
+          <el-select v-model="form.station" style="width: 390px" filterable @change="onFormStationChange">
             <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="工区">
-          <el-select v-model="form.area" style="width: 320px" filterable @change="onFormAreaChange">
+          <el-select v-model="form.area" style="width: 390px" filterable @change="onFormAreaChange">
             <el-option v-for="opt in formAreaOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="安装地点">
-          <el-input v-model="form.boxAddress" style="width: 320px" />
+          <el-input v-model="form.boxAddress" style="width: 390px" />
         </el-form-item>
         <el-form-item label="规格">
-          <el-input v-model="form.size" style="width: 320px" />
+          <el-input v-model="form.size" style="width: 390px" />
         </el-form-item>
         <el-form-item label="明装暗装">
-          <el-select v-model="form.pileType" style="width: 320px" clearable>
+          <el-select v-model="form.pileType" style="width: 390px" clearable>
             <el-option label="明装" value="明装" />
             <el-option label="暗装" value="暗装" />
           </el-select>
         </el-form-item>
         <el-form-item label="室内室外">
-          <el-select v-model="form.indoorOutdoor" style="width: 320px" clearable>
+          <el-select v-model="form.indoorOutdoor" style="width: 390px" clearable>
             <el-option label="室内" value="室内" />
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
         <el-form-item label="是否与其它单位共用">
-          <el-select v-model="form.sharedWithOthers" style="width: 320px" clearable @change="onSharedWithOthersChange">
+          <el-select v-model="form.sharedWithOthers" style="width: 390px" clearable @change="onSharedWithOthersChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
           </el-select>
         </el-form-item>
         <el-form-item label="共用范围">
-          <el-input v-model="form.sharedScope" :disabled="form.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 320px" />
+          <el-input v-model="form.sharedScope" :disabled="form.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 390px" />
         </el-form-item>
         <el-form-item label="是否为大功率电器">
-          <el-select v-model="form.highPowerAppliance" style="width: 320px" clearable @change="onHighPowerChange">
+          <el-select v-model="form.highPowerAppliance" style="width: 390px" clearable @change="onHighPowerChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
           </el-select>
         </el-form-item>
         <el-form-item label="大功率电器名称">
-          <el-input v-model="form.highPowerName" :disabled="form.highPowerAppliance !== '是'" placeholder="选择是后必填" style="width: 320px" />
+          <el-input v-model="form.highPowerName" :disabled="form.highPowerAppliance !== '是'" placeholder="选择是后必填" style="width: 390px" />
         </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="form.systemUrl" />
