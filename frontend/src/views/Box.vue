@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="toolbar">
-      <el-input v-model="filters.boxId" placeholder="台账号（模糊）" class="field" clearable />
+      <el-input v-model="filters.boxId" placeholder="台账号" class="field" clearable />
       <el-select v-model="filters.station" placeholder="车间" class="field" clearable filterable @change="onFilterStationChange">
         <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
       </el-select>
