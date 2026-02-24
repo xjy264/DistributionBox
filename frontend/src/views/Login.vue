@@ -2,7 +2,7 @@
   <div class="login">
     <div class="overlay"></div>
     <div class="card">
-      <div class="brand">配电箱管理系统</div>
+      <div class="brand">低压配电管理系统</div>
 
       <el-form :model="form" label-position="top" @submit.prevent>
         <el-form-item label="用户名" class="form-item">
