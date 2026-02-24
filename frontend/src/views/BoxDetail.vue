@@ -59,55 +59,55 @@
     </el-tabs>
 
     <el-dialog v-model="boxEditDialog" title="编辑配电箱基础信息" width="700px">
-      <el-form :model="boxEditForm" label-width="110px">
+      <el-form :model="boxEditForm" label-width="150px" class="compact-form">
         <el-form-item label="台账号">
-          <el-input v-model="boxEditForm.boxId" disabled />
+          <el-input v-model="boxEditForm.boxId" disabled style="width: 260px" />
         </el-form-item>
         <el-form-item label="车间">
-          <el-select v-model="boxEditForm.station" style="width: 100%" filterable @change="onEditStationChange">
+          <el-select v-model="boxEditForm.station" style="width: 260px" filterable @change="onEditStationChange">
             <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="工区">
-          <el-select v-model="boxEditForm.area" style="width: 100%" filterable>
+          <el-select v-model="boxEditForm.area" style="width: 260px" filterable>
             <el-option v-for="opt in editAreaOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="安装地点">
-          <el-input v-model="boxEditForm.boxAddress" />
+          <el-input v-model="boxEditForm.boxAddress" style="width: 260px" />
         </el-form-item>
         <el-form-item label="规格">
-          <el-input v-model="boxEditForm.size" />
+          <el-input v-model="boxEditForm.size" style="width: 260px" />
         </el-form-item>
         <el-form-item label="明装暗装">
-          <el-select v-model="boxEditForm.pileType" style="width: 100%" clearable>
+          <el-select v-model="boxEditForm.pileType" style="width: 260px" clearable>
             <el-option label="明装" value="明装" />
             <el-option label="暗装" value="暗装" />
           </el-select>
         </el-form-item>
         <el-form-item label="室内室外">
-          <el-select v-model="boxEditForm.indoorOutdoor" style="width: 100%" clearable>
+          <el-select v-model="boxEditForm.indoorOutdoor" style="width: 260px" clearable>
             <el-option label="室内" value="室内" />
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
         <el-form-item label="是否与其它单位共用">
-          <el-select v-model="boxEditForm.sharedWithOthers" style="width: 100%" clearable @change="onEditSharedWithOthersChange">
+          <el-select v-model="boxEditForm.sharedWithOthers" style="width: 260px" clearable @change="onEditSharedWithOthersChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
           </el-select>
         </el-form-item>
         <el-form-item label="共用范围">
-          <el-input v-model="boxEditForm.sharedScope" :disabled="boxEditForm.sharedWithOthers !== '是'" placeholder="选择是后必填" />
+          <el-input v-model="boxEditForm.sharedScope" :disabled="boxEditForm.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 260px" />
         </el-form-item>
         <el-form-item label="是否为大功率电器">
-          <el-select v-model="boxEditForm.highPowerAppliance" style="width: 100%" clearable @change="onEditHighPowerChange">
+          <el-select v-model="boxEditForm.highPowerAppliance" style="width: 260px" clearable @change="onEditHighPowerChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
           </el-select>
         </el-form-item>
         <el-form-item label="大功率电器名称">
-          <el-input v-model="boxEditForm.highPowerName" :disabled="boxEditForm.highPowerAppliance !== '是'" placeholder="选择是后必填" />
+          <el-input v-model="boxEditForm.highPowerName" :disabled="boxEditForm.highPowerAppliance !== '是'" placeholder="选择是后必填" style="width: 260px" />
         </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="boxImageForm.systemUrl" />
@@ -534,4 +534,7 @@ watch(
 
 
 /* image edit section moved into base info dialog */
+.compact-form :deep(.el-form-item__label) {
+  white-space: nowrap;
+}
 </style>
