@@ -389,17 +389,21 @@ const saveBoxBaseInfo = async () => {
     pileType: boxEditForm.pileType,
     indoorOutdoor: boxEditForm.indoorOutdoor,
     sharedWithOthers: boxEditForm.sharedWithOthers,
-    sharedScope: boxEditForm.sharedScope,
+    sharedScope: boxEditForm.sharedWithOthers === '是' ? boxEditForm.sharedScope : '',
     highPowerAppliance: boxEditForm.highPowerAppliance,
-    highPowerName: boxEditForm.highPowerName,
+    highPowerName: boxEditForm.highPowerAppliance === '是' ? boxEditForm.highPowerName : '',
     systemUrl: normalizeImageField(boxImageForm.systemUrl),
     firstUrl: normalizeImageField(boxImageForm.firstUrl),
     secondUrl: normalizeImageField(boxImageForm.secondUrl),
   }
-  await http.post('/box/save', payload)
-  boxEditDialog.value = false
-  await load()
-  ElMessage.success('基础信息保存成功')
+  try {
+    await http.post('/box/save', payload)
+    boxEditDialog.value = false
+    await load()
+    ElMessage.success('基础信息保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.msg || '基础信息保存失败')
+  }
 }
 
 const openComponentDialog = () => {

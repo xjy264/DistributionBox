@@ -130,6 +130,26 @@ const pageSize = ref(10)
 const total = ref(0)
 const dialogVisible = ref(false)
 const form = reactive<any>({})
+
+const initForm = () => {
+  Object.assign(form, {
+    id: undefined,
+    boxId: '',
+    station: '',
+    area: '',
+    boxAddress: '',
+    size: '',
+    pileType: '',
+    indoorOutdoor: '',
+    sharedWithOthers: '',
+    sharedScope: '',
+    highPowerAppliance: '',
+    highPowerName: '',
+    systemUrl: '',
+    firstUrl: '',
+    secondUrl: ''
+  })
+}
 const locationTree = ref<TreeNode[]>([])
 const router = useRouter()
 
@@ -206,7 +226,7 @@ const onFilterStationChange = () => {
 const onFilterAreaChange = () => {}
 
 const openDialog = () => {
-  Object.keys(form).forEach((k) => delete form[k])
+  initForm()
   dialogVisible.value = true
 }
 
@@ -243,9 +263,31 @@ const save = async () => {
     ElMessage.error('选择为大功率电器后，必须填写大功率电器名称')
     return
   }
-  await http.post('/box/save', form)
-  dialogVisible.value = false
-  load()
+  const payload = {
+    id: form.id,
+    boxId: form.boxId,
+    station: form.station,
+    area: form.area,
+    boxAddress: form.boxAddress,
+    size: form.size,
+    pileType: form.pileType,
+    indoorOutdoor: form.indoorOutdoor,
+    sharedWithOthers: form.sharedWithOthers,
+    sharedScope: form.sharedWithOthers === '是' ? form.sharedScope : '',
+    highPowerAppliance: form.highPowerAppliance,
+    highPowerName: form.highPowerAppliance === '是' ? form.highPowerName : '',
+    systemUrl: form.systemUrl,
+    firstUrl: form.firstUrl,
+    secondUrl: form.secondUrl
+  }
+  try {
+    await http.post('/box/save', payload)
+    dialogVisible.value = false
+    await load()
+    ElMessage.success('保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.msg || '保存失败')
+  }
 }
 
 const remove = async (id: number) => {
