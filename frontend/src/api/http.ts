@@ -25,17 +25,19 @@ http.interceptors.response.use(
   (error) => {
     // 只在明确的 401 未授权响应时才登出，其他错误不处理
     if (error.response && error.response.status === 401) {
-      // 避免在登录页面循环跳转，也排除字典接口
       const pathname = window.location.pathname
       const url = error.config?.url || ''
-      if (pathname !== '/login' && !url.includes('/dict/') && !url.includes('/location/')) {
-        // 防止多个 401 响应触发多次跳转
+      const shouldIgnore = url.includes('/dict/')
+        || url.includes('/location/')
+        || url.includes('/files/')
+        || url.includes('/api/files/')
+
+      if (pathname !== '/login' && !shouldIgnore) {
         if (!isRedirecting) {
           isRedirecting = true
           const store = useUserStore(pinia)
           store.logout()
           window.location.href = '/login'
-          // 延迟重置标志，确保页面跳转完成
           setTimeout(() => { isRedirecting = false }, 1000)
         }
       }
