@@ -100,14 +100,24 @@ public class BoxController {
     public IPage<Box> findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String id,
+                               @RequestParam(defaultValue = "") String boxId,
+                               @RequestParam(defaultValue = "") String railwayStation,
                                @RequestParam(defaultValue = "") String station,
                                @RequestParam(defaultValue = "") String address,
-                               @RequestParam(defaultValue = "") String area) {
+                               @RequestParam(defaultValue = "") String area,
+                               @RequestParam(defaultValue = "") String pileType,
+                               @RequestParam(defaultValue = "") String indoorOutdoor) {
         IPage<Box> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Box> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("deleted", 0);
         if (!"".equals(id)) {
             queryWrapper.like("id", id);
+        }
+        if (!"".equals(boxId)) {
+            queryWrapper.like("box_id", boxId);
+        }
+        if (!"".equals(railwayStation)) {
+            queryWrapper.like("railway_station", railwayStation);
         }
         if (!"".equals(station)) {
             queryWrapper.like("station", station);
@@ -117,6 +127,12 @@ public class BoxController {
         }
         if (!"".equals(area)) {
             queryWrapper.like("area", area);
+        }
+        if (!"".equals(pileType)) {
+            queryWrapper.eq("pile_type", pileType);
+        }
+        if (!"".equals(indoorOutdoor)) {
+            queryWrapper.eq("indoor_outdoor", indoorOutdoor);
         }
         queryWrapper.orderByDesc("id");
         return boxService.page(page, queryWrapper);
