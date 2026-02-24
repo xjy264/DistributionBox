@@ -60,17 +60,17 @@
         </div>
         <el-table :data="circuits" border>
           <el-table-column type="index" label="序号" width="70" />
-          <el-table-column prop="supplyCircuit" label="供电回路" width="120" />
-          <el-table-column prop="switchModel" label="开关型号" width="120" />
+          <el-table-column prop="supplyCircuit" label="供电回路" width="100" />
+          <el-table-column prop="switchModel" label="开关型号" width="100" />
           <el-table-column prop="ratedCurrent" label="额定电流" width="100" />
           <el-table-column prop="wireSection" label="导线截面" width="100" />
-          <el-table-column prop="powerVoltage" label="电源电压" width="100" />
-          <el-table-column prop="startCurrent" label="启动电流" width="100" />
-          <el-table-column prop="runCurrent" label="运行电流" width="100" />
-          <el-table-column prop="power" label="功率" width="90" />
-          <el-table-column prop="electricDevice" label="用电设备" width="120" />
+          <el-table-column prop="powerVoltage" label="电源电压" width="90" />
+          <el-table-column prop="startCurrent" label="启动电流" width="90" />
+          <el-table-column prop="runCurrent" label="运行电流" width="90" />
+          <el-table-column prop="power" label="功率" width="70" />
+          <el-table-column prop="electricDevice" label="用电设备" width="100" />
           <el-table-column prop="deviceLocation" label="设备地点" min-width="180" show-overflow-tooltip />
-          <el-table-column prop="remark" label="备注" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="remark" label="备注" min-width="100" show-overflow-tooltip />
           <el-table-column label="操作" width="160">
             <template #default="scope">
               <el-button size="small" @click="editCircuit(scope.row)">编辑</el-button>

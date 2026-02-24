@@ -27,6 +27,7 @@
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/common/Result.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/User.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/EmergencyRepairBox.java
+/Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/mapper/BoxCircuitMapper.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/DepartmentController.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/FilesController.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/mapper/DictMapper.java
@@ -52,6 +53,7 @@
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/mapper/RepairTaskMapper.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/common/RoleEnum.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/mapper/InspectionItemMapper.java
+/Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/BoxCircuit.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/RepairTask.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/Home.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/common/Constants.java
@@ -61,6 +63,7 @@
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/impl/InspectionTaskServiceImpl.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/impl/BoxServiceImpl.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/security/JwtAuthenticationFilter.java
+/Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/BoxCircuitController.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/InspectionItem.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/mapper/BoxMapper.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/IDepartmentService.java
@@ -93,6 +96,7 @@
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/impl/RepairTaskServiceImpl.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/dto/EmergencyRepairSaveDto.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/entity/Role.java
+/Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/impl/BoxCircuitServiceImpl.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/mapper/InspectionBoxMapper.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/DistributionBoxApplication.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/RepairTaskController.java
@@ -119,3 +123,4 @@
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/InspectionItemController.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/controller/dto/RepairTaskViewDto.java
 /Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/IInspectionService.java
+/Users/xuejiayao/project/distributionBox/backend/src/main/java/com/distributionbox/service/IBoxCircuitService.java
