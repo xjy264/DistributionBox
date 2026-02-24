@@ -12,22 +12,16 @@
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
-      <el-descriptions-item label="明桩暗桩">{{ toDisplay(box.pileType) }}</el-descriptions-item>
+      <el-descriptions-item label="明装暗装">{{ toDisplay(box.pileType) }}</el-descriptions-item>
       <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
-      <el-descriptions-item label="远景">
+      <el-descriptions-item label="图片1">
         <PreviewImage :src="resolvePreviewUrl(box.firstUrl)" width="220px" height="160px" />
       </el-descriptions-item>
-      <el-descriptions-item label="近景">
+      <el-descriptions-item label="图片2">
         <PreviewImage :src="resolvePreviewUrl(box.secondUrl)" width="220px" height="160px" />
-      </el-descriptions-item>
-      <el-descriptions-item label="图片3">
-        <PreviewImage :src="resolvePreviewUrl(box.thirdUrl)" width="220px" height="160px" />
-      </el-descriptions-item>
-      <el-descriptions-item label="图片4">
-        <PreviewImage :src="resolvePreviewUrl(box.fourthUrl)" width="220px" height="160px" />
       </el-descriptions-item>
     </el-descriptions>
 
@@ -81,10 +75,10 @@
         <el-form-item label="规格">
           <el-input v-model="boxEditForm.size" />
         </el-form-item>
-        <el-form-item label="明桩暗桩">
+        <el-form-item label="明装暗装">
           <el-select v-model="boxEditForm.pileType" style="width: 100%" clearable>
-            <el-option label="明桩" value="明桩" />
-            <el-option label="暗桩" value="暗桩" />
+            <el-option label="明装" value="明装" />
+            <el-option label="暗装" value="暗装" />
           </el-select>
         </el-form-item>
         <el-form-item label="室内室外">
@@ -96,17 +90,11 @@
         <el-form-item label="系统图">
           <ImageUpload v-model="boxImageForm.systemUrl" />
         </el-form-item>
-        <el-form-item label="远景">
+        <el-form-item label="图片1">
           <ImageUpload v-model="boxImageForm.firstUrl" />
         </el-form-item>
-        <el-form-item label="近景">
+        <el-form-item label="图片2">
           <ImageUpload v-model="boxImageForm.secondUrl" />
-        </el-form-item>
-        <el-form-item label="图片3">
-          <ImageUpload v-model="boxImageForm.thirdUrl" />
-        </el-form-item>
-        <el-form-item label="图片4">
-          <ImageUpload v-model="boxImageForm.fourthUrl" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -185,8 +173,6 @@ const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
   secondUrl: '',
-  thirdUrl: '',
-  fourthUrl: ''
 })
 let currentLoadToken = 0
 
@@ -251,8 +237,6 @@ const syncBoxImageForm = () => {
   boxImageForm.systemUrl = normalizeImageField(box.systemUrl)
   boxImageForm.firstUrl = normalizeImageField(box.firstUrl)
   boxImageForm.secondUrl = normalizeImageField(box.secondUrl)
-  boxImageForm.thirdUrl = normalizeImageField(box.thirdUrl)
-  boxImageForm.fourthUrl = normalizeImageField(box.fourthUrl)
 }
 
 const refreshBoxOptions = () => {
@@ -361,8 +345,6 @@ const saveBoxBaseInfo = async () => {
     systemUrl: normalizeImageField(boxImageForm.systemUrl),
     firstUrl: normalizeImageField(boxImageForm.firstUrl),
     secondUrl: normalizeImageField(boxImageForm.secondUrl),
-    thirdUrl: normalizeImageField(boxImageForm.thirdUrl),
-    fourthUrl: normalizeImageField(boxImageForm.fourthUrl)
   }
   await http.post('/box/save', payload)
   boxEditDialog.value = false

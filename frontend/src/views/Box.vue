@@ -62,10 +62,10 @@
         <el-form-item label="规格">
           <el-input v-model="form.size" />
         </el-form-item>
-        <el-form-item label="明桩暗桩">
+        <el-form-item label="明装暗装">
           <el-select v-model="form.pileType" style="width: 100%" clearable>
-            <el-option label="明桩" value="明桩" />
-            <el-option label="暗桩" value="暗桩" />
+            <el-option label="明装" value="明装" />
+            <el-option label="暗装" value="暗装" />
           </el-select>
         </el-form-item>
         <el-form-item label="室内室外">
@@ -77,17 +77,11 @@
         <el-form-item label="系统图">
           <ImageUpload v-model="form.systemUrl" />
         </el-form-item>
-        <el-form-item label="远景">
+        <el-form-item label="图片1">
           <ImageUpload v-model="form.firstUrl" />
         </el-form-item>
-        <el-form-item label="近景">
+        <el-form-item label="图片2">
           <ImageUpload v-model="form.secondUrl" />
-        </el-form-item>
-        <el-form-item label="图片3">
-          <ImageUpload v-model="form.thirdUrl" />
-        </el-form-item>
-        <el-form-item label="图片4">
-          <ImageUpload v-model="form.fourthUrl" />
         </el-form-item>
       </el-form>
       <template #footer>
