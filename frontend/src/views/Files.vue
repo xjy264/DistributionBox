@@ -47,7 +47,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
 import http from '@/api/http'
 import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import PreviewImage from '@/components/PreviewImage.vue'

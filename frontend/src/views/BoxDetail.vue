@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import EntityForm from '@/components/EntityForm.vue'

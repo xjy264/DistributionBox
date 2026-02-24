@@ -54,8 +54,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
 const router = useRouter()
 const list = ref<any[]>([])
@@ -87,12 +88,10 @@ const onSizeChange = (size: number) => { pageSize.value = size; load() }
 const onCurrentChange = (current: number) => { pageNum.value = current; load() }
 const goDetail = (id: number) => router.push(`/overhaul-task/${id}`)
 const removeTask = async (id: number) => {
-  try {
-    await ElMessageBox.confirm('确认删除该工单？', '提示', { type: 'warning' })
-    await http.delete(`/overhaul-task/${id}`)
-    await load()
-    ElMessage.success('删除成功')
-  } catch {}
+  if (!(await confirmDeleteAction('确认删除该工单？'))) return
+  await http.delete(`/overhaul-task/${id}`)
+  await load()
+  ElMessage.success('删除成功')
 }
 
 const openCreateDialog = () => {

@@ -88,7 +88,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import ImageUpload from '@/components/ImageUpload.vue'

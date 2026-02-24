@@ -53,7 +53,6 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
 import http from '@/api/http'
 import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import EntityForm from '@/components/EntityForm.vue'
@@ -77,7 +76,7 @@ const fields = [
 ]
 
 const load = async () => {
-  const res = await http.get('/roles/page', {
+  const res = await http.get('/role/page', {
     params: { pageNum: pageNum.value, pageSize: pageSize.value, name: name.value }
   })
   tableData.value = res.data.data.content
@@ -95,29 +94,29 @@ const edit = (row: any) => {
 }
 
 const save = async () => {
-  await http.post('/roles', form)
+  await http.post('/role', form)
   dialogVisible.value = false
   load()
 }
 
 const remove = async (id: number) => {
   if (!(await confirmDeleteAction())) return
-  await http.delete(`/roles/${id}`)
+  await http.delete(`/role/${id}`)
   load()
 }
 
 const openBind = async (row: any) => {
   roleId.value = row.id
-  const idsRes = await http.get('/menus/ids')
+  const idsRes = await http.get('/menu/ids')
   allMenuIds.value = idsRes.data.data
-  const res = await http.get(`/roles/checks/${row.id}`)
+  const res = await http.get(`/role/checks/${row.id}`)
   menuIds.value = res.data.data
   bindVisible.value = true
 }
 
 const saveBind = async () => {
   if (!roleId.value) return
-  await http.post(`/roles/roleMenu/${roleId.value}`, menuIds.value)
+  await http.post(`/role/roleMenu/${roleId.value}`, menuIds.value)
   bindVisible.value = false
 }
 

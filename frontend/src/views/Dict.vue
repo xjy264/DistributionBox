@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
