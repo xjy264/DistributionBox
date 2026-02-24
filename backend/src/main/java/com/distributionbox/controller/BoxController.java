@@ -101,7 +101,6 @@ public class BoxController {
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String id,
                                @RequestParam(defaultValue = "") String boxId,
-                               @RequestParam(defaultValue = "") String railwayStation,
                                @RequestParam(defaultValue = "") String station,
                                @RequestParam(defaultValue = "") String address,
                                @RequestParam(defaultValue = "") String area,
@@ -115,9 +114,6 @@ public class BoxController {
         }
         if (!"".equals(boxId)) {
             queryWrapper.like("box_id", boxId);
-        }
-        if (!"".equals(railwayStation)) {
-            queryWrapper.like("railway_station", railwayStation);
         }
         if (!"".equals(station)) {
             queryWrapper.like("station", station);

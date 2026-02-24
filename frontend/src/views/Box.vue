@@ -2,7 +2,6 @@
   <div>
     <div class="toolbar">
       <el-input v-model="filters.boxId" placeholder="台账号（模糊）" class="field" clearable />
-      <el-input v-model="filters.railwayStation" placeholder="车站（模糊）" class="field" clearable />
       <el-select v-model="filters.station" placeholder="车间" class="field" clearable filterable @change="onFilterStationChange">
         <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
       </el-select>
@@ -10,14 +9,6 @@
         <el-option v-for="opt in filterAreaOptions" :key="opt" :label="opt" :value="opt" />
       </el-select>
       <el-input v-model="filters.address" placeholder="安装地点" class="field" clearable />
-      <el-select v-model="filters.pileType" placeholder="明桩暗桩" class="field" clearable>
-        <el-option label="明桩" value="明桩" />
-        <el-option label="暗桩" value="暗桩" />
-      </el-select>
-      <el-select v-model="filters.indoorOutdoor" placeholder="室内室外" class="field" clearable>
-        <el-option label="室内" value="室内" />
-        <el-option label="室外" value="室外" />
-      </el-select>
       <el-button type="primary" @click="load">搜索</el-button>
       <el-button @click="reset">重置</el-button>
       <el-button type="success" @click="openDialog">新增</el-button>
@@ -25,11 +16,8 @@
 
     <el-table :data="tableData" border>
       <el-table-column prop="boxId" label="台账号" />
-      <el-table-column prop="railwayStation" label="车站" />
       <el-table-column prop="station" label="车间" />
       <el-table-column prop="area" label="工区" />
-      <el-table-column prop="pileType" label="明桩暗桩" />
-      <el-table-column prop="indoorOutdoor" label="室内室外" />
       <el-table-column prop="boxAddress" label="安装地点" />
       <el-table-column prop="size" label="规格" />
       <el-table-column label="操作" width="340">
@@ -57,9 +45,6 @@
       <el-form :model="form" label-width="90px">
         <el-form-item label="台帐号">
           <el-input v-model="form.boxId" />
-        </el-form-item>
-        <el-form-item label="车站">
-          <el-input v-model="form.railwayStation" placeholder="可选" />
         </el-form-item>
         <el-form-item label="车间">
           <el-select v-model="form.station" style="width: 100%" filterable @change="onFormStationChange">
@@ -126,7 +111,7 @@ type TreeNode = {
   children?: TreeNode[]
 }
 
-const filters = reactive({ boxId: '', railwayStation: '', station: '', area: '', address: '', pileType: '', indoorOutdoor: '' })
+const filters = reactive({ boxId: '', station: '', area: '', address: '' })
 const tableData = ref<any[]>([])
 const pageNum = ref(1)
 const pageSize = ref(10)
@@ -143,12 +128,6 @@ const getAreaOptions = (stationName: string) => {
   return (station?.children || []).map((item) => item.name)
 }
 
-const getAddressOptions = (stationName: string, areaName: string) => {
-  const station = locationTree.value.find((item) => item.name === stationName)
-  const area = (station?.children || []).find((item) => item.name === areaName)
-  return (area?.children || []).map((item) => item.name)
-}
-
 const filterAreaOptions = computed(() => getAreaOptions(filters.station))
 const formAreaOptions = computed(() => getAreaOptions(form.station || ''))
 
@@ -157,7 +136,6 @@ const loadLocations = async () => {
     const res = await http.get('/location/tree')
     locationTree.value = res.data || []
   } catch {
-    // 后端 location 接口未就绪时，降级为从现有配电箱数据推导联动选项，避免登录后被401链路影响
     const res = await http.get('/box/page', { params: { pageNum: 1, pageSize: 1000 } })
     const records = res.data?.records || []
     const map = new Map<string, Map<string, Set<string>>>()
@@ -188,12 +166,9 @@ const load = async () => {
       pageNum: pageNum.value,
       pageSize: pageSize.value,
       boxId: filters.boxId,
-      railwayStation: filters.railwayStation,
       station: filters.station,
       area: filters.area,
-      address: filters.address,
-      pileType: filters.pileType,
-      indoorOutdoor: filters.indoorOutdoor
+      address: filters.address
     }
   })
   const data = res.data
@@ -203,12 +178,9 @@ const load = async () => {
 
 const reset = () => {
   filters.boxId = ''
-  filters.railwayStation = ''
   filters.station = ''
   filters.area = ''
   filters.address = ''
-  filters.pileType = ''
-  filters.indoorOutdoor = ''
   load()
 }
 

@@ -30,7 +30,6 @@ public class Box implements Serializable {
 
     private String boxId;
 
-    private String railwayStation;
 
     private String station;
 
