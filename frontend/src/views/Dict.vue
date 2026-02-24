@@ -80,6 +80,7 @@
 import { computed, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
 type TreeNode = {
   id: number
@@ -219,6 +220,7 @@ const save = async () => {
 }
 
 const remove = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`/location/${id}`)
   await load()
 }

@@ -10,9 +10,10 @@
       <el-table-column prop="taskNo" label="任务单号" min-width="260" />
       <el-table-column prop="reportTime" label="报修时间" min-width="260" />
       <el-table-column prop="reportUser" label="报修人" min-width="220" />
-      <el-table-column label="操作" width="160" fixed="right">
+      <el-table-column label="操作" width="230" fixed="right">
         <template #default="scope">
           <el-button size="small" type="primary" @click="goDetail(scope.row.id)">进入工单</el-button>
+          <el-button size="small" type="danger" @click="removeTask(scope.row.id)">删除工单</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,6 +56,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
 const router = useRouter()
 const list = ref<any[]>([])
@@ -85,6 +87,12 @@ const load = async () => {
 const onSizeChange = (size: number) => { pageSize.value = size; load() }
 const onCurrentChange = (current: number) => { pageNum.value = current; load() }
 const goDetail = (id: number) => router.push(`/overhaul-task/${id}`)
+const removeTask = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该工单？'))) return
+  await http.delete(`/overhaul-task/${id}`)
+  await load()
+  ElMessage.success('删除成功')
+}
 
 const openCreateDialog = () => {
   Object.assign(form, {

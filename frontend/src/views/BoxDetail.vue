@@ -8,6 +8,7 @@
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
       <el-descriptions-item label="台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="车站">{{ toDisplay(box.railwayStation) }}</el-descriptions-item>
       <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
@@ -15,10 +16,10 @@
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
-      <el-descriptions-item label="图片1">
+      <el-descriptions-item label="远景">
         <PreviewImage :src="resolvePreviewUrl(box.firstUrl)" width="220px" height="160px" />
       </el-descriptions-item>
-      <el-descriptions-item label="图片2">
+      <el-descriptions-item label="近景">
         <PreviewImage :src="resolvePreviewUrl(box.secondUrl)" width="220px" height="160px" />
       </el-descriptions-item>
       <el-descriptions-item label="图片3">
@@ -63,6 +64,9 @@
         <el-form-item label="台账号">
           <el-input v-model="boxEditForm.boxId" disabled />
         </el-form-item>
+        <el-form-item label="车站">
+          <el-input v-model="boxEditForm.railwayStation" />
+        </el-form-item>
         <el-form-item label="车间">
           <el-input v-model="boxEditForm.station" />
         </el-form-item>
@@ -75,13 +79,25 @@
         <el-form-item label="规格">
           <el-input v-model="boxEditForm.size" />
         </el-form-item>
+        <el-form-item label="明桩暗桩">
+          <el-select v-model="boxEditForm.pileType" style="width: 100%" clearable>
+            <el-option label="明桩" value="明桩" />
+            <el-option label="暗桩" value="暗桩" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="室内室外">
+          <el-select v-model="boxEditForm.indoorOutdoor" style="width: 100%" clearable>
+            <el-option label="室内" value="室内" />
+            <el-option label="室外" value="室外" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="boxImageForm.systemUrl" />
         </el-form-item>
-        <el-form-item label="图片1">
+        <el-form-item label="远景">
           <ImageUpload v-model="boxImageForm.firstUrl" />
         </el-form-item>
-        <el-form-item label="图片2">
+        <el-form-item label="近景">
           <ImageUpload v-model="boxImageForm.secondUrl" />
         </el-form-item>
         <el-form-item label="图片3">
@@ -121,6 +137,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import EntityForm from '@/components/EntityForm.vue'
 import ImageUpload from '@/components/ImageUpload.vue'
 import PreviewImage from '@/components/PreviewImage.vue'
@@ -141,10 +158,13 @@ const boxEditDialog = ref(false)
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
   boxId: '',
+  railwayStation: '',
   station: '',
   area: '',
   boxAddress: '',
-  size: ''
+  size: '',
+  pileType: '',
+  indoorOutdoor: ''
 })
 const inspectionForm = reactive<any>({ boxIds: [] })
 const boxImageForm = reactive<any>({
@@ -275,10 +295,13 @@ const load = async () => {
 
 const openBoxEditDialog = () => {
   boxEditForm.boxId = box.boxId || ''
+  boxEditForm.railwayStation = box.railwayStation || ''
   boxEditForm.station = box.station || ''
   boxEditForm.area = box.area || ''
   boxEditForm.boxAddress = box.boxAddress || ''
   boxEditForm.size = box.size || ''
+  boxEditForm.pileType = box.pileType || ''
+  boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
   boxEditDialog.value = true
 }
 
@@ -288,10 +311,13 @@ const saveBoxBaseInfo = async () => {
     ...box,
     id: box.id,
     boxId: box.boxId,
+    railwayStation: boxEditForm.railwayStation,
     station: boxEditForm.station,
     area: boxEditForm.area,
     boxAddress: boxEditForm.boxAddress,
     size: boxEditForm.size,
+    pileType: boxEditForm.pileType,
+    indoorOutdoor: boxEditForm.indoorOutdoor,
     systemUrl: normalizeImageField(boxImageForm.systemUrl),
     firstUrl: normalizeImageField(boxImageForm.firstUrl),
     secondUrl: normalizeImageField(boxImageForm.secondUrl),
@@ -323,6 +349,7 @@ const saveComponent = async () => {
 }
 
 const removeComponent = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`/components/${id}`)
   load()
 }
@@ -397,6 +424,7 @@ const saveInspection = async () => {
 }
 
 const removeInspection = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`/maintenance-task/${id}`)
   load()
 }

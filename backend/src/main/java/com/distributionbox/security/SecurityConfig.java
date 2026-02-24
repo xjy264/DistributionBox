@@ -50,6 +50,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/files/**", "/files/preview/**").permitAll()
                         .requestMatchers("/login", "/register").permitAll()
                         .anyRequest().authenticated()
                 )

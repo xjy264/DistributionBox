@@ -34,6 +34,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import EntityForm from '@/components/EntityForm.vue'
 
 const name = ref('')
@@ -52,7 +53,7 @@ const fields = [
 ]
 
 const load = async () => {
-  const res = await http.get('/menus', { params: { name: name.value } })
+  const res = await http.get('/menu', { params: { name: name.value } })
   tableData.value = res.data.data
 }
 
@@ -67,13 +68,14 @@ const edit = (row: any) => {
 }
 
 const save = async () => {
-  await http.post('/menus', form)
+  await http.post('/menu', form)
   dialogVisible.value = false
   load()
 }
 
 const remove = async (id: number) => {
-  await http.delete(`/menus/${id}`)
+  if (!(await confirmDeleteAction())) return
+  await http.delete(`/menu/${id}`)
   load()
 }
 

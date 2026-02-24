@@ -116,6 +116,7 @@ import ImageUpload from '@/components/ImageUpload.vue'
 import PreviewImage from '@/components/PreviewImage.vue'
 import { resolvePreviewUrl } from '@/utils/image'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
 const route = useRoute(); const router = useRouter();
 const id = Number(route.params.id)
@@ -179,16 +180,16 @@ const saveTask = async()=>{
 const openDisease = ()=>{ Object.assign(diseaseForm,{id:null,taskId:id,seqNo:diseases.value.length+1,diseaseLocation:'',diseaseDesc:'',quantity:0,disposalMethod:'',remark:''}); diseaseDialog.value=true }
 const editDisease = (r:any)=>{ Object.assign(diseaseForm,r); diseaseDialog.value=true }
 const saveDisease = async()=>{ if(!diseaseForm.seqNo) diseaseForm.seqNo=1; if(diseaseForm.id) await http.post('/maintenance-module/disease/update',diseaseForm); else await http.post('/maintenance-module/disease/save',diseaseForm); diseaseDialog.value=false; await loadModules() }
-const delDisease = async(id:number)=>{ await http.delete(`/maintenance-module/disease/${id}`); await loadModules() }
+const delDisease = async(id:number)=>{ if(!(await confirmDeleteAction())) return; await http.delete(`/maintenance-module/disease/${id}`); await loadModules() }
 
 const openCompare = ()=>{ Object.assign(compareForm,{id:null,taskId:id,diseaseLocation:'',beforeImageUrl:'',diseaseNote:'',afterImageUrl:'',disposalNote:''}); compareDialog.value=true }
 const editCompare = (r:any)=>{ Object.assign(compareForm,r); compareDialog.value=true }
 const saveCompare = async()=>{ await http.post('/maintenance-module/compare/save',compareForm); compareDialog.value=false; await loadModules() }
-const delCompare = async(id:number)=>{ await http.delete(`/maintenance-module/compare/${id}`); await loadModules() }
+const delCompare = async(id:number)=>{ if(!(await confirmDeleteAction())) return; await http.delete(`/maintenance-module/compare/${id}`); await loadModules() }
 
 const openProcess = ()=>{ Object.assign(processForm,{id:null,taskId:id,imageUrl:''}); processDialog.value=true }
 const saveProcess = async()=>{ await http.post('/maintenance-module/process/save',processForm); processDialog.value=false; await loadModules() }
-const delProcess = async(id:number)=>{ await http.delete(`/maintenance-module/process/${id}`); await loadModules() }
+const delProcess = async(id:number)=>{ if(!(await confirmDeleteAction())) return; await http.delete(`/maintenance-module/process/${id}`); await loadModules() }
 
 onMounted(async()=>{ await loadTask(); await loadModules() })
 </script>

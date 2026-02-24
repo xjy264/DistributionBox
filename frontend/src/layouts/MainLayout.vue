@@ -42,8 +42,6 @@ const menuConfig = [
 
   { label: '文件', path: '/files' },
   { label: '用户', path: '/users' },
-  { label: '角色', path: '/roles' },
-  { label: '菜单', path: '/menus' },
   { label: '图表', path: '/echarts' },
   { label: '人员', path: '/person' }
 ]

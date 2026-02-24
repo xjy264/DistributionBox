@@ -1,6 +1,8 @@
 <template>
   <div>
     <div class="toolbar">
+      <el-input v-model="filters.boxId" placeholder="台账号（模糊）" class="field" clearable />
+      <el-input v-model="filters.railwayStation" placeholder="车站（模糊）" class="field" clearable />
       <el-select v-model="filters.station" placeholder="车间" class="field" clearable filterable @change="onFilterStationChange">
         <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
       </el-select>
@@ -8,15 +10,26 @@
         <el-option v-for="opt in filterAreaOptions" :key="opt" :label="opt" :value="opt" />
       </el-select>
       <el-input v-model="filters.address" placeholder="安装地点" class="field" clearable />
+      <el-select v-model="filters.pileType" placeholder="明桩暗桩" class="field" clearable>
+        <el-option label="明桩" value="明桩" />
+        <el-option label="暗桩" value="暗桩" />
+      </el-select>
+      <el-select v-model="filters.indoorOutdoor" placeholder="室内室外" class="field" clearable>
+        <el-option label="室内" value="室内" />
+        <el-option label="室外" value="室外" />
+      </el-select>
       <el-button type="primary" @click="load">搜索</el-button>
       <el-button @click="reset">重置</el-button>
       <el-button type="success" @click="openDialog">新增</el-button>
     </div>
 
     <el-table :data="tableData" border>
-      <el-table-column prop="boxId" label="台帐号" />
+      <el-table-column prop="boxId" label="台账号" />
+      <el-table-column prop="railwayStation" label="车站" />
       <el-table-column prop="station" label="车间" />
       <el-table-column prop="area" label="工区" />
+      <el-table-column prop="pileType" label="明桩暗桩" />
+      <el-table-column prop="indoorOutdoor" label="室内室外" />
       <el-table-column prop="boxAddress" label="安装地点" />
       <el-table-column prop="size" label="规格" />
       <el-table-column label="操作" width="340">
@@ -45,6 +58,9 @@
         <el-form-item label="台帐号">
           <el-input v-model="form.boxId" />
         </el-form-item>
+        <el-form-item label="车站">
+          <el-input v-model="form.railwayStation" placeholder="可选" />
+        </el-form-item>
         <el-form-item label="车间">
           <el-select v-model="form.station" style="width: 100%" filterable @change="onFormStationChange">
             <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
@@ -61,13 +77,25 @@
         <el-form-item label="规格">
           <el-input v-model="form.size" />
         </el-form-item>
+        <el-form-item label="明桩暗桩">
+          <el-select v-model="form.pileType" style="width: 100%" clearable>
+            <el-option label="明桩" value="明桩" />
+            <el-option label="暗桩" value="暗桩" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="室内室外">
+          <el-select v-model="form.indoorOutdoor" style="width: 100%" clearable>
+            <el-option label="室内" value="室内" />
+            <el-option label="室外" value="室外" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="form.systemUrl" />
         </el-form-item>
-        <el-form-item label="图片1">
+        <el-form-item label="远景">
           <ImageUpload v-model="form.firstUrl" />
         </el-form-item>
-        <el-form-item label="图片2">
+        <el-form-item label="近景">
           <ImageUpload v-model="form.secondUrl" />
         </el-form-item>
         <el-form-item label="图片3">
@@ -90,6 +118,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 import ImageUpload from '@/components/ImageUpload.vue'
 
 type TreeNode = {
@@ -97,7 +126,7 @@ type TreeNode = {
   children?: TreeNode[]
 }
 
-const filters = reactive({ station: '', area: '', address: '' })
+const filters = reactive({ boxId: '', railwayStation: '', station: '', area: '', address: '', pileType: '', indoorOutdoor: '' })
 const tableData = ref<any[]>([])
 const pageNum = ref(1)
 const pageSize = ref(10)
@@ -158,9 +187,13 @@ const load = async () => {
     params: {
       pageNum: pageNum.value,
       pageSize: pageSize.value,
+      boxId: filters.boxId,
+      railwayStation: filters.railwayStation,
       station: filters.station,
       area: filters.area,
-      address: filters.address
+      address: filters.address,
+      pileType: filters.pileType,
+      indoorOutdoor: filters.indoorOutdoor
     }
   })
   const data = res.data
@@ -169,9 +202,13 @@ const load = async () => {
 }
 
 const reset = () => {
+  filters.boxId = ''
+  filters.railwayStation = ''
   filters.station = ''
   filters.area = ''
   filters.address = ''
+  filters.pileType = ''
+  filters.indoorOutdoor = ''
   load()
 }
 
@@ -211,6 +248,7 @@ const save = async () => {
 }
 
 const remove = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
   await http.delete(`/box/${id}`)
   load()
 }
