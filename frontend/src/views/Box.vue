@@ -74,6 +74,24 @@
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
+        <el-form-item label="是否与其它单位共用">
+          <el-select v-model="form.sharedWithOthers" style="width: 100%" clearable @change="onSharedWithOthersChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="共用范围">
+          <el-input v-model="form.sharedScope" :disabled="form.sharedWithOthers !== '是'" placeholder="选择是后必填" />
+        </el-form-item>
+        <el-form-item label="是否为大功率电器">
+          <el-select v-model="form.highPowerAppliance" style="width: 100%" clearable @change="onHighPowerChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="大功率电器名称">
+          <el-input v-model="form.highPowerName" :disabled="form.highPowerAppliance !== '是'" placeholder="选择是后必填" />
+        </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="form.systemUrl" />
         </el-form-item>
@@ -200,6 +218,14 @@ const onFormStationChange = () => {
 
 const onFormAreaChange = () => {}
 
+const onSharedWithOthersChange = () => {
+  if (form.sharedWithOthers !== '是') form.sharedScope = ''
+}
+
+const onHighPowerChange = () => {
+  if (form.highPowerAppliance !== '是') form.highPowerName = ''
+}
+
 const save = async () => {
   if (!form.boxId || !String(form.boxId).trim()) {
     ElMessage.error('请输入台帐号')
@@ -207,6 +233,14 @@ const save = async () => {
   }
   if (!form.station || !form.area || !form.boxAddress) {
     ElMessage.error('请选择车间、工区和安装地点')
+    return
+  }
+  if (form.sharedWithOthers === '是' && !String(form.sharedScope || '').trim()) {
+    ElMessage.error('请选择与其它单位共用后，必须填写共用范围')
+    return
+  }
+  if (form.highPowerAppliance === '是' && !String(form.highPowerName || '').trim()) {
+    ElMessage.error('选择为大功率电器后，必须填写大功率电器名称')
     return
   }
   await http.post('/box/save', form)

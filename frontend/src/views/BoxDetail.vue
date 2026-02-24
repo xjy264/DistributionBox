@@ -14,6 +14,10 @@
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="明装暗装">{{ toDisplay(box.pileType) }}</el-descriptions-item>
       <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
+      <el-descriptions-item label="是否与其它单位共用">{{ toDisplay(box.sharedWithOthers) }}</el-descriptions-item>
+      <el-descriptions-item label="共用范围">{{ toDisplay(box.sharedScope) }}</el-descriptions-item>
+      <el-descriptions-item label="是否为大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
+      <el-descriptions-item label="大功率电器名称">{{ toDisplay(box.highPowerName) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
@@ -86,6 +90,24 @@
             <el-option label="室内" value="室内" />
             <el-option label="室外" value="室外" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="是否与其它单位共用">
+          <el-select v-model="boxEditForm.sharedWithOthers" style="width: 100%" clearable @change="onEditSharedWithOthersChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="共用范围">
+          <el-input v-model="boxEditForm.sharedScope" :disabled="boxEditForm.sharedWithOthers !== '是'" placeholder="选择是后必填" />
+        </el-form-item>
+        <el-form-item label="是否为大功率电器">
+          <el-select v-model="boxEditForm.highPowerAppliance" style="width: 100%" clearable @change="onEditHighPowerChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="大功率电器名称">
+          <el-input v-model="boxEditForm.highPowerName" :disabled="boxEditForm.highPowerAppliance !== '是'" placeholder="选择是后必填" />
         </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="boxImageForm.systemUrl" />
@@ -165,7 +187,11 @@ const boxEditForm = reactive<any>({
   boxAddress: '',
   size: '',
   pileType: '',
-  indoorOutdoor: ''
+  indoorOutdoor: '',
+  sharedWithOthers: '',
+  sharedScope: '',
+  highPowerAppliance: '',
+  highPowerName: ''
 })
 const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
 const inspectionForm = reactive<any>({ boxIds: [] })
@@ -284,6 +310,14 @@ const onEditStationChange = () => {
   }
 }
 
+const onEditSharedWithOthersChange = () => {
+  if (boxEditForm.sharedWithOthers !== '是') boxEditForm.sharedScope = ''
+}
+
+const onEditHighPowerChange = () => {
+  if (boxEditForm.highPowerAppliance !== '是') boxEditForm.highPowerName = ''
+}
+
 const load = async () => {
   const id = Number(route.params.id)
   if (!id) {
@@ -327,11 +361,23 @@ const openBoxEditDialog = () => {
   boxEditForm.size = box.size || ''
   boxEditForm.pileType = box.pileType || ''
   boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
+  boxEditForm.sharedWithOthers = box.sharedWithOthers || ''
+  boxEditForm.sharedScope = box.sharedScope || ''
+  boxEditForm.highPowerAppliance = box.highPowerAppliance || ''
+  boxEditForm.highPowerName = box.highPowerName || ''
   boxEditDialog.value = true
 }
 
 const saveBoxBaseInfo = async () => {
   if (!box.id) return
+  if (boxEditForm.sharedWithOthers === '是' && !String(boxEditForm.sharedScope || '').trim()) {
+    ElMessage.error('选择与其它单位共用后，必须填写共用范围')
+    return
+  }
+  if (boxEditForm.highPowerAppliance === '是' && !String(boxEditForm.highPowerName || '').trim()) {
+    ElMessage.error('选择为大功率电器后，必须填写大功率电器名称')
+    return
+  }
   const payload = {
     ...box,
     id: box.id,
@@ -342,6 +388,10 @@ const saveBoxBaseInfo = async () => {
     size: boxEditForm.size,
     pileType: boxEditForm.pileType,
     indoorOutdoor: boxEditForm.indoorOutdoor,
+    sharedWithOthers: boxEditForm.sharedWithOthers,
+    sharedScope: boxEditForm.sharedScope,
+    highPowerAppliance: boxEditForm.highPowerAppliance,
+    highPowerName: boxEditForm.highPowerName,
     systemUrl: normalizeImageField(boxImageForm.systemUrl),
     firstUrl: normalizeImageField(boxImageForm.firstUrl),
     secondUrl: normalizeImageField(boxImageForm.secondUrl),

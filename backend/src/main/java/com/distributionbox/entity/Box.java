@@ -48,5 +48,13 @@ public class Box implements Serializable {
 
     private String indoorOutdoor;
 
+    private String sharedWithOthers;
+
+    private String sharedScope;
+
+    private String highPowerAppliance;
+
+    private String highPowerName;
+
     private Integer deleted;
 }
