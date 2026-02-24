@@ -8,6 +8,7 @@ import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.distributionbox.entity.Box;
 import com.distributionbox.entity.Components;
+import com.distributionbox.service.IBoxCircuitService;
 import com.distributionbox.service.IBoxService;
 import com.distributionbox.service.IComponentsService;
 import jakarta.annotation.Resource;
@@ -40,6 +41,9 @@ public class BoxController {
 
     @Resource
     private IComponentsService componentsService;
+
+    @Resource
+    private IBoxCircuitService boxCircuitService;
 
     //查找全部
     @GetMapping
@@ -75,6 +79,7 @@ public class BoxController {
         box.setDeleted(1);
         boolean updated = boxService.updateById(box);
         componentsService.deleteByBoxId(id);
+        boxCircuitService.deleteByBoxId(id);
         return updated;
     }
 

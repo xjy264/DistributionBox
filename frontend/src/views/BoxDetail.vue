@@ -7,27 +7,25 @@
 
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
-      <el-descriptions-item label="台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="*台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
             <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
-      <el-descriptions-item label="明桩暗桩">{{ toDisplay(box.pileType) }}</el-descriptions-item>
+      <el-descriptions-item label="明装暗装">{{ toDisplay(box.pileType) }}</el-descriptions-item>
       <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
+      <el-descriptions-item label="是否与其它单位共用">{{ toDisplay(box.sharedWithOthers) }}</el-descriptions-item>
+      <el-descriptions-item label="共用范围">{{ toDisplay(box.sharedScope) }}</el-descriptions-item>
+      <el-descriptions-item label="是否为大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
+      <el-descriptions-item label="大功率电器名称">{{ toDisplay(box.highPowerName) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
-      <el-descriptions-item label="远景">
+      <el-descriptions-item label="图片1">
         <PreviewImage :src="resolvePreviewUrl(box.firstUrl)" width="220px" height="160px" />
       </el-descriptions-item>
-      <el-descriptions-item label="近景">
+      <el-descriptions-item label="图片2">
         <PreviewImage :src="resolvePreviewUrl(box.secondUrl)" width="220px" height="160px" />
-      </el-descriptions-item>
-      <el-descriptions-item label="图片3">
-        <PreviewImage :src="resolvePreviewUrl(box.thirdUrl)" width="220px" height="160px" />
-      </el-descriptions-item>
-      <el-descriptions-item label="图片4">
-        <PreviewImage :src="resolvePreviewUrl(box.fourthUrl)" width="220px" height="160px" />
       </el-descriptions-item>
     </el-descriptions>
 
@@ -56,62 +54,120 @@
         </el-table>
       </el-tab-pane>
 
+      <el-tab-pane label="回路">
+        <div class="sub-toolbar">
+          <el-button type="success" @click="openCircuitDialog">新增回路</el-button>
+        </div>
+        <el-table :data="circuits" border>
+          <el-table-column type="index" label="序号" width="70" />
+          <el-table-column prop="supplyCircuit" label="供电回路" width="100" />
+          <el-table-column prop="switchModel" label="开关型号" width="100" />
+          <el-table-column prop="ratedCurrent" label="额定电流" width="100" />
+          <el-table-column prop="wireSection" label="导线截面" width="100" />
+          <el-table-column prop="powerVoltage" label="电源电压" width="90" />
+          <el-table-column prop="startCurrent" label="启动电流" width="90" />
+          <el-table-column prop="runCurrent" label="运行电流" width="90" />
+          <el-table-column prop="power" label="功率" width="70" />
+          <el-table-column prop="electricDevice" label="用电设备" width="100" />
+          <el-table-column prop="deviceLocation" label="设备地点" min-width="180" show-overflow-tooltip />
+          <el-table-column prop="remark" label="备注" min-width="100" show-overflow-tooltip />
+          <el-table-column label="操作" width="160">
+            <template #default="scope">
+              <el-button size="small" @click="editCircuit(scope.row)">编辑</el-button>
+              <el-button size="small" type="danger" @click="removeCircuit(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
       <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
     </el-tabs>
 
     <el-dialog v-model="boxEditDialog" title="编辑配电箱基础信息" width="700px">
-      <el-form :model="boxEditForm" label-width="110px">
+      <el-form :model="boxEditForm" label-width="150px" class="compact-form">
         <el-form-item label="台账号">
-          <el-input v-model="boxEditForm.boxId" disabled />
+          <el-input v-model="boxEditForm.boxId" disabled style="width: 430px" />
         </el-form-item>
         <el-form-item label="车间">
-          <el-select v-model="boxEditForm.station" style="width: 100%" filterable @change="onEditStationChange">
+          <el-select v-model="boxEditForm.station" style="width: 430px" filterable @change="onEditStationChange">
             <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="工区">
-          <el-select v-model="boxEditForm.area" style="width: 100%" filterable>
+          <el-select v-model="boxEditForm.area" style="width: 430px" filterable>
             <el-option v-for="opt in editAreaOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="安装地点">
-          <el-input v-model="boxEditForm.boxAddress" />
+          <el-input v-model="boxEditForm.boxAddress" style="width: 430px" />
         </el-form-item>
         <el-form-item label="规格">
-          <el-input v-model="boxEditForm.size" />
+          <el-input v-model="boxEditForm.size" style="width: 430px" />
         </el-form-item>
-        <el-form-item label="明桩暗桩">
-          <el-select v-model="boxEditForm.pileType" style="width: 100%" clearable>
-            <el-option label="明桩" value="明桩" />
-            <el-option label="暗桩" value="暗桩" />
+        <el-form-item label="明装暗装">
+          <el-select v-model="boxEditForm.pileType" style="width: 430px" clearable>
+            <el-option label="明装" value="明装" />
+            <el-option label="暗装" value="暗装" />
           </el-select>
         </el-form-item>
         <el-form-item label="室内室外">
-          <el-select v-model="boxEditForm.indoorOutdoor" style="width: 100%" clearable>
+          <el-select v-model="boxEditForm.indoorOutdoor" style="width: 430px" clearable>
             <el-option label="室内" value="室内" />
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
+        <el-form-item label="是否与其它单位共用">
+          <el-select v-model="boxEditForm.sharedWithOthers" style="width: 430px" clearable @change="onEditSharedWithOthersChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="共用范围">
+          <el-input v-model="boxEditForm.sharedScope" :disabled="boxEditForm.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 430px" />
+        </el-form-item>
+        <el-form-item label="是否为大功率电器">
+          <el-select v-model="boxEditForm.highPowerAppliance" style="width: 430px" clearable @change="onEditHighPowerChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="大功率电器名称">
+          <el-input v-model="boxEditForm.highPowerName" :disabled="boxEditForm.highPowerAppliance !== '是'" placeholder="选择是后必填" style="width: 430px" />
+        </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="boxImageForm.systemUrl" />
         </el-form-item>
-        <el-form-item label="远景">
+        <el-form-item label="图片1">
           <ImageUpload v-model="boxImageForm.firstUrl" />
         </el-form-item>
-        <el-form-item label="近景">
+        <el-form-item label="图片2">
           <ImageUpload v-model="boxImageForm.secondUrl" />
-        </el-form-item>
-        <el-form-item label="图片3">
-          <ImageUpload v-model="boxImageForm.thirdUrl" />
-        </el-form-item>
-        <el-form-item label="图片4">
-          <ImageUpload v-model="boxImageForm.fourthUrl" />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="boxEditDialog = false">取消</el-button>
         <el-button type="primary" @click="saveBoxBaseInfo">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="circuitDialog" title="回路" width="900px">
+      <el-form :model="circuitForm" label-width="110px">
+        <el-form-item label="供电回路"><el-input v-model="circuitForm.supplyCircuit" /></el-form-item>
+        <el-form-item label="开关型号"><el-input v-model="circuitForm.switchModel" /></el-form-item>
+        <el-form-item label="额定电流"><el-input v-model="circuitForm.ratedCurrent" /></el-form-item>
+        <el-form-item label="导线截面"><el-input v-model="circuitForm.wireSection" /></el-form-item>
+        <el-form-item label="电源电压"><el-input v-model="circuitForm.powerVoltage" /></el-form-item>
+        <el-form-item label="启动电流"><el-input v-model="circuitForm.startCurrent" /></el-form-item>
+        <el-form-item label="运行电流"><el-input v-model="circuitForm.runCurrent" /></el-form-item>
+        <el-form-item label="功率"><el-input v-model="circuitForm.power" /></el-form-item>
+        <el-form-item label="用电设备"><el-input v-model="circuitForm.electricDevice" /></el-form-item>
+        <el-form-item label="设备地点"><el-input v-model="circuitForm.deviceLocation" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="备注"><el-input v-model="circuitForm.remark" type="textarea" :rows="2" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="circuitDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveCircuit">保存</el-button>
       </template>
     </el-dialog>
 
@@ -163,11 +219,13 @@ const getAreaOptions = (stationName: string) => {
 const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
+const circuits = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
 const boxEditDialog = ref(false)
+const circuitDialog = ref(false)
 
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
@@ -177,16 +235,19 @@ const boxEditForm = reactive<any>({
   boxAddress: '',
   size: '',
   pileType: '',
-  indoorOutdoor: ''
+  indoorOutdoor: '',
+  sharedWithOthers: '否',
+  sharedScope: '',
+  highPowerAppliance: '否',
+  highPowerName: ''
 })
 const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
 const inspectionForm = reactive<any>({ boxIds: [] })
+const circuitForm = reactive<any>({})
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
   secondUrl: '',
-  thirdUrl: '',
-  fourthUrl: ''
 })
 let currentLoadToken = 0
 
@@ -251,8 +312,6 @@ const syncBoxImageForm = () => {
   boxImageForm.systemUrl = normalizeImageField(box.systemUrl)
   boxImageForm.firstUrl = normalizeImageField(box.firstUrl)
   boxImageForm.secondUrl = normalizeImageField(box.secondUrl)
-  boxImageForm.thirdUrl = normalizeImageField(box.thirdUrl)
-  boxImageForm.fourthUrl = normalizeImageField(box.fourthUrl)
 }
 
 const refreshBoxOptions = () => {
@@ -300,6 +359,14 @@ const onEditStationChange = () => {
   }
 }
 
+const onEditSharedWithOthersChange = () => {
+  if (boxEditForm.sharedWithOthers !== '是') boxEditForm.sharedScope = ''
+}
+
+const onEditHighPowerChange = () => {
+  if (boxEditForm.highPowerAppliance !== '是') boxEditForm.highPowerName = ''
+}
+
 const load = async () => {
   const id = Number(route.params.id)
   if (!id) {
@@ -313,9 +380,10 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes] = await Promise.allSettled([
+  const [boxRes, compRes, circuitRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
-    http.get(`/components/${id}`)
+    http.get(`/components/${id}`),
+    http.get(`/box-circuit/${id}`)
   ])
 
   if (token !== currentLoadToken) return
@@ -331,6 +399,13 @@ const load = async () => {
     components.value = []
   }
 
+  if (circuitRes.status === 'fulfilled') {
+    const circuitData = unwrapPayload(circuitRes.value.data)
+    circuits.value = safeArray(circuitData)
+  } else {
+    circuits.value = []
+  }
+
   inspections.value = []
 
 }
@@ -343,11 +418,23 @@ const openBoxEditDialog = () => {
   boxEditForm.size = box.size || ''
   boxEditForm.pileType = box.pileType || ''
   boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
+  boxEditForm.sharedWithOthers = box.sharedWithOthers || '否'
+  boxEditForm.sharedScope = box.sharedScope || ''
+  boxEditForm.highPowerAppliance = box.highPowerAppliance || '否'
+  boxEditForm.highPowerName = box.highPowerName || ''
   boxEditDialog.value = true
 }
 
 const saveBoxBaseInfo = async () => {
   if (!box.id) return
+  if (boxEditForm.sharedWithOthers === '是' && !String(boxEditForm.sharedScope || '').trim()) {
+    ElMessage.error('选择与其它单位共用后，必须填写共用范围')
+    return
+  }
+  if (boxEditForm.highPowerAppliance === '是' && !String(boxEditForm.highPowerName || '').trim()) {
+    ElMessage.error('选择为大功率电器后，必须填写大功率电器名称')
+    return
+  }
   const payload = {
     ...box,
     id: box.id,
@@ -358,16 +445,22 @@ const saveBoxBaseInfo = async () => {
     size: boxEditForm.size,
     pileType: boxEditForm.pileType,
     indoorOutdoor: boxEditForm.indoorOutdoor,
+    sharedWithOthers: boxEditForm.sharedWithOthers,
+    sharedScope: boxEditForm.sharedWithOthers === '是' ? boxEditForm.sharedScope : '',
+    highPowerAppliance: boxEditForm.highPowerAppliance,
+    highPowerName: boxEditForm.highPowerAppliance === '是' ? boxEditForm.highPowerName : '',
     systemUrl: normalizeImageField(boxImageForm.systemUrl),
     firstUrl: normalizeImageField(boxImageForm.firstUrl),
     secondUrl: normalizeImageField(boxImageForm.secondUrl),
-    thirdUrl: normalizeImageField(boxImageForm.thirdUrl),
-    fourthUrl: normalizeImageField(boxImageForm.fourthUrl)
   }
-  await http.post('/box/save', payload)
-  boxEditDialog.value = false
-  await load()
-  ElMessage.success('基础信息保存成功')
+  try {
+    await http.post('/box/save', payload)
+    boxEditDialog.value = false
+    await load()
+    ElMessage.success('基础信息保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.msg || '基础信息保存失败')
+  }
 }
 
 const openComponentDialog = () => {
@@ -392,6 +485,35 @@ const removeComponent = async (id: number) => {
   if (!(await confirmDeleteAction())) return
   await http.delete(`/components/${id}`)
   load()
+}
+
+
+const openCircuitDialog = () => {
+  Object.keys(circuitForm).forEach((k) => delete circuitForm[k])
+  circuitDialog.value = true
+}
+
+const editCircuit = (row: any) => {
+  Object.keys(circuitForm).forEach((k) => delete circuitForm[k])
+  Object.assign(circuitForm, row)
+  circuitDialog.value = true
+}
+
+const saveCircuit = async () => {
+  if (!box.id) return
+  await http.post('/box-circuit/save', {
+    ...circuitForm,
+    boxId: box.id
+  })
+  circuitDialog.value = false
+  await load()
+  ElMessage.success('回路保存成功')
+}
+
+const removeCircuit = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
+  await http.delete(`/box-circuit/${id}`)
+  await load()
 }
 
 const openInspectionDialog = () => {
@@ -502,4 +624,7 @@ watch(
 
 
 /* image edit section moved into base info dialog */
+.compact-form :deep(.el-form-item__label) {
+  white-space: nowrap;
+}
 </style>

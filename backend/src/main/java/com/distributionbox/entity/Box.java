@@ -41,15 +41,20 @@ public class Box implements Serializable {
 
     private String secondUrl;
 
-    private String thirdUrl;
-
-    private String fourthUrl;
 
     private String size;
 
     private String pileType;
 
     private String indoorOutdoor;
+
+    private String sharedWithOthers;
+
+    private String sharedScope;
+
+    private String highPowerAppliance;
+
+    private String highPowerName;
 
     private Integer deleted;
 }

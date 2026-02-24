@@ -42,52 +42,64 @@
     </div>
 
     <el-dialog v-model="dialogVisible" title="配电箱" width="700px">
-      <el-form :model="form" label-width="90px">
-        <el-form-item label="台帐号">
-          <el-input v-model="form.boxId" />
+      <el-form :model="form" label-width="150px" class="compact-form">
+        <el-form-item label="*台账号">
+          <el-input v-model="form.boxId" style="width: 430px" />
         </el-form-item>
         <el-form-item label="车间">
-          <el-select v-model="form.station" style="width: 100%" filterable @change="onFormStationChange">
+          <el-select v-model="form.station" style="width: 430px" filterable @change="onFormStationChange">
             <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="工区">
-          <el-select v-model="form.area" style="width: 100%" filterable @change="onFormAreaChange">
+          <el-select v-model="form.area" style="width: 430px" filterable @change="onFormAreaChange">
             <el-option v-for="opt in formAreaOptions" :key="opt" :label="opt" :value="opt" />
           </el-select>
         </el-form-item>
         <el-form-item label="安装地点">
-          <el-input v-model="form.boxAddress" />
+          <el-input v-model="form.boxAddress" style="width: 430px" />
         </el-form-item>
         <el-form-item label="规格">
-          <el-input v-model="form.size" />
+          <el-input v-model="form.size" style="width: 430px" />
         </el-form-item>
-        <el-form-item label="明桩暗桩">
-          <el-select v-model="form.pileType" style="width: 100%" clearable>
-            <el-option label="明桩" value="明桩" />
-            <el-option label="暗桩" value="暗桩" />
+        <el-form-item label="明装暗装">
+          <el-select v-model="form.pileType" style="width: 430px" clearable>
+            <el-option label="明装" value="明装" />
+            <el-option label="暗装" value="暗装" />
           </el-select>
         </el-form-item>
         <el-form-item label="室内室外">
-          <el-select v-model="form.indoorOutdoor" style="width: 100%" clearable>
+          <el-select v-model="form.indoorOutdoor" style="width: 430px" clearable>
             <el-option label="室内" value="室内" />
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
+        <el-form-item label="是否与其它单位共用">
+          <el-select v-model="form.sharedWithOthers" style="width: 430px" clearable @change="onSharedWithOthersChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="共用范围">
+          <el-input v-model="form.sharedScope" :disabled="form.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 430px" />
+        </el-form-item>
+        <el-form-item label="是否为大功率电器">
+          <el-select v-model="form.highPowerAppliance" style="width: 430px" clearable @change="onHighPowerChange">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="大功率电器名称">
+          <el-input v-model="form.highPowerName" :disabled="form.highPowerAppliance !== '是'" placeholder="选择是后必填" style="width: 430px" />
+        </el-form-item>
         <el-form-item label="系统图">
           <ImageUpload v-model="form.systemUrl" />
         </el-form-item>
-        <el-form-item label="远景">
+        <el-form-item label="图片1">
           <ImageUpload v-model="form.firstUrl" />
         </el-form-item>
-        <el-form-item label="近景">
+        <el-form-item label="图片2">
           <ImageUpload v-model="form.secondUrl" />
-        </el-form-item>
-        <el-form-item label="图片3">
-          <ImageUpload v-model="form.thirdUrl" />
-        </el-form-item>
-        <el-form-item label="图片4">
-          <ImageUpload v-model="form.fourthUrl" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -118,6 +130,26 @@ const pageSize = ref(10)
 const total = ref(0)
 const dialogVisible = ref(false)
 const form = reactive<any>({})
+
+const initForm = () => {
+  Object.assign(form, {
+    id: undefined,
+    boxId: '',
+    station: '',
+    area: '',
+    boxAddress: '',
+    size: '',
+    pileType: '',
+    indoorOutdoor: '',
+    sharedWithOthers: '否',
+    sharedScope: '',
+    highPowerAppliance: '否',
+    highPowerName: '',
+    systemUrl: '',
+    firstUrl: '',
+    secondUrl: ''
+  })
+}
 const locationTree = ref<TreeNode[]>([])
 const router = useRouter()
 
@@ -194,11 +226,15 @@ const onFilterStationChange = () => {
 const onFilterAreaChange = () => {}
 
 const openDialog = () => {
-  Object.keys(form).forEach((k) => delete form[k])
+  initForm()
   dialogVisible.value = true
 }
 
 const onFormStationChange = () => {
+  if (!form.station) {
+    form.area = ''
+    return
+  }
   if (!formAreaOptions.value.includes(form.area)) {
     form.area = ''
   }
@@ -206,18 +242,52 @@ const onFormStationChange = () => {
 
 const onFormAreaChange = () => {}
 
+const onSharedWithOthersChange = () => {
+  if (form.sharedWithOthers !== "是") form.sharedScope = ""
+}
+
+const onHighPowerChange = () => {
+  if (form.highPowerAppliance !== "是") form.highPowerName = ""
+}
+
 const save = async () => {
   if (!form.boxId || !String(form.boxId).trim()) {
     ElMessage.error('请输入台帐号')
     return
   }
-  if (!form.station || !form.area || !form.boxAddress) {
-    ElMessage.error('请选择车间、工区和安装地点')
+  if (form.sharedWithOthers === '是' && !String(form.sharedScope || '').trim()) {
+    ElMessage.error('选择与其它单位共用后，必须填写共用范围')
     return
   }
-  await http.post('/box/save', form)
-  dialogVisible.value = false
-  load()
+  if (form.highPowerAppliance === '是' && !String(form.highPowerName || '').trim()) {
+    ElMessage.error('选择为大功率电器后，必须填写大功率电器名称')
+    return
+  }
+  const payload = {
+    id: form.id,
+    boxId: form.boxId,
+    station: form.station,
+    area: form.area,
+    boxAddress: form.boxAddress,
+    size: form.size,
+    pileType: form.pileType,
+    indoorOutdoor: form.indoorOutdoor,
+    sharedWithOthers: form.sharedWithOthers,
+    sharedScope: form.sharedWithOthers === '是' ? form.sharedScope : '',
+    highPowerAppliance: form.highPowerAppliance,
+    highPowerName: form.highPowerAppliance === '是' ? form.highPowerName : '',
+    systemUrl: form.systemUrl,
+    firstUrl: form.firstUrl,
+    secondUrl: form.secondUrl
+  }
+  try {
+    await http.post('/box/save', payload)
+    dialogVisible.value = false
+    await load()
+    ElMessage.success('保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.msg || '保存失败')
+  }
 }
 
 const remove = async (id: number) => {
@@ -266,5 +336,8 @@ onMounted(async () => {
 }
 .pager {
   margin-top: 12px;
+}
+.compact-form :deep(.el-form-item__label) {
+  white-space: nowrap;
 }
 </style>
