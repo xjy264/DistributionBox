@@ -165,7 +165,8 @@ const load = async () => {
     params: {
       pageNum: pageNum.value,
       pageSize: pageSize.value,
-      boxId: filters.boxId,
+      boxId: (filters.boxId || "").trim(),
+      boxAccount: (filters.boxId || "").trim(),
       station: filters.station,
       area: filters.area,
       address: filters.address
