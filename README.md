@@ -1,4 +1,4 @@
-# 配电箱管理系统（DistributionBox）
+# 低压配电管理系统（低压配电管理系统）
 
 一个面向配电箱运维场景的前后端系统，支持：
 
@@ -51,7 +51,7 @@
 ## 项目结构
 
 ```text
-DistributionBox/
+低压配电管理系统/
 ├── frontend/                 # 前端项目
 ├── backend/                  # 后端项目
 ├── sql/                      # SQL 初始化与迁移脚本
@@ -72,7 +72,7 @@ DistributionBox/
 - MySQL 8.x
 
 ### 2. 初始化数据库
-1. 创建数据库（例如 `distributionbox`）
+1. 创建数据库（例如 `低压配电管理系统`）
 2. 执行 SQL（按你的版本选择）
    - 可先用：`sql/2.22.sql`
    - 如有新增改动，再执行 `sql/migrations` 中对应版本脚本

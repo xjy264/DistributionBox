@@ -66,10 +66,14 @@
           <el-input v-model="boxEditForm.boxId" disabled />
         </el-form-item>
         <el-form-item label="车间">
-          <el-input v-model="boxEditForm.station" />
+          <el-select v-model="boxEditForm.station" style="width: 100%" filterable @change="onEditStationChange">
+            <el-option v-for="opt in stationOptions" :key="opt" :label="opt" :value="opt" />
+          </el-select>
         </el-form-item>
         <el-form-item label="工区">
-          <el-input v-model="boxEditForm.area" />
+          <el-select v-model="boxEditForm.area" style="width: 100%" filterable>
+            <el-option v-for="opt in editAreaOptions" :key="opt" :label="opt" :value="opt" />
+          </el-select>
         </el-form-item>
         <el-form-item label="安装地点">
           <el-input v-model="boxEditForm.boxAddress" />
@@ -131,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
@@ -143,6 +147,18 @@ import { normalizeImageField, resolvePreviewUrl } from '@/utils/image'
 
 const route = useRoute()
 const router = useRouter()
+
+type TreeNode = {
+  name: string
+  children?: TreeNode[]
+}
+
+const locationTree = ref<TreeNode[]>([])
+const stationOptions = computed(() => locationTree.value.map((item) => item.name))
+const getAreaOptions = (stationName: string) => {
+  const station = locationTree.value.find((item) => item.name === stationName)
+  return (station?.children || []).map((item) => item.name)
+}
 
 const box = reactive<any>({})
 const components = ref<any[]>([])
@@ -163,6 +179,7 @@ const boxEditForm = reactive<any>({
   pileType: '',
   indoorOutdoor: ''
 })
+const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
 const inspectionForm = reactive<any>({ boxIds: [] })
 const boxImageForm = reactive<any>({
   systemUrl: '',
@@ -253,6 +270,34 @@ const loadBoxOptions = async () => {
     value: row.id
   }))
   refreshBoxOptions()
+}
+
+const loadLocations = async () => {
+  try {
+    const res = await http.get('/location/tree')
+    locationTree.value = res.data || []
+  } catch {
+    const res = await http.get('/box/page', { params: { pageNum: 1, pageSize: 1000 } })
+    const rows = safeArray((res.data || {}).records)
+    const map = new Map<string, Set<string>>()
+    rows.forEach((row: any) => {
+      const station = row.station || ''
+      const area = row.area || ''
+      if (!station || !area) return
+      if (!map.has(station)) map.set(station, new Set())
+      map.get(station)!.add(area)
+    })
+    locationTree.value = Array.from(map.entries()).map(([station, areaSet]) => ({
+      name: station,
+      children: Array.from(areaSet).map((area) => ({ name: area }))
+    }))
+  }
+}
+
+const onEditStationChange = () => {
+  if (!editAreaOptions.value.includes(boxEditForm.area)) {
+    boxEditForm.area = ''
+  }
 }
 
 const load = async () => {
@@ -430,6 +475,7 @@ const goMaintenanceTask = (taskId: number) => {
 }
 
 onMounted(async () => {
+  await loadLocations()
   await loadBoxOptions()
   await load()
 })

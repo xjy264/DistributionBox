@@ -1,7 +1,7 @@
 <template>
   <el-container class="layout">
     <el-aside width="220px" class="aside">
-      <div class="logo">DistributionBox</div>
+      <div class="logo">低压配电管理系统</div>
       <el-menu :default-active="active" class="menu" router>
         <el-menu-item v-for="item in visibleMenus" :key="item.path" :index="item.path">
           <span>{{ item.label }}</span>
@@ -11,7 +11,7 @@
     <el-container>
       <el-header class="header">
         <div class="header-left">
-          <span class="title">配电箱管理系统</span>
+          <span class="title">低压配电管理系统</span>
         </div>
         <div class="header-right">
           <span class="user">{{ userLabel }}</span>
