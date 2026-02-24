@@ -54,6 +54,32 @@
         </el-table>
       </el-tab-pane>
 
+      <el-tab-pane label="回路">
+        <div class="sub-toolbar">
+          <el-button type="success" @click="openCircuitDialog">新增回路</el-button>
+        </div>
+        <el-table :data="circuits" border>
+          <el-table-column type="index" label="序号" width="70" />
+          <el-table-column prop="supplyCircuit" label="供电回路" width="120" />
+          <el-table-column prop="switchModel" label="开关型号" width="120" />
+          <el-table-column prop="ratedCurrent" label="额定电流" width="100" />
+          <el-table-column prop="wireSection" label="导线截面" width="100" />
+          <el-table-column prop="powerVoltage" label="电源电压" width="100" />
+          <el-table-column prop="startCurrent" label="启动电流" width="100" />
+          <el-table-column prop="runCurrent" label="运行电流" width="100" />
+          <el-table-column prop="power" label="功率" width="90" />
+          <el-table-column prop="electricDevice" label="用电设备" width="120" />
+          <el-table-column prop="deviceLocation" label="设备地点" min-width="180" show-overflow-tooltip />
+          <el-table-column prop="remark" label="备注" min-width="160" show-overflow-tooltip />
+          <el-table-column label="操作" width="160">
+            <template #default="scope">
+              <el-button size="small" @click="editCircuit(scope.row)">编辑</el-button>
+              <el-button size="small" type="danger" @click="removeCircuit(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
       <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
     </el-tabs>
@@ -125,6 +151,26 @@
       </template>
     </el-dialog>
 
+    <el-dialog v-model="circuitDialog" title="回路" width="900px">
+      <el-form :model="circuitForm" label-width="110px">
+        <el-form-item label="供电回路"><el-input v-model="circuitForm.supplyCircuit" /></el-form-item>
+        <el-form-item label="开关型号"><el-input v-model="circuitForm.switchModel" /></el-form-item>
+        <el-form-item label="额定电流"><el-input v-model="circuitForm.ratedCurrent" /></el-form-item>
+        <el-form-item label="导线截面"><el-input v-model="circuitForm.wireSection" /></el-form-item>
+        <el-form-item label="电源电压"><el-input v-model="circuitForm.powerVoltage" /></el-form-item>
+        <el-form-item label="启动电流"><el-input v-model="circuitForm.startCurrent" /></el-form-item>
+        <el-form-item label="运行电流"><el-input v-model="circuitForm.runCurrent" /></el-form-item>
+        <el-form-item label="功率"><el-input v-model="circuitForm.power" /></el-form-item>
+        <el-form-item label="用电设备"><el-input v-model="circuitForm.electricDevice" /></el-form-item>
+        <el-form-item label="设备地点"><el-input v-model="circuitForm.deviceLocation" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="备注"><el-input v-model="circuitForm.remark" type="textarea" :rows="2" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="circuitDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveCircuit">保存</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="componentDialog" title="元器件" width="700px">
       <EntityForm v-model="componentForm" :fields="componentFields" />
       <template #footer>
@@ -173,11 +219,13 @@ const getAreaOptions = (stationName: string) => {
 const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
+const circuits = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
 const boxEditDialog = ref(false)
+const circuitDialog = ref(false)
 
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
@@ -195,6 +243,7 @@ const boxEditForm = reactive<any>({
 })
 const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
 const inspectionForm = reactive<any>({ boxIds: [] })
+const circuitForm = reactive<any>({})
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -331,9 +380,10 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes] = await Promise.allSettled([
+  const [boxRes, compRes, circuitRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
-    http.get(`/components/${id}`)
+    http.get(`/components/${id}`),
+    http.get(`/box-circuit/${id}`)
   ])
 
   if (token !== currentLoadToken) return
@@ -347,6 +397,13 @@ const load = async () => {
     components.value = safeArray(compData)
   } else {
     components.value = []
+  }
+
+  if (circuitRes.status === 'fulfilled') {
+    const circuitData = unwrapPayload(circuitRes.value.data)
+    circuits.value = safeArray(circuitData)
+  } else {
+    circuits.value = []
   }
 
   inspections.value = []
@@ -428,6 +485,35 @@ const removeComponent = async (id: number) => {
   if (!(await confirmDeleteAction())) return
   await http.delete(`/components/${id}`)
   load()
+}
+
+
+const openCircuitDialog = () => {
+  Object.keys(circuitForm).forEach((k) => delete circuitForm[k])
+  circuitDialog.value = true
+}
+
+const editCircuit = (row: any) => {
+  Object.keys(circuitForm).forEach((k) => delete circuitForm[k])
+  Object.assign(circuitForm, row)
+  circuitDialog.value = true
+}
+
+const saveCircuit = async () => {
+  if (!box.id) return
+  await http.post('/box-circuit/save', {
+    ...circuitForm,
+    boxId: box.id
+  })
+  circuitDialog.value = false
+  await load()
+  ElMessage.success('回路保存成功')
+}
+
+const removeCircuit = async (id: number) => {
+  if (!(await confirmDeleteAction())) return
+  await http.delete(`/box-circuit/${id}`)
+  await load()
 }
 
 const openInspectionDialog = () => {
