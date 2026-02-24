@@ -8,11 +8,12 @@
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
       <el-descriptions-item label="台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
-      <el-descriptions-item label="车站">{{ toDisplay(box.railwayStation) }}</el-descriptions-item>
-      <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
+            <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
+      <el-descriptions-item label="明桩暗桩">{{ toDisplay(box.pileType) }}</el-descriptions-item>
+      <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
       </el-descriptions-item>
@@ -63,9 +64,6 @@
       <el-form :model="boxEditForm" label-width="110px">
         <el-form-item label="台账号">
           <el-input v-model="boxEditForm.boxId" disabled />
-        </el-form-item>
-        <el-form-item label="车站">
-          <el-input v-model="boxEditForm.railwayStation" />
         </el-form-item>
         <el-form-item label="车间">
           <el-input v-model="boxEditForm.station" />
@@ -158,7 +156,6 @@ const boxEditDialog = ref(false)
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
   boxId: '',
-  railwayStation: '',
   station: '',
   area: '',
   boxAddress: '',
@@ -295,7 +292,6 @@ const load = async () => {
 
 const openBoxEditDialog = () => {
   boxEditForm.boxId = box.boxId || ''
-  boxEditForm.railwayStation = box.railwayStation || ''
   boxEditForm.station = box.station || ''
   boxEditForm.area = box.area || ''
   boxEditForm.boxAddress = box.boxAddress || ''
@@ -311,7 +307,6 @@ const saveBoxBaseInfo = async () => {
     ...box,
     id: box.id,
     boxId: box.boxId,
-    railwayStation: boxEditForm.railwayStation,
     station: boxEditForm.station,
     area: boxEditForm.area,
     boxAddress: boxEditForm.boxAddress,

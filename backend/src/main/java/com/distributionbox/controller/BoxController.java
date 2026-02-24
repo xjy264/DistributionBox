@@ -101,7 +101,7 @@ public class BoxController {
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String id,
                                @RequestParam(defaultValue = "") String boxId,
-                               @RequestParam(defaultValue = "") String railwayStation,
+                               @RequestParam(defaultValue = "") String boxAccount,
                                @RequestParam(defaultValue = "") String station,
                                @RequestParam(defaultValue = "") String address,
                                @RequestParam(defaultValue = "") String area,
@@ -113,11 +113,12 @@ public class BoxController {
         if (!"".equals(id)) {
             queryWrapper.like("id", id);
         }
-        if (!"".equals(boxId)) {
-            queryWrapper.like("box_id", boxId);
+        String keyword = boxId == null ? "" : boxId.trim();
+        if ((keyword == null || keyword.isEmpty()) && boxAccount != null) {
+            keyword = boxAccount.trim();
         }
-        if (!"".equals(railwayStation)) {
-            queryWrapper.like("railway_station", railwayStation);
+        if (!"".equals(keyword)) {
+            queryWrapper.like("box_id", keyword);
         }
         if (!"".equals(station)) {
             queryWrapper.like("station", station);
