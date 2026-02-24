@@ -7,7 +7,7 @@
 
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
-      <el-descriptions-item label="台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="*台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
             <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
@@ -188,9 +188,9 @@ const boxEditForm = reactive<any>({
   size: '',
   pileType: '',
   indoorOutdoor: '',
-  sharedWithOthers: '',
+  sharedWithOthers: '否',
   sharedScope: '',
-  highPowerAppliance: '',
+  highPowerAppliance: '否',
   highPowerName: ''
 })
 const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
@@ -361,9 +361,9 @@ const openBoxEditDialog = () => {
   boxEditForm.size = box.size || ''
   boxEditForm.pileType = box.pileType || ''
   boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
-  boxEditForm.sharedWithOthers = box.sharedWithOthers || ''
+  boxEditForm.sharedWithOthers = box.sharedWithOthers || '否'
   boxEditForm.sharedScope = box.sharedScope || ''
-  boxEditForm.highPowerAppliance = box.highPowerAppliance || ''
+  boxEditForm.highPowerAppliance = box.highPowerAppliance || '否'
   boxEditForm.highPowerName = box.highPowerName || ''
   boxEditDialog.value = true
 }

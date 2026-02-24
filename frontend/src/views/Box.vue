@@ -43,7 +43,7 @@
 
     <el-dialog v-model="dialogVisible" title="配电箱" width="700px">
       <el-form :model="form" label-width="150px" class="compact-form">
-        <el-form-item label="台帐号">
+        <el-form-item label="*台账号">
           <el-input v-model="form.boxId" style="width: 430px" />
         </el-form-item>
         <el-form-item label="车间">
@@ -141,9 +141,9 @@ const initForm = () => {
     size: '',
     pileType: '',
     indoorOutdoor: '',
-    sharedWithOthers: '',
+    sharedWithOthers: '否',
     sharedScope: '',
-    highPowerAppliance: '',
+    highPowerAppliance: '否',
     highPowerName: '',
     systemUrl: '',
     firstUrl: '',
@@ -231,6 +231,10 @@ const openDialog = () => {
 }
 
 const onFormStationChange = () => {
+  if (!form.station) {
+    form.area = ''
+    return
+  }
   if (!formAreaOptions.value.includes(form.area)) {
     form.area = ''
   }
@@ -249,10 +253,6 @@ const onHighPowerChange = () => {
 const save = async () => {
   if (!form.boxId || !String(form.boxId).trim()) {
     ElMessage.error('请输入台帐号')
-    return
-  }
-  if (!form.station || !form.area || !form.boxAddress) {
-    ElMessage.error('请选择车间、工区和安装地点')
     return
   }
   if (form.sharedWithOthers === '是' && !String(form.sharedScope || '').trim()) {
