@@ -219,24 +219,36 @@
         <el-form-item label="盯控人员"><el-input v-model="maintenanceForm.superviseUser" /></el-form-item>
         <el-form-item label="维保人员"><el-input v-model="maintenanceForm.maintenanceUser" /></el-form-item>
       </el-form>
-      <el-table :data="currentMaintenanceTemplate" border size="small">
-        <el-table-column prop="section" label="分段" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="seq" label="序号" width="70" />
-        <el-table-column prop="content" label="检查内容" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="standard" label="检查标准" min-width="220" show-overflow-tooltip />
+      <el-table :data="maintenanceDisplayRows" border size="small" :span-method="maintenanceSpanMethod" row-key="rowKey">
+        <el-table-column label="序号" width="120">
+          <template #default="scope">
+            <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
+            <span v-else>{{ scope.row.seq }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="检查内容" min-width="260" show-overflow-tooltip>
+          <template #default="scope">
+            <span v-if="!scope.row.isSection">{{ scope.row.content }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="检查标准" min-width="260" show-overflow-tooltip>
+          <template #default="scope">
+            <span v-if="!scope.row.isSection">{{ scope.row.standard }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="检查结果" min-width="180">
           <template #default="scope">
-            <el-input v-model="maintenanceForm[scope.row.prefix + 'Result']" />
+            <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Result']" />
           </template>
         </el-table-column>
         <el-table-column label="是否正常" min-width="140">
           <template #default="scope">
-            <el-input v-model="maintenanceForm[scope.row.prefix + 'Status']" />
+            <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Status']" />
           </template>
         </el-table-column>
         <el-table-column label="备注" min-width="180">
           <template #default="scope">
-            <el-input v-model="maintenanceForm[scope.row.prefix + 'Remark']" />
+            <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Remark']" />
           </template>
         </el-table-column>
       </el-table>
@@ -521,6 +533,26 @@ const maintenanceTemplates: Record<string, { section: string; seq: number; prefi
 }
 
 const currentMaintenanceTemplate = computed(() => maintenanceTemplates[maintenanceType.value] || [])
+const maintenanceDisplayRows = computed(() => {
+  const rows: any[] = []
+  let section = ''
+  for (const item of currentMaintenanceTemplate.value) {
+    if (item.section !== section) {
+      section = item.section
+      rows.push({ isSection: true, sectionTitle: section, rowKey: `section-${section}` })
+    }
+    rows.push({ ...item, isSection: false, rowKey: `item-${item.prefix}` })
+  }
+  return rows
+})
+
+const maintenanceSpanMethod = ({ row, columnIndex }: any) => {
+  if (row?.isSection) {
+    if (columnIndex === 0) return [1, 6]
+    return [0, 0]
+  }
+  return [1, 1]
+}
 
 const goBack = () => router.push('/box')
 
@@ -955,6 +987,10 @@ watch(maintenanceType, async () => {
 }
 .sub-toolbar {
   margin-bottom: 10px;
+}
+.section-title {
+  font-weight: 700;
+  color: #1f2937;
 }
 
 
