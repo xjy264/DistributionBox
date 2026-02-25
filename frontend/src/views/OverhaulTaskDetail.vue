@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="toolbar">
-      <el-button @click="goBack">返回检修记录</el-button>
+      <el-button @click="goBack">返回配电箱详情</el-button>
       <el-tag type="success">工单ID：{{ task.id || '-' }}</el-tag>
       <el-tag>工单号：{{ task.taskNo || '-' }}</el-tag>
       <el-tag>报修时间：{{ task.reportTime || '-' }}</el-tag>
@@ -90,7 +90,14 @@ const save = async () => {
   await load()
 }
 
-const goBack = () => router.push('/overhaul')
+const goBack = () => {
+  const boxId = Number(task.boxId)
+  if (!Number.isFinite(boxId) || boxId <= 0) {
+    ElMessage.error('当前工单未关联有效配电箱，无法返回详情页')
+    return
+  }
+  router.push(`/box-detail/${boxId}`)
+}
 
 onMounted(async () => { await loadBoxes(); await load() })
 </script>
