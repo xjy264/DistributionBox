@@ -349,6 +349,14 @@ const unwrapPayload = (payload: any) => {
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
 
+const getCurrentBoxId = () => {
+  const routeId = Number(route.params.id)
+  if (Number.isFinite(routeId) && routeId > 0) return routeId
+  const stateId = Number(box.id)
+  if (Number.isFinite(stateId) && stateId > 0) return stateId
+  return null
+}
+
 // image utils moved to @/utils/image
 
 const syncBoxImageForm = () => {
@@ -411,7 +419,7 @@ const onEditHighPowerChange = () => {
 }
 
 const load = async () => {
-  const id = Number(route.params.id)
+  const id = getCurrentBoxId()
   if (!id) {
     Object.keys(box).forEach((k) => delete box[k])
     components.value = []
@@ -573,14 +581,23 @@ const removeCircuit = async (id: number) => {
 
 
 const openOverhaulDialog = () => {
+  const currentBoxId = getCurrentBoxId()
+  if (!currentBoxId) {
+    ElMessage.error('未获取到当前配电箱ID，无法新增检修记录')
+    return
+  }
   Object.keys(overhaulForm).forEach((k) => delete overhaulForm[k])
-  Object.assign(overhaulForm, { boxId: box.id })
+  Object.assign(overhaulForm, { boxId: currentBoxId })
   overhaulDialog.value = true
 }
 
 const saveOverhaul = async () => {
-  if (!box.id) return
-  await http.post('/overhaul-task/save', { ...overhaulForm, boxId: box.id })
+  const currentBoxId = getCurrentBoxId()
+  if (!currentBoxId) {
+    ElMessage.error('未获取到当前配电箱ID，无法保存检修记录')
+    return
+  }
+  await http.post('/overhaul-task/save', { ...overhaulForm, boxId: currentBoxId })
   overhaulDialog.value = false
   await load()
   ElMessage.success('检修记录保存成功')
