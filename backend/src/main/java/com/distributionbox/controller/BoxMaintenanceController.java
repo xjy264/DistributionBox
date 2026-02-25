@@ -91,13 +91,15 @@ public class BoxMaintenanceController {
                 String colSql = String.join(",", cols);
                 String qSql = String.join(",", cols.stream().map(c -> "?").toList());
                 Object[] args = cols.stream().map(dbMap::get).toArray();
-                jdbcTemplate.update("INSERT INTO " + table + " (" + colSql + ") VALUES (" + qSql + ")", args);
+                int affected = jdbcTemplate.update("INSERT INTO " + table + " (" + colSql + ") VALUES (" + qSql + ")", args);
+                if (affected <= 0) return Result.error("500", "保存失败，未写入数据");
             } else {
                 List<String> cols = new ArrayList<>(dbMap.keySet());
                 String setSql = String.join(",", cols.stream().map(c -> c + "=?").toList());
                 List<Object> args = new ArrayList<>(cols.stream().map(dbMap::get).toList());
                 args.add(id);
-                jdbcTemplate.update("UPDATE " + table + " SET " + setSql + " WHERE id = ?", args.toArray());
+                int affected = jdbcTemplate.update("UPDATE " + table + " SET " + setSql + " WHERE id = ?", args.toArray());
+                if (affected <= 0) return Result.error("500", "保存失败，未找到可更新记录");
             }
             return Result.success(true);
         } catch (Exception e) {

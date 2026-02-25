@@ -574,6 +574,17 @@ const unwrapPayload = (payload: any) => {
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
 
+const unwrapResultData = (res: any) => {
+  const body = res?.data || {}
+  if (body && typeof body === 'object' && 'code' in body) {
+    if (String(body.code) !== '200') {
+      throw new Error(body.msg || '请求失败')
+    }
+    return body.data
+  }
+  return body
+}
+
 const getCurrentBoxId = () => {
   const routeId = Number(route.params.id)
   if (Number.isFinite(routeId) && routeId > 0) return routeId
@@ -811,7 +822,7 @@ const loadMaintenanceRecords = async () => {
   const boxId = getCurrentBoxId()
   if (!boxId) { maintenanceRecords.value = []; return }
   const res = await http.get(`/box-maintenance/${maintenanceType.value}/page`, { params: { boxId, pageNum: 1, pageSize: 200 } })
-  const pageData = res.data?.data || {}
+  const pageData = unwrapResultData(res) || {}
   maintenanceRecords.value = (pageData.records || []).map((r: any) => ({
     ...r,
     superviseUser: r.supervise_user,
@@ -834,17 +845,23 @@ const openMaintenanceDialog = () => {
 }
 
 const saveMaintenance = async () => {
-  const boxId = getCurrentBoxId()
-  if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法保存维保记录'); return }
-  await http.post(`/box-maintenance/${maintenanceType.value}/save`, { ...maintenanceForm, boxId })
-  maintenanceDialog.value = false
-  await loadMaintenanceRecords()
-  ElMessage.success('维保记录保存成功')
+  try {
+    const boxId = getCurrentBoxId()
+    if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法保存维保记录'); return }
+    const res = await http.post(`/box-maintenance/${maintenanceType.value}/save`, { ...maintenanceForm, boxId })
+    unwrapResultData(res)
+    maintenanceDialog.value = false
+    await loadMaintenanceRecords()
+    ElMessage.success('维保记录保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.message || error?.response?.data?.msg || '维保记录保存失败')
+  }
 }
 
 const removeMaintenance = async (id: number) => {
   if (!(await confirmDeleteAction('确认删除该维保记录？'))) return
-  await http.delete(`/box-maintenance/${maintenanceType.value}/${id}`)
+  const res = await http.delete(`/box-maintenance/${maintenanceType.value}/${id}`)
+  unwrapResultData(res)
   await loadMaintenanceRecords()
 }
 
