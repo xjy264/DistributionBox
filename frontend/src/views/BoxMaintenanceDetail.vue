@@ -18,13 +18,13 @@
 
     <el-divider />
 
-    <el-table :data="displayRows" border size="small" :span-method="spanMethod" row-key="rowKey">
+    <el-table :data="displayRows" border size="small" row-key="rowKey" table-layout="fixed">
       <el-table-column label="序号" width="120">
         <template #default="scope">
           <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
           <span v-else>{{ scope.row.sectionSeq }}</span>
         
-    <el-dialog v-model="editDialog" :title="`修改${typeLabel}维保记录`" width="1000px" append-to-body destroy-on-close>
+    <el-drawer v-model="editDialog" :title="`修改${typeLabel}维保记录`" size="92%" append-to-body destroy-on-close>
       <el-form :model="editForm" label-width="110px">
         <el-form-item label="盯控人员"><el-input v-model="editForm.superviseUser" /></el-form-item>
         <el-form-item label="维保人员"><el-input v-model="editForm.maintenanceUser" /></el-form-item>
@@ -33,21 +33,21 @@
       <el-table :data="displayRows" border size="small" :span-method="spanMethod" row-key="rowKey">
         <el-table-column label="序号" width="120">
           <template #default="scope">
-            <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
+            <span v-if="scope.row.isSection">—</span>
             <span v-else>{{ scope.row.sectionSeq }}</span>
           </template>
         </el-table-column>
         <el-table-column label="检查内容" min-width="180" show-overflow-tooltip>
-          <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.content }}</span></template>
+          <template #default="scope"><span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span><span v-else>{{ scope.row.content }}</span></template>
         </el-table-column>
         <el-table-column label="检查标准" min-width="180" show-overflow-tooltip>
           <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.standard }}</span></template>
         </el-table-column>
         <el-table-column label="检查结果" width="120">
-          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Result']" /></template>
+          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Result']" clearable /></template>
         </el-table-column>
         <el-table-column label="是否正常" width="120">
-          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Status']" /></template>
+          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Status']" clearable /></template>
         </el-table-column>
         <el-table-column label="备注" width="120">
           <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Remark']" /></template>
@@ -57,7 +57,7 @@
         <el-button @click="editDialog=false">取消</el-button>
         <el-button type="primary" @click="saveEdit">保存</el-button>
       </template>
-    </el-dialog>
+    </el-drawer>
 
 </template>
       </el-table-column>
