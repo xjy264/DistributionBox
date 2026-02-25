@@ -229,27 +229,27 @@
             <span v-else>{{ scope.row.sectionSeq }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="检查内容" min-width="260" show-overflow-tooltip>
+        <el-table-column label="检查内容" min-width="180" show-overflow-tooltip>
           <template #default="scope">
             <span v-if="!scope.row.isSection">{{ scope.row.content }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="检查标准" min-width="260" show-overflow-tooltip>
+        <el-table-column label="检查标准" min-width="180" show-overflow-tooltip>
           <template #default="scope">
             <span v-if="!scope.row.isSection">{{ scope.row.standard }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="检查结果" min-width="180">
+        <el-table-column label="检查结果" width="120">
           <template #default="scope">
             <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Result']" />
           </template>
         </el-table-column>
-        <el-table-column label="是否正常" min-width="140">
+        <el-table-column label="是否正常" width="120">
           <template #default="scope">
             <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Status']" />
           </template>
         </el-table-column>
-        <el-table-column label="备注" min-width="180">
+        <el-table-column label="备注" width="120">
           <template #default="scope">
             <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Remark']" />
           </template>

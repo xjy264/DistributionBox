@@ -24,7 +24,7 @@
           <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
           <span v-else>{{ scope.row.sectionSeq }}</span>
         
-    <el-dialog v-model="editDialog" :title="`修改${typeLabel}维保记录`" width="1000px">
+    <el-dialog v-model="editDialog" :title="`修改${typeLabel}维保记录`" width="1000px" append-to-body destroy-on-close>
       <el-form :model="editForm" label-width="110px">
         <el-form-item label="盯控人员"><el-input v-model="editForm.superviseUser" /></el-form-item>
         <el-form-item label="维保人员"><el-input v-model="editForm.maintenanceUser" /></el-form-item>
@@ -37,19 +37,19 @@
             <span v-else>{{ scope.row.sectionSeq }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="检查内容" min-width="260" show-overflow-tooltip>
+        <el-table-column label="检查内容" min-width="180" show-overflow-tooltip>
           <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.content }}</span></template>
         </el-table-column>
-        <el-table-column label="检查标准" min-width="260" show-overflow-tooltip>
+        <el-table-column label="检查标准" min-width="180" show-overflow-tooltip>
           <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.standard }}</span></template>
         </el-table-column>
-        <el-table-column label="检查结果" min-width="180">
+        <el-table-column label="检查结果" width="120">
           <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Result']" /></template>
         </el-table-column>
-        <el-table-column label="是否正常" min-width="140">
+        <el-table-column label="是否正常" width="120">
           <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Status']" /></template>
         </el-table-column>
-        <el-table-column label="备注" min-width="180">
+        <el-table-column label="备注" width="120">
           <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Remark']" /></template>
         </el-table-column>
       </el-table>
