@@ -42,6 +42,69 @@
       </el-table-column>
     </el-table>
 
+
+
+    <el-divider />
+    <h3>维保病害处置前后对比图</h3>
+    <div class="toolbar">
+      <el-button type="success" @click="openCompareDialog">新增病害处置记录</el-button>
+    </div>
+    <el-table :data="compareList" border>
+      <el-table-column prop="disease_location" label="病害位置" min-width="120" />
+      <el-table-column label="维保前图片" min-width="140">
+        <template #default="scope"><el-image v-if="scope.row.before_image_url" :src="scope.row.before_image_url" style="width:80px;height:60px" fit="cover" /></template>
+      </el-table-column>
+      <el-table-column prop="disease_desc" label="病害说明" min-width="160" show-overflow-tooltip />
+      <el-table-column label="维保后图片" min-width="140">
+        <template #default="scope"><el-image v-if="scope.row.after_image_url" :src="scope.row.after_image_url" style="width:80px;height:60px" fit="cover" /></template>
+      </el-table-column>
+      <el-table-column prop="disposal_desc" label="处置说明" min-width="160" show-overflow-tooltip />
+      <el-table-column label="操作" width="160">
+        <template #default="scope">
+          <el-button size="small" @click="editCompare(scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="removeCompare(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-divider />
+    <h3>维保工程图片</h3>
+    <div class="toolbar">
+      <el-button type="success" @click="openProcessDialog">新增工程图片</el-button>
+    </div>
+    <el-table :data="processImageList" border>
+      <el-table-column label="图片" min-width="180">
+        <template #default="scope"><el-image v-if="scope.row.image_url" :src="scope.row.image_url" style="width:120px;height:80px" fit="cover" /></template>
+      </el-table-column>
+      <el-table-column label="操作" width="120">
+        <template #default="scope"><el-button size="small" type="danger" @click="removeProcessImage(scope.row.id)">删除</el-button></template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog v-model="compareDialog" title="病害处置前后对比" width="760px">
+      <el-form :model="compareForm" label-width="110px">
+        <el-form-item label="病害位置"><el-input v-model="compareForm.diseaseLocation" /></el-form-item>
+        <el-form-item label="维保前图片"><ImageUpload v-model="compareForm.beforeImageUrl" /></el-form-item>
+        <el-form-item label="病害说明"><el-input v-model="compareForm.diseaseDesc" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="维保后图片"><ImageUpload v-model="compareForm.afterImageUrl" /></el-form-item>
+        <el-form-item label="处置说明"><el-input v-model="compareForm.disposalDesc" type="textarea" :rows="2" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="compareDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveCompare">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="processDialog" title="新增维保工程图片" width="520px">
+      <el-form :model="processForm" label-width="90px">
+        <el-form-item label="图片"><ImageUpload v-model="processForm.imageUrl" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="processDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveProcessImage">保存</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="editDialog" :title="`修改${typeLabel}维保记录`" width="1000px">
       <el-form :model="editForm" label-width="110px">
         <el-form-item label="盯控人员"><el-input v-model="editForm.superviseUser" /></el-form-item>
@@ -84,6 +147,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
+import ImageUpload from '@/components/ImageUpload.vue'
+import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
 const route = useRoute()
 const router = useRouter()
@@ -93,6 +158,12 @@ const boxId = Number(route.query.boxId || 0)
 const record = reactive<any>({})
 const editDialog = ref(false)
 const editForm = reactive<any>({})
+const compareList = ref<any[]>([])
+const processImageList = ref<any[]>([])
+const compareDialog = ref(false)
+const processDialog = ref(false)
+const compareForm = reactive<any>({})
+const processForm = reactive<any>({})
 
 const typeLabel = computed(() => ({ monthly: '月检', quarterly: '季检', yearly: '年检' } as any)[type] || type)
 
@@ -282,12 +353,71 @@ const load = async () => {
   Object.assign(record, res.data?.data || {})
 }
 
+
+
+const loadCompareList = async () => {
+  const r = await http.get('/box-maintenance-compare/list', { params: { type, recordId: id } })
+  compareList.value = r.data?.data || []
+}
+
+const openCompareDialog = () => {
+  Object.keys(compareForm).forEach((k) => delete compareForm[k])
+  compareDialog.value = true
+}
+
+const editCompare = (row: any) => {
+  Object.keys(compareForm).forEach((k) => delete compareForm[k])
+  Object.assign(compareForm, {
+    id: row.id,
+    diseaseLocation: row.disease_location,
+    beforeImageUrl: row.before_image_url,
+    diseaseDesc: row.disease_desc,
+    afterImageUrl: row.after_image_url,
+    disposalDesc: row.disposal_desc
+  })
+  compareDialog.value = true
+}
+
+const saveCompare = async () => {
+  await http.post('/box-maintenance-compare/save', { type, recordId: id, ...compareForm })
+  compareDialog.value = false
+  await loadCompareList()
+}
+
+const removeCompare = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该病害处置记录？'))) return
+  await http.delete(`/box-maintenance-compare/${id}`)
+  await loadCompareList()
+}
+
+const loadProcessImageList = async () => {
+  const r = await http.get('/box-maintenance-process-image/list', { params: { type, recordId: id } })
+  processImageList.value = r.data?.data || []
+}
+
+const openProcessDialog = () => {
+  Object.keys(processForm).forEach((k) => delete processForm[k])
+  processDialog.value = true
+}
+
+const saveProcessImage = async () => {
+  await http.post('/box-maintenance-process-image/save', { type, recordId: id, imageUrl: processForm.imageUrl })
+  processDialog.value = false
+  await loadProcessImageList()
+}
+
+const removeProcessImage = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该工程图片？'))) return
+  await http.delete(`/box-maintenance-process-image/${id}`)
+  await loadProcessImageList()
+}
+
 const goBack = () => {
   if (boxId > 0) router.push(`/box-detail/${boxId}`)
   else router.push('/box')
 }
 
-onMounted(load)
+onMounted(async () => { await load(); await loadCompareList(); await loadProcessImageList() })
 </script>
 
 <style scoped>
