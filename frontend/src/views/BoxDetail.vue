@@ -94,8 +94,9 @@
           <el-table-column prop="superviseUser" label="盯控人员" min-width="140" />
           <el-table-column prop="maintenanceUser" label="维保人员" min-width="140" />
           <el-table-column prop="createdTime" label="创建时间" min-width="180" />
-          <el-table-column label="操作" width="120">
+          <el-table-column label="操作" width="220">
             <template #default="scope">
+              <el-button size="small" type="primary" @click="goMaintenanceDetail(scope.row.id)">进入记录</el-button>
               <el-button size="small" type="danger" @click="removeMaintenance(scope.row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -863,6 +864,11 @@ const removeMaintenance = async (id: number) => {
   const res = await http.delete(`/box-maintenance/${maintenanceType.value}/${id}`)
   unwrapResultData(res)
   await loadMaintenanceRecords()
+}
+
+const goMaintenanceDetail = (id: number) => {
+  const boxId = getCurrentBoxId()
+  router.push(`/box-maintenance/${maintenanceType.value}/${id}?boxId=${boxId || ''}`)
 }
 
 const openOverhaulDialog = () => {
