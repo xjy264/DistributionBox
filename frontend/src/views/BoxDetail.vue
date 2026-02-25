@@ -82,7 +82,7 @@
 
       <el-tab-pane label="维保记录">
         <div class="sub-toolbar">
-          <el-select v-model="maintenanceType" style="width: 160px" @change="loadMaintenanceRecords">
+          <el-select v-model="maintenanceType" style="width: 160px; margin-right: 240px" @change="loadMaintenanceRecords">
             <el-option label="月检" value="monthly" />
             <el-option label="季检" value="quarterly" />
             <el-option label="年检" value="yearly" />
