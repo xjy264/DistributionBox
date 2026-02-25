@@ -128,9 +128,15 @@ public class BoxMaintenanceController {
         payload.forEach((k, v) -> {
             if ("id".equals(k) || "boxId".equals(k) || !StringUtils.hasText(k)) return;
             String dbKey = camelToSnake(k);
-            map.put(dbKey, v);
+            map.put(dbKey, normalizeDbValue(v));
         });
         return map;
+    }
+
+    private Object normalizeDbValue(Object value) {
+        if (value == null) return null;
+        if (value instanceof String str && !StringUtils.hasText(str)) return null;
+        return value;
     }
 
     private String camelToSnake(String key) {
