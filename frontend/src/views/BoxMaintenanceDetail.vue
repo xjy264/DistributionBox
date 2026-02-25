@@ -52,11 +52,11 @@
     <el-table :data="compareList" border>
       <el-table-column prop="disease_location" label="病害位置" min-width="120" />
       <el-table-column label="维保前图片" min-width="140">
-        <template #default="scope"><el-image v-if="scope.row.before_image_url" :src="scope.row.before_image_url" style="width:80px;height:60px" fit="cover" /></template>
+        <template #default="scope"><PreviewImage :src="resolvePreviewUrl(scope.row.before_image_url)" width="80px" height="60px" /></template>
       </el-table-column>
       <el-table-column prop="disease_desc" label="病害说明" min-width="160" show-overflow-tooltip />
       <el-table-column label="维保后图片" min-width="140">
-        <template #default="scope"><el-image v-if="scope.row.after_image_url" :src="scope.row.after_image_url" style="width:80px;height:60px" fit="cover" /></template>
+        <template #default="scope"><PreviewImage :src="resolvePreviewUrl(scope.row.after_image_url)" width="80px" height="60px" /></template>
       </el-table-column>
       <el-table-column prop="disposal_desc" label="处置说明" min-width="160" show-overflow-tooltip />
       <el-table-column label="操作" width="160">
@@ -68,13 +68,13 @@
     </el-table>
 
     <el-divider />
-    <h3>维保工程图片</h3>
+    <h3>维保过程图片</h3>
     <div class="toolbar">
-      <el-button type="success" @click="openProcessDialog">新增工程图片</el-button>
+      <el-button type="success" @click="openProcessDialog">新增过程图片</el-button>
     </div>
     <el-table :data="processImageList" border>
       <el-table-column label="图片" min-width="180">
-        <template #default="scope"><el-image v-if="scope.row.image_url" :src="scope.row.image_url" style="width:120px;height:80px" fit="cover" /></template>
+        <template #default="scope"><PreviewImage :src="resolvePreviewUrl(scope.row.image_url)" width="120px" height="80px" /></template>
       </el-table-column>
       <el-table-column label="操作" width="120">
         <template #default="scope"><el-button size="small" type="danger" @click="removeProcessImage(scope.row.id)">删除</el-button></template>
@@ -95,7 +95,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="processDialog" title="新增维保工程图片" width="520px">
+    <el-dialog v-model="processDialog" title="新增维保过程图片" width="520px">
       <el-form :model="processForm" label-width="90px">
         <el-form-item label="图片"><ImageUpload v-model="processForm.imageUrl" /></el-form-item>
       </el-form>
@@ -148,6 +148,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 import ImageUpload from '@/components/ImageUpload.vue'
+import PreviewImage from '@/components/PreviewImage.vue'
+import { resolvePreviewUrl } from '@/utils/image'
 import { confirmDeleteAction } from '@/utils/confirmDeleteAction'
 
 const route = useRoute()
@@ -407,7 +409,7 @@ const saveProcessImage = async () => {
 }
 
 const removeProcessImage = async (id: number) => {
-  if (!(await confirmDeleteAction('确认删除该工程图片？'))) return
+  if (!(await confirmDeleteAction('确认删除该过程图片？'))) return
   await http.delete(`/box-maintenance-process-image/${id}`)
   await loadProcessImageList()
 }
