@@ -127,9 +127,22 @@ public class BoxMaintenanceController {
         Map<String, Object> map = new LinkedHashMap<>();
         payload.forEach((k, v) -> {
             if ("id".equals(k) || "boxId".equals(k) || !StringUtils.hasText(k)) return;
-            String dbKey = k.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
+            String dbKey = camelToSnake(k);
             map.put(dbKey, v);
         });
         return map;
+    }
+
+    private String camelToSnake(String key) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            if (Character.isUpperCase(c)) {
+                sb.append('_').append(Character.toLowerCase(c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }
