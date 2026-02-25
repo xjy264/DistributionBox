@@ -93,6 +93,7 @@
           <el-table-column prop="id" label="记录ID" width="100" />
           <el-table-column prop="superviseUser" label="盯控人员" min-width="140" />
           <el-table-column prop="maintenanceUser" label="维保人员" min-width="140" />
+          <el-table-column prop="maintenanceTime" label="维保时间" min-width="180" />
           <el-table-column prop="createdTime" label="创建时间" min-width="180" />
           <el-table-column label="操作" width="220">
             <template #default="scope">
@@ -215,10 +216,11 @@
     </el-dialog>
 
 
-    <el-dialog v-model="maintenanceDialog" title="新增维保记录" width="1000px">
+    <el-dialog v-model="maintenanceDialog" :title="`新增${maintenanceTypeLabel}维保记录`" width="1000px">
       <el-form :model="maintenanceForm" label-width="110px">
         <el-form-item label="盯控人员"><el-input v-model="maintenanceForm.superviseUser" /></el-form-item>
         <el-form-item label="维保人员"><el-input v-model="maintenanceForm.maintenanceUser" /></el-form-item>
+        <el-form-item label="维保时间"><el-date-picker v-model="maintenanceForm.maintenanceTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width:100%" /></el-form-item>
       </el-form>
       <el-table :data="maintenanceDisplayRows" border size="small" :span-method="maintenanceSpanMethod" row-key="rowKey">
         <el-table-column label="序号" width="120">
@@ -329,6 +331,7 @@ const inspections = ref<any[]>([])
 const circuits = ref<any[]>([])
 const maintenanceRecords = ref<any[]>([])
 const maintenanceType = ref<'monthly'|'quarterly'|'yearly'>('monthly')
+const maintenanceTypeLabel = computed(() => ({ monthly: '月检', quarterly: '季检', yearly: '年检' } as any)[maintenanceType.value] || '月检')
 const overhaulTasks = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
@@ -828,6 +831,7 @@ const loadMaintenanceRecords = async () => {
     ...r,
     superviseUser: r.supervise_user,
     maintenanceUser: r.maintenance_user,
+    maintenanceTime: r.maintenance_time,
     createdTime: r.created_time
   }))
 }
@@ -836,7 +840,7 @@ const openMaintenanceDialog = () => {
   const boxId = getCurrentBoxId()
   if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法新增维保记录'); return }
   Object.keys(maintenanceForm).forEach((k) => delete maintenanceForm[k])
-  Object.assign(maintenanceForm, { boxId })
+  Object.assign(maintenanceForm, { boxId, maintenanceTime: '' })
   currentMaintenanceTemplate.value.forEach((item) => {
     maintenanceForm[item.prefix + 'Result'] = ''
     maintenanceForm[item.prefix + 'Status'] = ''

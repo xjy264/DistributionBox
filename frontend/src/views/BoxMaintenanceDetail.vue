@@ -5,11 +5,13 @@
       <el-tag>维保类型：{{ typeLabel }}</el-tag>
       <el-tag>记录ID：{{ record.id || '-' }}</el-tag>
       <el-tag>配电箱ID：{{ record.box_id || '-' }}</el-tag>
+      <el-button type="primary" @click="openEdit">修改维保记录</el-button>
     </div>
 
     <el-descriptions title="维保头信息" :column="2" border>
       <el-descriptions-item label="盯控人员">{{ record.supervise_user || '-' }}</el-descriptions-item>
       <el-descriptions-item label="维保人员">{{ record.maintenance_user || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="维保时间">{{ record.maintenance_time || '-' }}</el-descriptions-item>
       <el-descriptions-item label="创建时间">{{ record.created_time || '-' }}</el-descriptions-item>
       <el-descriptions-item label="更新时间">{{ record.updated_time || '-' }}</el-descriptions-item>
     </el-descriptions>
@@ -21,7 +23,43 @@
         <template #default="scope">
           <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
           <span v-else>{{ scope.row.sectionSeq }}</span>
-        </template>
+        
+    <el-dialog v-model="editDialog" :title="`修改${typeLabel}维保记录`" width="1000px">
+      <el-form :model="editForm" label-width="110px">
+        <el-form-item label="盯控人员"><el-input v-model="editForm.superviseUser" /></el-form-item>
+        <el-form-item label="维保人员"><el-input v-model="editForm.maintenanceUser" /></el-form-item>
+        <el-form-item label="维保时间"><el-date-picker v-model="editForm.maintenanceTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width:100%" /></el-form-item>
+      </el-form>
+      <el-table :data="displayRows" border size="small" :span-method="spanMethod" row-key="rowKey">
+        <el-table-column label="序号" width="120">
+          <template #default="scope">
+            <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
+            <span v-else>{{ scope.row.sectionSeq }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="检查内容" min-width="260" show-overflow-tooltip>
+          <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.content }}</span></template>
+        </el-table-column>
+        <el-table-column label="检查标准" min-width="260" show-overflow-tooltip>
+          <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.standard }}</span></template>
+        </el-table-column>
+        <el-table-column label="检查结果" min-width="180">
+          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Result']" /></template>
+        </el-table-column>
+        <el-table-column label="是否正常" min-width="140">
+          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Status']" /></template>
+        </el-table-column>
+        <el-table-column label="备注" min-width="180">
+          <template #default="scope"><el-input v-if="!scope.row.isSection" v-model="editForm[scope.row.prefix + 'Remark']" /></template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <el-button @click="editDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveEdit">保存</el-button>
+      </template>
+    </el-dialog>
+
+</template>
       </el-table-column>
       <el-table-column label="检查内容" min-width="260" show-overflow-tooltip>
         <template #default="scope"><span v-if="!scope.row.isSection">{{ scope.row.content }}</span></template>
@@ -43,8 +81,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import http from '@/api/http'
 
 const route = useRoute()
@@ -53,6 +92,8 @@ const type = String(route.params.type || 'monthly')
 const id = Number(route.params.id)
 const boxId = Number(route.query.boxId || 0)
 const record = reactive<any>({})
+const editDialog = ref(false)
+const editForm = reactive<any>({})
 
 const typeLabel = computed(() => ({ monthly: '月检', quarterly: '季检', yearly: '年检' } as any)[type] || type)
 
@@ -205,6 +246,36 @@ const spanMethod = ({ row, columnIndex }: any) => {
     return [0, 0]
   }
   return [1, 1]
+}
+
+
+const openEdit = () => {
+  Object.keys(editForm).forEach((k) => delete editForm[k])
+  Object.assign(editForm, {
+    id: record.id,
+    boxId: record.box_id,
+    superviseUser: record.supervise_user || '',
+    maintenanceUser: record.maintenance_user || '',
+    maintenanceTime: record.maintenance_time || ''
+  })
+  displayRows.value.forEach((row: any) => {
+    if (row.isSection) return
+    editForm[row.prefix + 'Result'] = record[row.prefix + '_result'] || ''
+    editForm[row.prefix + 'Status'] = record[row.prefix + '_status'] || ''
+    editForm[row.prefix + 'Remark'] = record[row.prefix + '_remark'] || ''
+  })
+  editDialog.value = true
+}
+
+const saveEdit = async () => {
+  try {
+    await http.post(`/box-maintenance/${type}/save`, { ...editForm })
+    editDialog.value = false
+    await load()
+    ElMessage.success('维保记录修改成功')
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.msg || e?.message || '维保记录修改失败')
+  }
 }
 
 const load = async () => {
