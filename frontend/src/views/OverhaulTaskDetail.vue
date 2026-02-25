@@ -5,11 +5,13 @@
       <el-tag type="success">工单ID：{{ task.id || '-' }}</el-tag>
       <el-tag>工单号：{{ task.taskNo || '-' }}</el-tag>
       <el-tag>报修时间：{{ task.reportTime || '-' }}</el-tag>
+      <el-tag>关联配电箱：{{ task.boxAccount || task.boxId || '-' }}</el-tag>
       <el-tag>报修人：{{ task.reportUser || '-' }}</el-tag>
       <el-button type="primary" @click="openEdit">修改</el-button>
     </div>
 
     <el-descriptions title="检修工单信息" :column="2" border>
+      <el-descriptions-item label="关联配电箱">{{ task.boxAccount || task.boxId || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报修单位">{{ task.reportUnit || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报修时间">{{ task.reportTime || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报修人">{{ task.reportUser || '-' }}</el-descriptions-item>
@@ -23,6 +25,11 @@
 
     <el-dialog v-model="dialog" title="修改检修工单" width="760px">
       <el-form :model="form" label-width="110px">
+        <el-form-item label="关联配电箱*">
+          <el-select v-model="form.boxId" filterable style="width:100%">
+            <el-option v-for="opt in boxOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="任务单号"><el-input v-model="form.taskNo" placeholder="可空自动生成" /></el-form-item>
         <el-form-item label="报修单位"><el-input v-model="form.reportUnit" /></el-form-item>
         <el-form-item label="报修时间"><el-date-picker v-model="form.reportTime" type="date" value-format="YYYY-MM-DD" style="width:100%" /></el-form-item>
@@ -53,11 +60,18 @@ const router = useRouter()
 const id = Number(route.params.id)
 const task = reactive<any>({})
 const form = reactive<any>({})
+const boxOptions = ref<{label:string;value:number}[]>([])
 const dialog = ref(false)
 
 const load = async () => {
   const res = await http.get(`/overhaul-task/${id}`)
   Object.assign(task, res.data?.data || {})
+}
+
+const loadBoxes = async () => {
+  const res = await http.get('/box/page', { params: { pageNum: 1, pageSize: 1000 } })
+  const rows = res.data?.records || []
+  boxOptions.value = rows.map((r:any)=>({ value: r.id, label: `${r.boxId || '-'} / ${r.boxNo || '-'} / ${r.boxAddress || '-'}` }))
 }
 
 const openEdit = () => {
@@ -67,6 +81,7 @@ const openEdit = () => {
 }
 
 const save = async () => {
+  if (!form.boxId) { ElMessage.error('请选择关联配电箱'); return }
   const payload = { ...form, taskNo: (form.taskNo || '').trim() }
   if (!payload.taskNo) delete (payload as any).taskNo
   await http.post('/overhaul-task/save', payload)
@@ -77,7 +92,7 @@ const save = async () => {
 
 const goBack = () => router.push('/overhaul')
 
-onMounted(load)
+onMounted(async () => { await loadBoxes(); await load() })
 </script>
 
 <style scoped>

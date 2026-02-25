@@ -21,6 +21,7 @@ public class RepairTask implements Serializable {
     private Integer id;
 
     private String taskNo;
+    private Integer boxId;
     private String reportUnit;
     private String reportUser;
 

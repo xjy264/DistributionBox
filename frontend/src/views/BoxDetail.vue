@@ -79,6 +79,24 @@
         </el-table>
       </el-tab-pane>
 
+      <el-tab-pane label="检修记录">
+        <div class="sub-toolbar">
+          <el-button type="success" @click="openOverhaulDialog">新增检修记录</el-button>
+        </div>
+        <el-table :data="overhaulTasks" border>
+          <el-table-column type="index" label="序号" width="70" />
+          <el-table-column prop="taskNo" label="任务单号" min-width="180" />
+          <el-table-column prop="reportTime" label="报修时间" min-width="140" />
+          <el-table-column prop="reportUser" label="报修人" min-width="120" />
+          <el-table-column label="操作" width="180">
+            <template #default="scope">
+              <el-button size="small" type="primary" @click="goOverhaulTask(scope.row.id)">进入工单</el-button>
+              <el-button size="small" type="danger" @click="removeOverhaul(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
       <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
     </el-tabs>
@@ -172,6 +190,25 @@
       </template>
     </el-dialog>
 
+    <el-dialog v-model="overhaulDialog" title="新增检修记录" width="760px">
+      <el-form :model="overhaulForm" label-width="110px">
+        <el-form-item label="任务单号"><el-input v-model="overhaulForm.taskNo" placeholder="可空自动生成" /></el-form-item>
+        <el-form-item label="报修单位"><el-input v-model="overhaulForm.reportUnit" /></el-form-item>
+        <el-form-item label="报修时间"><el-date-picker v-model="overhaulForm.reportTime" type="date" value-format="YYYY-MM-DD" style="width:100%" /></el-form-item>
+        <el-form-item label="报修人"><el-input v-model="overhaulForm.reportUser" /></el-form-item>
+        <el-form-item label="报修接受人"><el-input v-model="overhaulForm.acceptUser" /></el-form-item>
+        <el-form-item label="盯控人员"><el-input v-model="overhaulForm.supervisionUser" /></el-form-item>
+        <el-form-item label="抢修人员"><el-input v-model="overhaulForm.rescueUsers" /></el-form-item>
+        <el-form-item label="故障现象"><el-input v-model="overhaulForm.faultPhenomenon" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="故障原因"><el-input v-model="overhaulForm.faultReason" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="抢修情况"><el-input v-model="overhaulForm.rescueSituation" type="textarea" :rows="3" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="overhaulDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveOverhaul">保存</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="componentDialog" title="元器件" width="700px">
       <EntityForm v-model="componentForm" :fields="componentFields" />
       <template #footer>
@@ -221,12 +258,14 @@ const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
 const circuits = ref<any[]>([])
+const overhaulTasks = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
 const boxEditDialog = ref(false)
 const circuitDialog = ref(false)
+const overhaulDialog = ref(false)
 
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
@@ -247,6 +286,7 @@ const boxEditForm = reactive<any>({
 const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
 const inspectionForm = reactive<any>({ boxIds: [] })
 const circuitForm = reactive<any>({})
+const overhaulForm = reactive<any>({})
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -383,10 +423,11 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes, circuitRes] = await Promise.allSettled([
+  const [boxRes, compRes, circuitRes, overhaulRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
     http.get(`/components/${id}`),
-    http.get(`/box-circuit/${id}`)
+    http.get(`/box-circuit/${id}`),
+    http.get(`/overhaul-task/page`, { params: { pageNum: 1, pageSize: 1000, boxId: id } })
   ])
 
   if (token !== currentLoadToken) return
@@ -407,6 +448,13 @@ const load = async () => {
     circuits.value = safeArray(circuitData)
   } else {
     circuits.value = []
+  }
+
+  if (overhaulRes.status === 'fulfilled') {
+    const pageData = overhaulRes.value.data?.data || {}
+    overhaulTasks.value = pageData.records || []
+  } else {
+    overhaulTasks.value = []
   }
 
   inspections.value = []
@@ -521,6 +569,32 @@ const removeCircuit = async (id: number) => {
   if (!(await confirmDeleteAction())) return
   await http.delete(`/box-circuit/${id}`)
   await load()
+}
+
+
+const openOverhaulDialog = () => {
+  Object.keys(overhaulForm).forEach((k) => delete overhaulForm[k])
+  Object.assign(overhaulForm, { boxId: box.id })
+  overhaulDialog.value = true
+}
+
+const saveOverhaul = async () => {
+  if (!box.id) return
+  await http.post('/overhaul-task/save', { ...overhaulForm, boxId: box.id })
+  overhaulDialog.value = false
+  await load()
+  ElMessage.success('检修记录保存成功')
+}
+
+const removeOverhaul = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该检修记录？'))) return
+  await http.delete(`/overhaul-task/${id}`)
+  await load()
+}
+
+const goOverhaulTask = (id: number) => {
+  if (!id) return
+  router.push(`/overhaul-task/${id}`)
 }
 
 const openInspectionDialog = () => {

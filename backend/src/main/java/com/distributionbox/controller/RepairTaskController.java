@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.distributionbox.common.Result;
 import com.distributionbox.controller.dto.RepairTaskSaveDto;
 import com.distributionbox.controller.dto.RepairTaskViewDto;
+import com.distributionbox.entity.Box;
 import com.distributionbox.entity.RepairTask;
+import com.distributionbox.service.IBoxService;
 import com.distributionbox.service.IRepairTaskService;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
@@ -30,6 +32,9 @@ public class RepairTaskController {
     @Resource
     private IRepairTaskService repairTaskService;
 
+    @Resource
+    private IBoxService boxService;
+
     @PostMapping("/save")
     public Result save(@RequestBody RepairTaskSaveDto dto) {
         RepairTask task = new RepairTask();
@@ -51,6 +56,7 @@ public class RepairTaskController {
                        @RequestParam(defaultValue = "") String taskNo,
                        @RequestParam(defaultValue = "") String reportUser,
                        @RequestParam(defaultValue = "") String rescueUsers,
+                       @RequestParam(required = false) Integer boxId,
                        @RequestParam(defaultValue = "") String reportTimeStart,
                        @RequestParam(defaultValue = "") String reportTimeEnd) {
         QueryWrapper<RepairTask> queryWrapper = new QueryWrapper<>();
@@ -62,6 +68,9 @@ public class RepairTaskController {
         }
         if (!rescueUsers.isBlank()) {
             queryWrapper.like("rescue_users", rescueUsers.trim());
+        }
+        if (boxId != null) {
+            queryWrapper.eq("box_id", boxId);
         }
         if (!reportTimeStart.isBlank()) {
             queryWrapper.ge("report_time", reportTimeStart.trim());
@@ -75,6 +84,12 @@ public class RepairTaskController {
         List<RepairTaskViewDto> records = page.getRecords().stream().map(task -> {
             RepairTaskViewDto view = new RepairTaskViewDto();
             BeanUtils.copyProperties(task, view);
+            if (task.getBoxId() != null) {
+                Box box = boxService.getById(task.getBoxId());
+                if (box != null) {
+                    view.setBoxAccount(box.getBoxId());
+                }
+            }
             return view;
         }).toList();
 
@@ -94,6 +109,12 @@ public class RepairTaskController {
         }
         RepairTaskViewDto view = new RepairTaskViewDto();
         BeanUtils.copyProperties(task, view);
+        if (task.getBoxId() != null) {
+            Box box = boxService.getById(task.getBoxId());
+            if (box != null) {
+                view.setBoxAccount(box.getBoxId());
+            }
+        }
         return Result.success(view);
     }
 }
