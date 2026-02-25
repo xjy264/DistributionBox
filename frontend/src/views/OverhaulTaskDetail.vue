@@ -5,13 +5,13 @@
       <el-tag type="success">工单ID：{{ task.id || '-' }}</el-tag>
       <el-tag>工单号：{{ task.taskNo || '-' }}</el-tag>
       <el-tag>报修时间：{{ task.reportTime || '-' }}</el-tag>
-      <el-tag>关联配电箱：{{ task.boxAccount || task.boxId || '-' }}</el-tag>
+      <el-tag>关联配电箱ID：{{ task.boxId || '-' }}</el-tag>
       <el-tag>报修人：{{ task.reportUser || '-' }}</el-tag>
       <el-button type="primary" @click="openEdit">修改</el-button>
     </div>
 
     <el-descriptions title="检修工单信息" :column="2" border>
-      <el-descriptions-item label="关联配电箱">{{ task.boxAccount || task.boxId || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="关联配电箱ID">{{ task.boxId || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报修单位">{{ task.reportUnit || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报修时间">{{ task.reportTime || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报修人">{{ task.reportUser || '-' }}</el-descriptions-item>
