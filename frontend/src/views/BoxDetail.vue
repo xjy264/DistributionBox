@@ -79,6 +79,29 @@
         </el-table>
       </el-tab-pane>
 
+
+      <el-tab-pane label="维保记录">
+        <div class="sub-toolbar">
+          <el-select v-model="maintenanceType" style="width: 160px" @change="loadMaintenanceRecords">
+            <el-option label="月检" value="monthly" />
+            <el-option label="季检" value="quarterly" />
+            <el-option label="年检" value="yearly" />
+          </el-select>
+          <el-button type="success" @click="openMaintenanceDialog">新增维保记录</el-button>
+        </div>
+        <el-table :data="maintenanceRecords" border>
+          <el-table-column prop="id" label="记录ID" width="100" />
+          <el-table-column prop="superviseUser" label="盯控人员" min-width="140" />
+          <el-table-column prop="maintenanceUser" label="维保人员" min-width="140" />
+          <el-table-column prop="createdTime" label="创建时间" min-width="180" />
+          <el-table-column label="操作" width="120">
+            <template #default="scope">
+              <el-button size="small" type="danger" @click="removeMaintenance(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
       <el-tab-pane label="检修记录">
         <div class="sub-toolbar">
           <el-button type="success" @click="openOverhaulDialog">新增检修记录</el-button>
@@ -190,6 +213,38 @@
       </template>
     </el-dialog>
 
+
+    <el-dialog v-model="maintenanceDialog" title="新增维保记录" width="1000px">
+      <el-form :model="maintenanceForm" label-width="110px">
+        <el-form-item label="盯控人员"><el-input v-model="maintenanceForm.superviseUser" /></el-form-item>
+        <el-form-item label="维保人员"><el-input v-model="maintenanceForm.maintenanceUser" /></el-form-item>
+      </el-form>
+      <el-table :data="currentMaintenanceTemplate" border size="small">
+        <el-table-column prop="seq" label="序号" width="70" />
+        <el-table-column prop="content" label="检查内容" min-width="220" />
+        <el-table-column prop="standard" label="检查标准" min-width="220" />
+        <el-table-column label="检查结果" min-width="180">
+          <template #default="scope">
+            <el-input v-model="maintenanceForm[scope.row.prefix + 'Result']" />
+          </template>
+        </el-table-column>
+        <el-table-column label="是否正常" min-width="140">
+          <template #default="scope">
+            <el-input v-model="maintenanceForm[scope.row.prefix + 'Status']" />
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" min-width="180">
+          <template #default="scope">
+            <el-input v-model="maintenanceForm[scope.row.prefix + 'Remark']" />
+          </template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <el-button @click="maintenanceDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveMaintenance">保存</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="overhaulDialog" title="新增检修记录" width="760px">
       <el-form :model="overhaulForm" label-width="110px">
         <el-form-item label="任务单号"><el-input v-model="overhaulForm.taskNo" placeholder="可空自动生成" /></el-form-item>
@@ -258,6 +313,8 @@ const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
 const circuits = ref<any[]>([])
+const maintenanceRecords = ref<any[]>([])
+const maintenanceType = ref<'monthly'|'quarterly'|'yearly'>('monthly')
 const overhaulTasks = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
@@ -266,6 +323,7 @@ const inspectionDialog = ref(false)
 const boxEditDialog = ref(false)
 const circuitDialog = ref(false)
 const overhaulDialog = ref(false)
+const maintenanceDialog = ref(false)
 
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
@@ -287,6 +345,7 @@ const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || '')
 const inspectionForm = reactive<any>({ boxIds: [] })
 const circuitForm = reactive<any>({})
 const overhaulForm = reactive<any>({})
+const maintenanceForm = reactive<any>({})
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -331,6 +390,47 @@ const inspectionFields = ref<any[]>([
   { key: 'laterUrl', label: '后期', type: 'image' },
   { key: 'remark', label: '备注', type: 'textarea' }
 ])
+
+
+
+const maintenanceTemplates: Record<string, { seq: number; prefix: string; content: string; standard: string }[]> = {
+  monthly: [
+    { seq: 1, prefix: 'm1', content: '箱体外观完好性', standard: '无破损、无明显锈蚀、门锁完整' },
+    { seq: 2, prefix: 'm2', content: '标识与编号', standard: '标识清晰、编号一致可辨识' },
+    { seq: 3, prefix: 'm3', content: '防护状态', standard: '防护盖齐全、孔洞封堵良好' },
+    { seq: 4, prefix: 'm4', content: '接地连接', standard: '接地线连接牢固，无松脱' },
+    { seq: 5, prefix: 'm5', content: '开关与断路器外观', standard: '无烧蚀、无异味、无异常变色' },
+    { seq: 6, prefix: 'm6', content: '接线端子紧固', standard: '无松动、无发热痕迹' },
+    { seq: 7, prefix: 'm7', content: '线缆绝缘外观', standard: '绝缘层完整无破损' },
+    { seq: 8, prefix: 'm8', content: '指示/仪表状态', standard: '显示正常、功能可用' },
+    { seq: 9, prefix: 'm9', content: '清洁情况', standard: '箱内外无明显积尘积水' },
+    { seq: 10, prefix: 'm10', content: '温升与异响检查', standard: '无异常温升、无异响' },
+    { seq: 11, prefix: 'm11', content: '回路标识核对', standard: '回路名称与实际一致' },
+    { seq: 12, prefix: 'm12', content: '检查与维护维保', standard: '记录完整，问题闭环处理' }
+  ],
+  quarterly: [
+    { seq: 1, prefix: 'q1', content: '季度紧固复检', standard: '关键连接点扭矩符合要求' },
+    { seq: 2, prefix: 'q2', content: '保护装置功能', standard: '保护动作正确可靠' },
+    { seq: 3, prefix: 'q3', content: '绝缘状态检测', standard: '绝缘状态满足运行要求' },
+    { seq: 4, prefix: 'q4', content: '接地系统复测', standard: '接地连续性良好' },
+    { seq: 5, prefix: 'q5', content: '回路负载检查', standard: '负载分配合理，无过载' },
+    { seq: 6, prefix: 'q6', content: '箱体防护复核', standard: '防护等级维持有效' },
+    { seq: 7, prefix: 'q7', content: '附件功能检查', standard: '附件动作灵敏可靠' },
+    { seq: 8, prefix: 'q8', content: '季度检查与维护维保', standard: '问题整改完成并归档' }
+  ],
+  yearly: [
+    { seq: 1, prefix: 'y1', content: '年度综合外观复检', standard: '外观总体状态良好' },
+    { seq: 2, prefix: 'y2', content: '主回路健康评估', standard: '主回路运行参数正常' },
+    { seq: 3, prefix: 'y3', content: '保护定值与动作校核', standard: '校核结果满足要求' },
+    { seq: 4, prefix: 'y4', content: '绝缘与接地年度检测', standard: '检测值满足规范' },
+    { seq: 5, prefix: 'y5', content: '关键器件老化评估', standard: '无失效风险或已更换' },
+    { seq: 6, prefix: 'y6', content: '回路整定与标识核对', standard: '整定准确、标识一致' },
+    { seq: 7, prefix: 'y7', content: '运行资料归档检查', standard: '维保资料完整可追溯' },
+    { seq: 8, prefix: 'y8', content: '年度检查与维护维保', standard: '年度闭环完成' }
+  ]
+}
+
+const currentMaintenanceTemplate = computed(() => maintenanceTemplates[maintenanceType.value] || [])
 
 const goBack = () => router.push('/box')
 
@@ -466,6 +566,7 @@ const load = async () => {
   }
 
   inspections.value = []
+  await loadMaintenanceRecords()
 
 }
 
@@ -579,6 +680,48 @@ const removeCircuit = async (id: number) => {
   await load()
 }
 
+
+
+const loadMaintenanceRecords = async () => {
+  const boxId = getCurrentBoxId()
+  if (!boxId) { maintenanceRecords.value = []; return }
+  const res = await http.get(`/box-maintenance/${maintenanceType.value}/page`, { params: { boxId, pageNum: 1, pageSize: 200 } })
+  const pageData = res.data?.data || {}
+  maintenanceRecords.value = (pageData.records || []).map((r: any) => ({
+    ...r,
+    superviseUser: r.supervise_user,
+    maintenanceUser: r.maintenance_user,
+    createdTime: r.created_time
+  }))
+}
+
+const openMaintenanceDialog = () => {
+  const boxId = getCurrentBoxId()
+  if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法新增维保记录'); return }
+  Object.keys(maintenanceForm).forEach((k) => delete maintenanceForm[k])
+  Object.assign(maintenanceForm, { boxId })
+  currentMaintenanceTemplate.value.forEach((item) => {
+    maintenanceForm[item.prefix + 'Result'] = ''
+    maintenanceForm[item.prefix + 'Status'] = ''
+    maintenanceForm[item.prefix + 'Remark'] = ''
+  })
+  maintenanceDialog.value = true
+}
+
+const saveMaintenance = async () => {
+  const boxId = getCurrentBoxId()
+  if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法保存维保记录'); return }
+  await http.post(`/box-maintenance/${maintenanceType.value}/save`, { ...maintenanceForm, boxId })
+  maintenanceDialog.value = false
+  await loadMaintenanceRecords()
+  ElMessage.success('维保记录保存成功')
+}
+
+const removeMaintenance = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该维保记录？'))) return
+  await http.delete(`/box-maintenance/${maintenanceType.value}/${id}`)
+  await loadMaintenanceRecords()
+}
 
 const openOverhaulDialog = () => {
   const currentBoxId = getCurrentBoxId()
@@ -706,6 +849,10 @@ watch(
     await load()
   }
 )
+
+watch(maintenanceType, async () => {
+  await loadMaintenanceRecords()
+})
 </script>
 
 <style scoped>
