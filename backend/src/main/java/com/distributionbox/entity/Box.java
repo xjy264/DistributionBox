@@ -30,6 +30,7 @@ public class Box implements Serializable {
 
     private String boxId;
 
+    private String boxNo;
 
     private String station;
 
@@ -47,6 +48,10 @@ public class Box implements Serializable {
     private String pileType;
 
     private String indoorOutdoor;
+
+    private String incomingSource;
+
+    private String incomingSpec;
 
     private String sharedWithOthers;
 

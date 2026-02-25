@@ -8,12 +8,15 @@
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
       <el-descriptions-item label="*台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="配电箱编号">{{ toDisplay(box.boxNo) }}</el-descriptions-item>
             <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="明装暗装">{{ toDisplay(box.pileType) }}</el-descriptions-item>
       <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
+      <el-descriptions-item label="进线来源">{{ toDisplay(box.incomingSource) }}</el-descriptions-item>
+      <el-descriptions-item label="进线规格">{{ toDisplay(box.incomingSpec) }}</el-descriptions-item>
       <el-descriptions-item label="是否与其它单位共用">{{ toDisplay(box.sharedWithOthers) }}</el-descriptions-item>
       <el-descriptions-item label="共用范围">{{ toDisplay(box.sharedScope) }}</el-descriptions-item>
       <el-descriptions-item label="是否为大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
@@ -37,6 +40,7 @@
           <el-button type="success" @click="openComponentDialog">新增元器件</el-button>
         </div>
         <el-table :data="components" border>
+          <el-table-column type="index" label="序号" width="70" />
           <el-table-column prop="componentsName" label="电器元件" />
           <el-table-column prop="componentsUnit" label="单位" />
           <el-table-column prop="componentsQuantity" label="数量" />
@@ -60,12 +64,8 @@
         </div>
         <el-table :data="circuits" border>
           <el-table-column type="index" label="序号" width="70" />
-          <el-table-column prop="supplyCircuit" label="供电回路" width="100" />
-          <el-table-column prop="switchModel" label="开关型号" width="100" />
-          <el-table-column prop="ratedCurrent" label="额定电流" width="100" />
-          <el-table-column prop="wireSection" label="导线截面" width="100" />
-          <el-table-column prop="powerVoltage" label="电源电压" width="90" />
-          <el-table-column prop="startCurrent" label="启动电流" width="90" />
+          <el-table-column prop="supplyCircuit" label="供电回路" width="120" />
+          <el-table-column prop="startCurrent" label="启动电流" width="100" />
           <el-table-column prop="runCurrent" label="运行电流" width="90" />
           <el-table-column prop="power" label="功率" width="70" />
           <el-table-column prop="electricDevice" label="用电设备" width="100" />
@@ -88,6 +88,9 @@
       <el-form :model="boxEditForm" label-width="150px" class="compact-form">
         <el-form-item label="台账号">
           <el-input v-model="boxEditForm.boxId" disabled style="width: 430px" />
+        </el-form-item>
+        <el-form-item label="配电箱编号">
+          <el-input v-model="boxEditForm.boxNo" style="width: 430px" />
         </el-form-item>
         <el-form-item label="车间">
           <el-select v-model="boxEditForm.station" style="width: 430px" filterable @change="onEditStationChange">
@@ -117,6 +120,12 @@
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
+        <el-form-item label="进线来源">
+          <el-input v-model="boxEditForm.incomingSource" style="width: 430px" />
+        </el-form-item>
+        <el-form-item label="进线规格">
+          <el-input v-model="boxEditForm.incomingSpec" style="width: 430px" />
+        </el-form-item>
         <el-form-item label="是否与其它单位共用">
           <el-select v-model="boxEditForm.sharedWithOthers" style="width: 430px" clearable @change="onEditSharedWithOthersChange">
             <el-option label="是" value="是" />
@@ -126,7 +135,7 @@
         <el-form-item label="共用范围">
           <el-input v-model="boxEditForm.sharedScope" :disabled="boxEditForm.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 430px" />
         </el-form-item>
-        <el-form-item label="是否为大功率电器">
+        <el-form-item label="是否有大功率电器">
           <el-select v-model="boxEditForm.highPowerAppliance" style="width: 430px" clearable @change="onEditHighPowerChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
@@ -154,10 +163,6 @@
     <el-dialog v-model="circuitDialog" title="回路" width="900px">
       <el-form :model="circuitForm" label-width="110px">
         <el-form-item label="供电回路"><el-input v-model="circuitForm.supplyCircuit" /></el-form-item>
-        <el-form-item label="开关型号"><el-input v-model="circuitForm.switchModel" /></el-form-item>
-        <el-form-item label="额定电流"><el-input v-model="circuitForm.ratedCurrent" /></el-form-item>
-        <el-form-item label="导线截面"><el-input v-model="circuitForm.wireSection" /></el-form-item>
-        <el-form-item label="电源电压"><el-input v-model="circuitForm.powerVoltage" /></el-form-item>
         <el-form-item label="启动电流"><el-input v-model="circuitForm.startCurrent" /></el-form-item>
         <el-form-item label="运行电流"><el-input v-model="circuitForm.runCurrent" /></el-form-item>
         <el-form-item label="功率"><el-input v-model="circuitForm.power" /></el-form-item>
@@ -230,12 +235,15 @@ const circuitDialog = ref(false)
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
   boxId: '',
+  boxNo: '',
   station: '',
   area: '',
   boxAddress: '',
   size: '',
   pileType: '',
   indoorOutdoor: '',
+  incomingSource: '',
+  incomingSpec: '',
   sharedWithOthers: '否',
   sharedScope: '',
   highPowerAppliance: '否',
@@ -412,12 +420,15 @@ const load = async () => {
 
 const openBoxEditDialog = () => {
   boxEditForm.boxId = box.boxId || ''
+  boxEditForm.boxNo = box.boxNo || ''
   boxEditForm.station = box.station || ''
   boxEditForm.area = box.area || ''
   boxEditForm.boxAddress = box.boxAddress || ''
   boxEditForm.size = box.size || ''
   boxEditForm.pileType = box.pileType || ''
   boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
+  boxEditForm.incomingSource = box.incomingSource || ''
+  boxEditForm.incomingSpec = box.incomingSpec || ''
   boxEditForm.sharedWithOthers = box.sharedWithOthers || '否'
   boxEditForm.sharedScope = box.sharedScope || ''
   boxEditForm.highPowerAppliance = box.highPowerAppliance || '否'
@@ -439,12 +450,15 @@ const saveBoxBaseInfo = async () => {
     ...box,
     id: box.id,
     boxId: box.boxId,
+    boxNo: boxEditForm.boxNo,
     station: boxEditForm.station,
     area: boxEditForm.area,
     boxAddress: boxEditForm.boxAddress,
     size: boxEditForm.size,
     pileType: boxEditForm.pileType,
     indoorOutdoor: boxEditForm.indoorOutdoor,
+    incomingSource: boxEditForm.incomingSource,
+    incomingSpec: boxEditForm.incomingSpec,
     sharedWithOthers: boxEditForm.sharedWithOthers,
     sharedScope: boxEditForm.sharedWithOthers === '是' ? boxEditForm.sharedScope : '',
     highPowerAppliance: boxEditForm.highPowerAppliance,
