@@ -79,6 +79,31 @@
         </el-table>
       </el-tab-pane>
 
+
+      <el-tab-pane label="维保记录">
+        <div class="sub-toolbar">
+          <el-select v-model="maintenanceType" style="width: 160px; margin-right: 40px" @change="loadMaintenanceRecords">
+            <el-option label="月检" value="monthly" />
+            <el-option label="季检" value="quarterly" />
+            <el-option label="年检" value="yearly" />
+          </el-select>
+          <el-button type="success" @click="openMaintenanceDialog">新增维保记录</el-button>
+        </div>
+        <el-table :data="maintenanceRecords" border>
+          <el-table-column prop="id" label="记录ID" width="100" />
+          <el-table-column prop="superviseUser" label="盯控人员" min-width="140" />
+          <el-table-column prop="maintenanceUser" label="维保人员" min-width="140" />
+          <el-table-column prop="maintenanceTime" label="维保时间" min-width="180" />
+          <el-table-column prop="createdTime" label="创建时间" min-width="180" />
+          <el-table-column label="操作" width="220">
+            <template #default="scope">
+              <el-button size="small" type="primary" @click="goMaintenanceDetail(scope.row.id)">进入记录</el-button>
+              <el-button size="small" type="danger" @click="removeMaintenance(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
       <el-tab-pane label="检修记录">
         <div class="sub-toolbar">
           <el-button type="success" @click="openOverhaulDialog">新增检修记录</el-button>
@@ -190,6 +215,52 @@
       </template>
     </el-dialog>
 
+
+    <el-dialog v-model="maintenanceDialog" :title="`新增${maintenanceTypeLabel}维保记录`" width="1000px">
+      <el-form :model="maintenanceForm" label-width="110px">
+        <el-form-item label="盯控人员"><el-input v-model="maintenanceForm.superviseUser" /></el-form-item>
+        <el-form-item label="维保人员"><el-input v-model="maintenanceForm.maintenanceUser" /></el-form-item>
+        <el-form-item label="维保时间"><el-date-picker v-model="maintenanceForm.maintenanceTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width:100%" /></el-form-item>
+      </el-form>
+      <el-table :data="maintenanceDisplayRows" border size="small" :span-method="maintenanceSpanMethod" row-key="rowKey">
+        <el-table-column label="序号" width="120">
+          <template #default="scope">
+            <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
+            <span v-else>{{ scope.row.sectionSeq }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="检查内容" min-width="180" show-overflow-tooltip>
+          <template #default="scope">
+            <span v-if="!scope.row.isSection">{{ scope.row.content }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="检查标准" min-width="180" show-overflow-tooltip>
+          <template #default="scope">
+            <span v-if="!scope.row.isSection">{{ scope.row.standard }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="检查结果" width="120">
+          <template #default="scope">
+            <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Result']" />
+          </template>
+        </el-table-column>
+        <el-table-column label="是否正常" width="120">
+          <template #default="scope">
+            <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Status']" />
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" width="120">
+          <template #default="scope">
+            <el-input v-if="!scope.row.isSection" v-model="maintenanceForm[scope.row.prefix + 'Remark']" />
+          </template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <el-button @click="maintenanceDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveMaintenance">保存</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="overhaulDialog" title="新增检修记录" width="760px">
       <el-form :model="overhaulForm" label-width="110px">
         <el-form-item label="任务单号"><el-input v-model="overhaulForm.taskNo" placeholder="可空自动生成" /></el-form-item>
@@ -258,6 +329,9 @@ const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
 const circuits = ref<any[]>([])
+const maintenanceRecords = ref<any[]>([])
+const maintenanceType = ref<'monthly'|'quarterly'|'yearly'>('monthly')
+const maintenanceTypeLabel = computed(() => ({ monthly: '月检', quarterly: '季检', yearly: '年检' } as any)[maintenanceType.value] || '月检')
 const overhaulTasks = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
@@ -266,6 +340,7 @@ const inspectionDialog = ref(false)
 const boxEditDialog = ref(false)
 const circuitDialog = ref(false)
 const overhaulDialog = ref(false)
+const maintenanceDialog = ref(false)
 
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
@@ -287,6 +362,7 @@ const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || '')
 const inspectionForm = reactive<any>({ boxIds: [] })
 const circuitForm = reactive<any>({})
 const overhaulForm = reactive<any>({})
+const maintenanceForm = reactive<any>({})
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -332,6 +408,159 @@ const inspectionFields = ref<any[]>([
   { key: 'remark', label: '备注', type: 'textarea' }
 ])
 
+
+
+const baseExteriorItems = [
+  ['配电箱（柜）周围有无杂物','周围无杂物'],
+  ['防触电警示标识是否完好','警示标识完好'],
+  ['配电箱（柜）门锁是否完好','门锁完好'],
+  ['配电箱（柜）箱体有无锈蚀变形情况，柜门是否密封良好','箱体无锈蚀变形，柜门密封良好'],
+  ['配电箱（柜）内是否有灰土积尘','无积土灰尘'],
+  ['配电箱（柜）内有无异响、异味','无异响和异味'],
+  ['配电箱（柜）内配线是否整齐','配线整齐'],
+  ['配电箱（柜）内标识是否齐全一致','标识齐全一致'],
+  ['配电箱内电线、电缆接头有无过热、变色、变形、异味','接头无过热、变色变形、异味'],
+  ['配电箱（柜）内零排安装是否稳固，有无N标识','安装稳固，有N标识'],
+  ['零排同一个接线端子最多并接俩根同线径导线','同一个接线端子最多并接俩根同线径导线'],
+  ['配电箱（柜）内地排安装是否稳固，有无PE标识','安装稳固，有PE标识'],
+  ['地排同一个接线端子最多并接俩根同线径导线','同一个接线端子最多并接俩根同线径导线'],
+  ['地排与箱体是否用不小于4平方黄绿铜线紧固连接','地排与箱体用不小于4平方黄绿铜线紧固连接'],
+  ['地排与箱门是否用不小于4平方黄绿铜线紧固连接','地排与箱门用不小于4平方黄绿铜线紧固连接'],
+  ['配电箱内元器件是否外观完好，排列整齐，附件齐全','元器件外观完好，排列整齐，附件齐全'],
+  ['配电箱内是否遗留有可能带电的导线及裸露端子','配电箱内无遗留可能带电导线及裸露端子'],
+  ['配电箱内不同极性带电裸露部分电气间隙是否在安全范围内','电气间隙在安全范围内'],
+  ['配电箱内电气元件是否在安全范围内','配电箱内电气元件在安全范围内'],
+  ['二次接线是否整齐、有无绝缘老化、断裂或接触不良','排线整齐无老化、断裂现象'],
+  ['指示灯、仪表显示是否正常','指示灯、仪表等正常'],
+  ['配电箱（柜）进出线是否防火封堵','进出线处做好防火封堵'],
+  ['塑壳断路器是否有隔弧挡片','必须有隔弧片']
+]
+
+const maintenanceTemplates: Record<string, { section: string; seq: number; prefix: string; content: string; standard: string }[]> = {
+  monthly: [
+    ...baseExteriorItems.map((it, idx) => ({ section: '一、配电箱（柜）外观检查', seq: idx + 1, prefix: `m${idx + 1}`, content: it[0], standard: it[1] })),
+    { section: '二、配电箱（柜）系统图检查', seq: 24, prefix: 'm24', content: '设备编号标识是否与系统图对应一致', standard: '设备编号标识与系统图对应一致' },
+    { section: '二、配电箱（柜）系统图检查', seq: 25, prefix: 'm25', content: '配电箱（柜）系统图与上次检查是否一致', standard: '与上次检查一致' },
+    { section: '三、站名字检查', seq: 26, prefix: 'm26', content: '站名字发光是否均匀无瞎点', standard: '发光均匀无瞎点' },
+    { section: '三、站名字检查', seq: 27, prefix: 'm27', content: '站名字亚克力板是否变形开裂', standard: '无变形开裂' },
+    { section: '三、站名字检查', seq: 28, prefix: 'm28', content: '站名字整体结构是否结实可靠', standard: '整体结构结实可靠' },
+    { section: '三、站名字检查', seq: 29, prefix: 'm29', content: '站名字电线路是否有发热老化开裂现象', standard: '连接部位无松动、缺失' },
+    { section: '四、检查与维护维保', seq: 30, prefix: 'm30', content: '配电箱（柜）内除尘清洁', standard: '配电箱（柜）内无积土灰尘' },
+    { section: '四、检查与维护维保', seq: 31, prefix: 'm31', content: '紧固电线、电缆接头、接头端子、螺栓', standard: '接头紧固' },
+    { section: '四、检查与维护维保', seq: 32, prefix: 'm32', content: '红外测试仪测量电缆、接头是否有过热现象', standard: '测试点温度符合要求规范' },
+    { section: '四、检查与维护维保', seq: 33, prefix: 'm33', content: '红外测试仪测量箱内元器件是否有过热现象', standard: '元器件无过热现象' },
+    { section: '四、检查与维护维保', seq: 34, prefix: 'm34', content: '核对电压表、电流表等显示是否正确', standard: '各种仪表正常' },
+    { section: '四、检查与维护维保', seq: 35, prefix: 'm35', content: '缺失或新增标识补充', standard: '按现场补充' },
+    { section: '四、检查与维护维保', seq: 36, prefix: 'm36', content: '发现零小病害的现场整治', standard: '病害处置无隐患' }
+  ],
+  quarterly: [
+    ...baseExteriorItems.map((it, idx) => ({ section: '一、配电箱（柜）外观检查', seq: idx + 1, prefix: `q${idx + 1}`, content: it[0], standard: it[1] })),
+    { section: '二、配电箱（柜）系统图检查', seq: 24, prefix: 'q24', content: '设备编号标识是否与系统图对应一致', standard: '设备编号标识与系统图对应一致' },
+    { section: '二、配电箱（柜）系统图检查', seq: 25, prefix: 'q25', content: '配电箱（柜）系统图与上次检查是否一致', standard: '与上次检查一致' },
+    { section: '三、站名字检查', seq: 26, prefix: 'q26', content: '站名字发光是否均匀无瞎点', standard: '发光均匀无瞎点' },
+    { section: '三、站名字检查', seq: 27, prefix: 'q27', content: '站名字亚克力板是否变形开裂', standard: '无变形开裂' },
+    { section: '三、站名字检查', seq: 28, prefix: 'q28', content: '站名字整体结构是否结实可靠', standard: '整体结构结实可靠' },
+    { section: '三、站名字检查', seq: 29, prefix: 'q29', content: '站名字电线路是否有发热老化开裂现象', standard: '连接部位无松动、缺失' },
+    { section: '三、站名字检查', seq: 30, prefix: 'q30', content: '站名字电源是否有老化损坏现象', standard: '电源无老化损坏' },
+    { section: '三、站名字检查', seq: 31, prefix: 'q31', content: '站名字电源安装是否牢靠', standard: '安装牢靠' },
+    { section: '三、站名字检查', seq: 32, prefix: 'q32', content: '发光二极管之间导线连接是否稳固无裸露', standard: '连接稳固无裸露' },
+    { section: '四、照明电线路检查与维护保养', seq: 33, prefix: 'q33', content: '电线路是否排列整齐，编号是否正确', standard: '电线路排列整齐，编号正确' },
+    { section: '四、照明电线路检查与维护保养', seq: 34, prefix: 'q34', content: '电缆起始段、拐弯处是否悬挂功能齐全的标识牌', standard: '悬挂功能齐全的标识牌' },
+    { section: '四、照明电线路检查与维护保养', seq: 35, prefix: 'q35', content: '电缆内绝缘层颜色与接线火地零一致', standard: '颜色与火地零一致' },
+    { section: '四、照明电线路检查与维护保养', seq: 36, prefix: 'q36', content: '电线电缆绝缘层是否有破损、变色、老化现象', standard: '绝缘层无破损、变色、老化' },
+    { section: '四、照明电线路检查与维护保养', seq: 37, prefix: 'q37', content: '对用电负荷进行核对', standard: '负荷核对无异常' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 38, prefix: 'q38', content: '电线路是否排列整齐，编号是否正确', standard: '电线路排列整齐，编号正确' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 39, prefix: 'q39', content: '电缆起始段、拐弯处是否悬挂功能齐全的标识牌', standard: '悬挂功能齐全的标识牌' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 40, prefix: 'q40', content: '电缆内绝缘层颜色与接线火地零一致', standard: '颜色与火地零一致' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 41, prefix: 'q41', content: '电线电缆绝缘层是否有破损、变色、老化现象', standard: '绝缘层无破损、变色、老化' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 42, prefix: 'q42', content: '电缆端子连接是否紧固无变色', standard: '连接紧固无变色' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 43, prefix: 'q43', content: '桥架线管是否有变形、锈蚀、涂层脱落', standard: '无变形、锈蚀、涂层脱落' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 44, prefix: 'q44', content: '桥架连接部位是否松动或缺失', standard: '无松动或缺失' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 45, prefix: 'q45', content: '桥架线管接地线是否完好', standard: '接地线完好' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 46, prefix: 'q46', content: '桥架线管内有无杂物，如有则清理', standard: '无杂物或已清理' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 47, prefix: 'q47', content: '桥架线管支架系统、管卡螺栓紧固或更换', standard: '紧固可靠' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 48, prefix: 'q48', content: '桥架、线管涂层脱落处的喷漆保养', standard: '喷漆保养到位' },
+    { section: '七、检查与维护维保', seq: 49, prefix: 'q49', content: '配电箱（柜）内除尘清洁', standard: '配电箱（柜）内无积土灰尘' },
+    { section: '七、检查与维护维保', seq: 50, prefix: 'q50', content: '紧固电线、电缆接头、接头端子、螺栓', standard: '接头紧固' },
+    { section: '七、检查与维护维保', seq: 51, prefix: 'q51', content: '红外测试仪测量电缆、接头是否有过热现象', standard: '测试点温度符合要求规范' },
+    { section: '七、检查与维护维保', seq: 52, prefix: 'q52', content: '红外测试仪测量箱内元器件是否有过热现象', standard: '元器件无过热现象' },
+    { section: '七、检查与维护维保', seq: 53, prefix: 'q53', content: '核对电压表、电流表等显示是否正确', standard: '各种仪表正常' },
+    { section: '七、检查与维护维保', seq: 54, prefix: 'q54', content: '对电线缆的运行温度进行测量', standard: '测量值符合要求' },
+    { section: '七、检查与维护维保', seq: 55, prefix: 'q55', content: '对电线电缆的绝缘阻值进行测量', standard: '阻值符合要求' },
+    { section: '七、检查与维护维保', seq: 56, prefix: 'q56', content: '缺失或新增标识补充', standard: '按现场补充' },
+    { section: '七、检查与维护维保', seq: 57, prefix: 'q57', content: '发现零小病害的现场整治', standard: '病害处置无隐患' }
+  ],
+  yearly: [
+    ...baseExteriorItems.map((it, idx) => ({ section: '一、配电箱（柜）外观检查', seq: idx + 1, prefix: `y${idx + 1}`, content: it[0], standard: it[1] })),
+    { section: '二、配电箱（柜）系统图检查', seq: 24, prefix: 'y24', content: '设备编号标识是否与系统图对应一致', standard: '设备编号标识与系统图对应一致' },
+    { section: '二、配电箱（柜）系统图检查', seq: 25, prefix: 'y25', content: '配电箱（柜）系统图与上次检查是否一致', standard: '与上次检查一致' },
+    { section: '三、站名字检查', seq: 26, prefix: 'y26', content: '站名字发光是否均匀无瞎点', standard: '发光均匀无瞎点' },
+    { section: '三、站名字检查', seq: 27, prefix: 'y27', content: '站名字亚克力板是否变形开裂', standard: '无变形开裂' },
+    { section: '三、站名字检查', seq: 28, prefix: 'y28', content: '站名字整体结构是否结实可靠', standard: '整体结构结实可靠' },
+    { section: '三、站名字检查', seq: 29, prefix: 'y29', content: '站名字电线路是否有发热老化开裂现象', standard: '连接部位无松动、缺失' },
+    { section: '三、站名字检查', seq: 30, prefix: 'y30', content: '站名字电源是否有老化损坏现象', standard: '电源无老化损坏' },
+    { section: '三、站名字检查', seq: 31, prefix: 'y31', content: '站名字电源安装是否牢靠', standard: '安装牢靠' },
+    { section: '三、站名字检查', seq: 32, prefix: 'y32', content: '发光二极管之间导线连接是否稳固无裸露', standard: '连接稳固无裸露' },
+    { section: '三、站名字检查', seq: 33, prefix: 'y33', content: '站字电流电压的测量', standard: '测量值符合要求' },
+    { section: '四、照明电线路检查与维护保养', seq: 34, prefix: 'y34', content: '电线路是否排列整齐，编号是否正确', standard: '电线路排列整齐，编号正确' },
+    { section: '四、照明电线路检查与维护保养', seq: 35, prefix: 'y35', content: '电缆起始段、拐弯处是否悬挂功能齐全的标识牌', standard: '悬挂功能齐全的标识牌' },
+    { section: '四、照明电线路检查与维护保养', seq: 36, prefix: 'y36', content: '电缆内绝缘层颜色与接线火地零一致', standard: '颜色与火地零一致' },
+    { section: '四、照明电线路检查与维护保养', seq: 37, prefix: 'y37', content: '电线电缆绝缘层是否有破损、变色、老化现象', standard: '绝缘层无破损、变色、老化' },
+    { section: '四、照明电线路检查与维护保养', seq: 38, prefix: 'y38', content: '对用电负荷进行核对', standard: '负荷核对无异常' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 39, prefix: 'y39', content: '电线路是否排列整齐，编号是否正确', standard: '电线路排列整齐，编号正确' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 40, prefix: 'y40', content: '电缆起始段、拐弯处是否悬挂功能齐全的标识牌', standard: '悬挂功能齐全的标识牌' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 41, prefix: 'y41', content: '电缆内绝缘层颜色与接线火地零一致', standard: '颜色与火地零一致' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 42, prefix: 'y42', content: '电线电缆绝缘层是否有破损、变色、老化现象', standard: '绝缘层无破损、变色、老化' },
+    { section: '五、电源电缆（含接箱）的检查与维护保养', seq: 43, prefix: 'y43', content: '电缆端子连接是否紧固无变色', standard: '连接紧固无变色' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 44, prefix: 'y44', content: '桥架线管是否有变形、锈蚀、涂层脱落', standard: '无变形、锈蚀、涂层脱落' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 45, prefix: 'y45', content: '桥架连接部位是否松动或缺失', standard: '无松动或缺失' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 46, prefix: 'y46', content: '桥架线管接地线是否完好', standard: '接地线完好' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 47, prefix: 'y47', content: '桥架线管内有无杂物，如有则清理', standard: '无杂物或已清理' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 48, prefix: 'y48', content: '桥架线管支架系统、管卡螺栓紧固或更换', standard: '紧固可靠' },
+    { section: '六、电缆桥架、线管的检查与维护保养', seq: 49, prefix: 'y49', content: '桥架、线管涂层脱落处的喷漆保养', standard: '喷漆保养到位' },
+    { section: '七、站台灯具接线盒', seq: 50, prefix: 'y50', content: '灯具接线盒内电线接头是否松动、完好', standard: '电线接头无松动、完好' },
+    { section: '七、站台灯具接线盒', seq: 51, prefix: 'y51', content: '灯具悬挂或安装支架是否牢固', standard: '灯具悬挂或安装支架牢固' },
+    { section: '七、站台灯具接线盒', seq: 52, prefix: 'y52', content: '灯具接线盒内是否有积水、灰尘', standard: '接线盒内无积水、灰尘' },
+    { section: '七、站台灯具接线盒', seq: 53, prefix: 'y53', content: '清理灯具内杂物', standard: '已清理' },
+    { section: '七、站台灯具接线盒', seq: 54, prefix: 'y54', content: '接线盒是否变形、锈蚀，螺栓是否缺失', standard: '无变形、锈蚀、缺失' },
+    { section: '七、站台灯具接线盒', seq: 55, prefix: 'y55', content: '相关病害的处理', standard: '病害处置完成' },
+    { section: '八、检查与维护维保', seq: 56, prefix: 'y56', content: '配电箱（柜）内除尘清洁', standard: '配电箱（柜）内无积土灰尘' },
+    { section: '八、检查与维护维保', seq: 57, prefix: 'y57', content: '紧固电线、电缆接头、接头端子、螺栓', standard: '接头紧固' },
+    { section: '八、检查与维护维保', seq: 58, prefix: 'y58', content: '红外测试仪测量电缆、接头是否有过热现象', standard: '测试点温度符合要求规范' },
+    { section: '八、检查与维护维保', seq: 59, prefix: 'y59', content: '红外测试仪测量箱内元器件是否有过热现象', standard: '元器件无过热现象' },
+    { section: '八、检查与维护维保', seq: 60, prefix: 'y60', content: '核对电压表、电流表等显示是否正确', standard: '各种仪表正常' },
+    { section: '八、检查与维护维保', seq: 61, prefix: 'y61', content: '对电线缆的运行温度进行测量', standard: '测量值符合要求' },
+    { section: '八、检查与维护维保', seq: 62, prefix: 'y62', content: '对电线电缆的绝缘阻值进行测量', standard: '阻值符合要求' },
+    { section: '八、检查与维护维保', seq: 63, prefix: 'y63', content: '缺失或新增标识补充', standard: '按现场补充' },
+    { section: '八、检查与维护维保', seq: 64, prefix: 'y64', content: '发现零小病害的现场整治', standard: '病害处置无隐患' }
+  ]
+}
+
+const currentMaintenanceTemplate = computed(() => maintenanceTemplates[maintenanceType.value] || [])
+const maintenanceDisplayRows = computed(() => {
+  const rows: any[] = []
+  let section = ''
+  let sectionSeq = 0
+  for (const item of currentMaintenanceTemplate.value) {
+    if (item.section !== section) {
+      section = item.section
+      sectionSeq = 0
+      rows.push({ isSection: true, sectionTitle: section, rowKey: `section-${section}` })
+    }
+    sectionSeq += 1
+    rows.push({ ...item, sectionSeq, isSection: false, rowKey: `item-${item.prefix}` })
+  }
+  return rows
+})
+
+const maintenanceSpanMethod = ({ row, columnIndex }: any) => {
+  if (row?.isSection) {
+    if (columnIndex === 0) return [1, 6]
+    return [0, 0]
+  }
+  return [1, 1]
+}
+
 const goBack = () => router.push('/box')
 
 const toDisplay = (value: unknown) => {
@@ -348,6 +577,17 @@ const unwrapPayload = (payload: any) => {
 }
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
+
+const unwrapResultData = (res: any) => {
+  const body = res?.data || {}
+  if (body && typeof body === 'object' && 'code' in body) {
+    if (String(body.code) !== '200') {
+      throw new Error(body.msg || '请求失败')
+    }
+    return body.data
+  }
+  return body
+}
 
 const getCurrentBoxId = () => {
   const routeId = Number(route.params.id)
@@ -466,6 +706,7 @@ const load = async () => {
   }
 
   inspections.value = []
+  await loadMaintenanceRecords()
 
 }
 
@@ -579,6 +820,60 @@ const removeCircuit = async (id: number) => {
   await load()
 }
 
+
+
+const loadMaintenanceRecords = async () => {
+  const boxId = getCurrentBoxId()
+  if (!boxId) { maintenanceRecords.value = []; return }
+  const res = await http.get(`/box-maintenance/${maintenanceType.value}/page`, { params: { boxId, pageNum: 1, pageSize: 200 } })
+  const pageData = unwrapResultData(res) || {}
+  maintenanceRecords.value = (pageData.records || []).map((r: any) => ({
+    ...r,
+    superviseUser: r.supervise_user,
+    maintenanceUser: r.maintenance_user,
+    maintenanceTime: r.maintenance_time,
+    createdTime: r.created_time
+  }))
+}
+
+const openMaintenanceDialog = () => {
+  const boxId = getCurrentBoxId()
+  if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法新增维保记录'); return }
+  Object.keys(maintenanceForm).forEach((k) => delete maintenanceForm[k])
+  Object.assign(maintenanceForm, { boxId, maintenanceTime: '' })
+  currentMaintenanceTemplate.value.forEach((item) => {
+    maintenanceForm[item.prefix + 'Result'] = ''
+    maintenanceForm[item.prefix + 'Status'] = ''
+    maintenanceForm[item.prefix + 'Remark'] = ''
+  })
+  maintenanceDialog.value = true
+}
+
+const saveMaintenance = async () => {
+  try {
+    const boxId = getCurrentBoxId()
+    if (!boxId) { ElMessage.error('未获取到当前配电箱ID，无法保存维保记录'); return }
+    const res = await http.post(`/box-maintenance/${maintenanceType.value}/save`, { ...maintenanceForm, boxId })
+    unwrapResultData(res)
+    maintenanceDialog.value = false
+    await loadMaintenanceRecords()
+    ElMessage.success('维保记录保存成功')
+  } catch (error: any) {
+    ElMessage.error(error?.message || error?.response?.data?.msg || '维保记录保存失败')
+  }
+}
+
+const removeMaintenance = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该维保记录？'))) return
+  const res = await http.delete(`/box-maintenance/${maintenanceType.value}/${id}`)
+  unwrapResultData(res)
+  await loadMaintenanceRecords()
+}
+
+const goMaintenanceDetail = (id: number) => {
+  const boxId = getCurrentBoxId()
+  router.push(`/box-maintenance/${maintenanceType.value}/${id}?boxId=${boxId || ''}`)
+}
 
 const openOverhaulDialog = () => {
   const currentBoxId = getCurrentBoxId()
@@ -706,6 +1001,10 @@ watch(
     await load()
   }
 )
+
+watch(maintenanceType, async () => {
+  await loadMaintenanceRecords()
+})
 </script>
 
 <style scoped>
@@ -718,6 +1017,10 @@ watch(
 }
 .sub-toolbar {
   margin-bottom: 10px;
+}
+.section-title {
+  font-weight: 700;
+  color: #1f2937;
 }
 
 

@@ -31,6 +31,9 @@ http.interceptors.response.use(
         || url.includes('/location/')
         || url.includes('/files/')
         || url.includes('/api/files/')
+        || url.includes('/box-maintenance/')
+        || url.includes('/box-maintenance-compare/')
+        || url.includes('/box-maintenance-process-image/')
 
       if (pathname !== '/login' && !shouldIgnore) {
         if (!isRedirecting) {
