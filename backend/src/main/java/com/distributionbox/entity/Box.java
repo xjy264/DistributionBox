@@ -51,7 +51,6 @@ public class Box implements Serializable {
 
     private String incomingSource;
 
-    private String incomingSpec;
 
     private String sharedWithOthers;
 

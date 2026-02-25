@@ -15,8 +15,7 @@
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="明装暗装">{{ toDisplay(box.pileType) }}</el-descriptions-item>
       <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
-      <el-descriptions-item label="进线来源">{{ toDisplay(box.incomingSource) }}</el-descriptions-item>
-      <el-descriptions-item label="进线规格">{{ toDisplay(box.incomingSpec) }}</el-descriptions-item>
+      <el-descriptions-item label="进线来源及规格">{{ toDisplay(box.incomingSource) }}</el-descriptions-item>
       <el-descriptions-item label="是否与其它单位共用">{{ toDisplay(box.sharedWithOthers) }}</el-descriptions-item>
       <el-descriptions-item label="共用范围">{{ toDisplay(box.sharedScope) }}</el-descriptions-item>
       <el-descriptions-item label="是否为大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
@@ -120,11 +119,8 @@
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
-        <el-form-item label="进线来源">
+        <el-form-item label="进线来源及规格">
           <el-input v-model="boxEditForm.incomingSource" style="width: 430px" />
-        </el-form-item>
-        <el-form-item label="进线规格">
-          <el-input v-model="boxEditForm.incomingSpec" style="width: 430px" />
         </el-form-item>
         <el-form-item label="是否与其它单位共用">
           <el-select v-model="boxEditForm.sharedWithOthers" style="width: 430px" clearable @change="onEditSharedWithOthersChange">
@@ -243,7 +239,6 @@ const boxEditForm = reactive<any>({
   pileType: '',
   indoorOutdoor: '',
   incomingSource: '',
-  incomingSpec: '',
   sharedWithOthers: '否',
   sharedScope: '',
   highPowerAppliance: '否',
@@ -428,7 +423,6 @@ const openBoxEditDialog = () => {
   boxEditForm.pileType = box.pileType || ''
   boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
   boxEditForm.incomingSource = box.incomingSource || ''
-  boxEditForm.incomingSpec = box.incomingSpec || ''
   boxEditForm.sharedWithOthers = box.sharedWithOthers || '否'
   boxEditForm.sharedScope = box.sharedScope || ''
   boxEditForm.highPowerAppliance = box.highPowerAppliance || '否'
@@ -458,7 +452,6 @@ const saveBoxBaseInfo = async () => {
     pileType: boxEditForm.pileType,
     indoorOutdoor: boxEditForm.indoorOutdoor,
     incomingSource: boxEditForm.incomingSource,
-    incomingSpec: boxEditForm.incomingSpec,
     sharedWithOthers: boxEditForm.sharedWithOthers,
     sharedScope: boxEditForm.sharedWithOthers === '是' ? boxEditForm.sharedScope : '',
     highPowerAppliance: boxEditForm.highPowerAppliance,
