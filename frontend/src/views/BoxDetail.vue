@@ -223,7 +223,7 @@
         <el-table-column label="序号" width="120">
           <template #default="scope">
             <span v-if="scope.row.isSection" class="section-title">{{ scope.row.sectionTitle }}</span>
-            <span v-else>{{ scope.row.seq }}</span>
+            <span v-else>{{ scope.row.sectionSeq }}</span>
           </template>
         </el-table-column>
         <el-table-column label="检查内容" min-width="260" show-overflow-tooltip>
@@ -536,12 +536,15 @@ const currentMaintenanceTemplate = computed(() => maintenanceTemplates[maintenan
 const maintenanceDisplayRows = computed(() => {
   const rows: any[] = []
   let section = ''
+  let sectionSeq = 0
   for (const item of currentMaintenanceTemplate.value) {
     if (item.section !== section) {
       section = item.section
+      sectionSeq = 0
       rows.push({ isSection: true, sectionTitle: section, rowKey: `section-${section}` })
     }
-    rows.push({ ...item, isSection: false, rowKey: `item-${item.prefix}` })
+    sectionSeq += 1
+    rows.push({ ...item, sectionSeq, isSection: false, rowKey: `item-${item.prefix}` })
   }
   return rows
 })
