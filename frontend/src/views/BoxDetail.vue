@@ -18,7 +18,7 @@
       <el-descriptions-item label="进线来源及规格">{{ toDisplay(box.incomingSource) }}</el-descriptions-item>
       <el-descriptions-item label="是否与其它单位共用">{{ toDisplay(box.sharedWithOthers) }}</el-descriptions-item>
       <el-descriptions-item label="共用范围">{{ toDisplay(box.sharedScope) }}</el-descriptions-item>
-      <el-descriptions-item label="是否为大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
+      <el-descriptions-item label="是否有大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
       <el-descriptions-item label="大功率电器名称">{{ toDisplay(box.highPowerName) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
