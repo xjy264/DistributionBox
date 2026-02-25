@@ -21,13 +21,9 @@ public class BoxCircuit implements Serializable {
 
     private String supplyCircuit;
 
-    private String switchModel;
 
-    private String ratedCurrent;
 
-    private String wireSection;
 
-    private String powerVoltage;
 
     private String startCurrent;
 

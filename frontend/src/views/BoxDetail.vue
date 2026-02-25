@@ -8,15 +8,17 @@
     <el-descriptions title="配电箱基础信息" :column="2" border>
       <el-descriptions-item label="配电箱ID">{{ toDisplay(box.id) }}</el-descriptions-item>
       <el-descriptions-item label="*台账号">{{ toDisplay(box.boxId) }}</el-descriptions-item>
+      <el-descriptions-item label="配电箱编号">{{ toDisplay(box.boxNo) }}</el-descriptions-item>
             <el-descriptions-item label="车间">{{ toDisplay(box.station) }}</el-descriptions-item>
       <el-descriptions-item label="工区">{{ toDisplay(box.area) }}</el-descriptions-item>
       <el-descriptions-item label="安装地点">{{ toDisplay(box.boxAddress) }}</el-descriptions-item>
       <el-descriptions-item label="规格">{{ toDisplay(box.size) }}</el-descriptions-item>
       <el-descriptions-item label="明装暗装">{{ toDisplay(box.pileType) }}</el-descriptions-item>
       <el-descriptions-item label="室内室外">{{ toDisplay(box.indoorOutdoor) }}</el-descriptions-item>
+      <el-descriptions-item label="进线来源及规格">{{ toDisplay(box.incomingSource) }}</el-descriptions-item>
       <el-descriptions-item label="是否与其它单位共用">{{ toDisplay(box.sharedWithOthers) }}</el-descriptions-item>
       <el-descriptions-item label="共用范围">{{ toDisplay(box.sharedScope) }}</el-descriptions-item>
-      <el-descriptions-item label="是否为大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
+      <el-descriptions-item label="是否有大功率电器">{{ toDisplay(box.highPowerAppliance) }}</el-descriptions-item>
       <el-descriptions-item label="大功率电器名称">{{ toDisplay(box.highPowerName) }}</el-descriptions-item>
       <el-descriptions-item label="系统图">
         <PreviewImage :src="resolvePreviewUrl(box.systemUrl)" width="220px" height="160px" />
@@ -37,6 +39,7 @@
           <el-button type="success" @click="openComponentDialog">新增元器件</el-button>
         </div>
         <el-table :data="components" border>
+          <el-table-column type="index" label="序号" width="70" />
           <el-table-column prop="componentsName" label="电器元件" />
           <el-table-column prop="componentsUnit" label="单位" />
           <el-table-column prop="componentsQuantity" label="数量" />
@@ -60,12 +63,8 @@
         </div>
         <el-table :data="circuits" border>
           <el-table-column type="index" label="序号" width="70" />
-          <el-table-column prop="supplyCircuit" label="供电回路" width="100" />
-          <el-table-column prop="switchModel" label="开关型号" width="100" />
-          <el-table-column prop="ratedCurrent" label="额定电流" width="100" />
-          <el-table-column prop="wireSection" label="导线截面" width="100" />
-          <el-table-column prop="powerVoltage" label="电源电压" width="90" />
-          <el-table-column prop="startCurrent" label="启动电流" width="90" />
+          <el-table-column prop="supplyCircuit" label="供电回路" width="120" />
+          <el-table-column prop="startCurrent" label="启动电流" width="100" />
           <el-table-column prop="runCurrent" label="运行电流" width="90" />
           <el-table-column prop="power" label="功率" width="70" />
           <el-table-column prop="electricDevice" label="用电设备" width="100" />
@@ -80,6 +79,24 @@
         </el-table>
       </el-tab-pane>
 
+      <el-tab-pane label="检修记录">
+        <div class="sub-toolbar">
+          <el-button type="success" @click="openOverhaulDialog">新增检修记录</el-button>
+        </div>
+        <el-table :data="overhaulTasks" border>
+          <el-table-column type="index" label="序号" width="70" />
+          <el-table-column prop="taskNo" label="任务单号" min-width="180" />
+          <el-table-column prop="reportTime" label="报修时间" min-width="140" />
+          <el-table-column prop="reportUser" label="报修人" min-width="120" />
+          <el-table-column label="操作" width="180">
+            <template #default="scope">
+              <el-button size="small" type="primary" @click="goOverhaulTask(scope.row.id)">进入工单</el-button>
+              <el-button size="small" type="danger" @click="removeOverhaul(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
       <!-- 维保信息已从配电箱详情移除，改为工单主单维护 -->
 
     </el-tabs>
@@ -88,6 +105,9 @@
       <el-form :model="boxEditForm" label-width="150px" class="compact-form">
         <el-form-item label="台账号">
           <el-input v-model="boxEditForm.boxId" disabled style="width: 430px" />
+        </el-form-item>
+        <el-form-item label="配电箱编号">
+          <el-input v-model="boxEditForm.boxNo" style="width: 430px" />
         </el-form-item>
         <el-form-item label="车间">
           <el-select v-model="boxEditForm.station" style="width: 430px" filterable @change="onEditStationChange">
@@ -117,6 +137,9 @@
             <el-option label="室外" value="室外" />
           </el-select>
         </el-form-item>
+        <el-form-item label="进线来源及规格">
+          <el-input v-model="boxEditForm.incomingSource" style="width: 430px" />
+        </el-form-item>
         <el-form-item label="是否与其它单位共用">
           <el-select v-model="boxEditForm.sharedWithOthers" style="width: 430px" clearable @change="onEditSharedWithOthersChange">
             <el-option label="是" value="是" />
@@ -126,7 +149,7 @@
         <el-form-item label="共用范围">
           <el-input v-model="boxEditForm.sharedScope" :disabled="boxEditForm.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 430px" />
         </el-form-item>
-        <el-form-item label="是否为大功率电器">
+        <el-form-item label="是否有大功率电器">
           <el-select v-model="boxEditForm.highPowerAppliance" style="width: 430px" clearable @change="onEditHighPowerChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
@@ -154,10 +177,6 @@
     <el-dialog v-model="circuitDialog" title="回路" width="900px">
       <el-form :model="circuitForm" label-width="110px">
         <el-form-item label="供电回路"><el-input v-model="circuitForm.supplyCircuit" /></el-form-item>
-        <el-form-item label="开关型号"><el-input v-model="circuitForm.switchModel" /></el-form-item>
-        <el-form-item label="额定电流"><el-input v-model="circuitForm.ratedCurrent" /></el-form-item>
-        <el-form-item label="导线截面"><el-input v-model="circuitForm.wireSection" /></el-form-item>
-        <el-form-item label="电源电压"><el-input v-model="circuitForm.powerVoltage" /></el-form-item>
         <el-form-item label="启动电流"><el-input v-model="circuitForm.startCurrent" /></el-form-item>
         <el-form-item label="运行电流"><el-input v-model="circuitForm.runCurrent" /></el-form-item>
         <el-form-item label="功率"><el-input v-model="circuitForm.power" /></el-form-item>
@@ -168,6 +187,25 @@
       <template #footer>
         <el-button @click="circuitDialog = false">取消</el-button>
         <el-button type="primary" @click="saveCircuit">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="overhaulDialog" title="新增检修记录" width="760px">
+      <el-form :model="overhaulForm" label-width="110px">
+        <el-form-item label="任务单号"><el-input v-model="overhaulForm.taskNo" placeholder="可空自动生成" /></el-form-item>
+        <el-form-item label="报修单位"><el-input v-model="overhaulForm.reportUnit" /></el-form-item>
+        <el-form-item label="报修时间"><el-date-picker v-model="overhaulForm.reportTime" type="date" value-format="YYYY-MM-DD" style="width:100%" /></el-form-item>
+        <el-form-item label="报修人"><el-input v-model="overhaulForm.reportUser" /></el-form-item>
+        <el-form-item label="报修接受人"><el-input v-model="overhaulForm.acceptUser" /></el-form-item>
+        <el-form-item label="盯控人员"><el-input v-model="overhaulForm.supervisionUser" /></el-form-item>
+        <el-form-item label="抢修人员"><el-input v-model="overhaulForm.rescueUsers" /></el-form-item>
+        <el-form-item label="故障现象"><el-input v-model="overhaulForm.faultPhenomenon" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="故障原因"><el-input v-model="overhaulForm.faultReason" type="textarea" :rows="2" /></el-form-item>
+        <el-form-item label="抢修情况"><el-input v-model="overhaulForm.rescueSituation" type="textarea" :rows="3" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="overhaulDialog=false">取消</el-button>
+        <el-button type="primary" @click="saveOverhaul">保存</el-button>
       </template>
     </el-dialog>
 
@@ -220,22 +258,26 @@ const box = reactive<any>({})
 const components = ref<any[]>([])
 const inspections = ref<any[]>([])
 const circuits = ref<any[]>([])
+const overhaulTasks = ref<any[]>([])
 const allBoxOptions = ref<{ label: string; value: number }[]>([])
 
 const componentDialog = ref(false)
 const inspectionDialog = ref(false)
 const boxEditDialog = ref(false)
 const circuitDialog = ref(false)
+const overhaulDialog = ref(false)
 
 const componentForm = reactive<any>({})
 const boxEditForm = reactive<any>({
   boxId: '',
+  boxNo: '',
   station: '',
   area: '',
   boxAddress: '',
   size: '',
   pileType: '',
   indoorOutdoor: '',
+  incomingSource: '',
   sharedWithOthers: '否',
   sharedScope: '',
   highPowerAppliance: '否',
@@ -244,6 +286,7 @@ const boxEditForm = reactive<any>({
 const editAreaOptions = computed(() => getAreaOptions(boxEditForm.station || ''))
 const inspectionForm = reactive<any>({ boxIds: [] })
 const circuitForm = reactive<any>({})
+const overhaulForm = reactive<any>({})
 const boxImageForm = reactive<any>({
   systemUrl: '',
   firstUrl: '',
@@ -305,6 +348,14 @@ const unwrapPayload = (payload: any) => {
 }
 
 const safeArray = (value: any): any[] => (Array.isArray(value) ? value : [])
+
+const getCurrentBoxId = () => {
+  const routeId = Number(route.params.id)
+  if (Number.isFinite(routeId) && routeId > 0) return routeId
+  const stateId = Number(box.id)
+  if (Number.isFinite(stateId) && stateId > 0) return stateId
+  return null
+}
 
 // image utils moved to @/utils/image
 
@@ -368,7 +419,7 @@ const onEditHighPowerChange = () => {
 }
 
 const load = async () => {
-  const id = Number(route.params.id)
+  const id = getCurrentBoxId()
   if (!id) {
     Object.keys(box).forEach((k) => delete box[k])
     components.value = []
@@ -380,10 +431,11 @@ const load = async () => {
   const token = ++currentLoadToken
   Object.keys(box).forEach((k) => delete box[k])
 
-  const [boxRes, compRes, circuitRes] = await Promise.allSettled([
+  const [boxRes, compRes, circuitRes, overhaulRes] = await Promise.allSettled([
     http.get(`/box/${id}`),
     http.get(`/components/${id}`),
-    http.get(`/box-circuit/${id}`)
+    http.get(`/box-circuit/${id}`),
+    http.get(`/overhaul-task/page`, { params: { pageNum: 1, pageSize: 1000, boxId: id } })
   ])
 
   if (token !== currentLoadToken) return
@@ -406,18 +458,27 @@ const load = async () => {
     circuits.value = []
   }
 
+  if (overhaulRes.status === 'fulfilled') {
+    const pageData = overhaulRes.value.data?.data || {}
+    overhaulTasks.value = pageData.records || []
+  } else {
+    overhaulTasks.value = []
+  }
+
   inspections.value = []
 
 }
 
 const openBoxEditDialog = () => {
   boxEditForm.boxId = box.boxId || ''
+  boxEditForm.boxNo = box.boxNo || ''
   boxEditForm.station = box.station || ''
   boxEditForm.area = box.area || ''
   boxEditForm.boxAddress = box.boxAddress || ''
   boxEditForm.size = box.size || ''
   boxEditForm.pileType = box.pileType || ''
   boxEditForm.indoorOutdoor = box.indoorOutdoor || ''
+  boxEditForm.incomingSource = box.incomingSource || ''
   boxEditForm.sharedWithOthers = box.sharedWithOthers || '否'
   boxEditForm.sharedScope = box.sharedScope || ''
   boxEditForm.highPowerAppliance = box.highPowerAppliance || '否'
@@ -439,12 +500,14 @@ const saveBoxBaseInfo = async () => {
     ...box,
     id: box.id,
     boxId: box.boxId,
+    boxNo: boxEditForm.boxNo,
     station: boxEditForm.station,
     area: boxEditForm.area,
     boxAddress: boxEditForm.boxAddress,
     size: boxEditForm.size,
     pileType: boxEditForm.pileType,
     indoorOutdoor: boxEditForm.indoorOutdoor,
+    incomingSource: boxEditForm.incomingSource,
     sharedWithOthers: boxEditForm.sharedWithOthers,
     sharedScope: boxEditForm.sharedWithOthers === '是' ? boxEditForm.sharedScope : '',
     highPowerAppliance: boxEditForm.highPowerAppliance,
@@ -514,6 +577,41 @@ const removeCircuit = async (id: number) => {
   if (!(await confirmDeleteAction())) return
   await http.delete(`/box-circuit/${id}`)
   await load()
+}
+
+
+const openOverhaulDialog = () => {
+  const currentBoxId = getCurrentBoxId()
+  if (!currentBoxId) {
+    ElMessage.error('未获取到当前配电箱ID，无法新增检修记录')
+    return
+  }
+  Object.keys(overhaulForm).forEach((k) => delete overhaulForm[k])
+  Object.assign(overhaulForm, { boxId: currentBoxId })
+  overhaulDialog.value = true
+}
+
+const saveOverhaul = async () => {
+  const currentBoxId = getCurrentBoxId()
+  if (!currentBoxId) {
+    ElMessage.error('未获取到当前配电箱ID，无法保存检修记录')
+    return
+  }
+  await http.post('/overhaul-task/save', { ...overhaulForm, boxId: currentBoxId })
+  overhaulDialog.value = false
+  await load()
+  ElMessage.success('检修记录保存成功')
+}
+
+const removeOverhaul = async (id: number) => {
+  if (!(await confirmDeleteAction('确认删除该检修记录？'))) return
+  await http.delete(`/overhaul-task/${id}`)
+  await load()
+}
+
+const goOverhaulTask = (id: number) => {
+  if (!id) return
+  router.push(`/overhaul-task/${id}`)
 }
 
 const openInspectionDialog = () => {

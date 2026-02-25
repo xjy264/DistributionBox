@@ -10,6 +10,7 @@ public class RepairTaskSaveDto {
 
     private Integer id;
     private String taskNo;
+    private Integer boxId;
     private String reportUnit;
     private String reportUser;
     private Date reportTime;

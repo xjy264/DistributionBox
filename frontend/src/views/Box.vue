@@ -16,6 +16,7 @@
 
     <el-table :data="tableData" border>
       <el-table-column prop="boxId" label="台账号" />
+      <el-table-column prop="boxNo" label="配电箱编号" />
       <el-table-column prop="station" label="车间" />
       <el-table-column prop="area" label="工区" />
       <el-table-column prop="boxAddress" label="安装地点" />
@@ -45,6 +46,9 @@
       <el-form :model="form" label-width="150px" class="compact-form">
         <el-form-item label="*台账号">
           <el-input v-model="form.boxId" style="width: 430px" />
+        </el-form-item>
+        <el-form-item label="配电箱编号">
+          <el-input v-model="form.boxNo" style="width: 430px" />
         </el-form-item>
         <el-form-item label="车间">
           <el-select v-model="form.station" style="width: 430px" filterable @change="onFormStationChange">
@@ -83,7 +87,7 @@
         <el-form-item label="共用范围">
           <el-input v-model="form.sharedScope" :disabled="form.sharedWithOthers !== '是'" placeholder="选择是后必填" style="width: 430px" />
         </el-form-item>
-        <el-form-item label="是否为大功率电器">
+        <el-form-item label="是否有大功率电器">
           <el-select v-model="form.highPowerAppliance" style="width: 430px" clearable @change="onHighPowerChange">
             <el-option label="是" value="是" />
             <el-option label="否" value="否" />
@@ -135,6 +139,7 @@ const initForm = () => {
   Object.assign(form, {
     id: undefined,
     boxId: '',
+    boxNo: '',
     station: '',
     area: '',
     boxAddress: '',
@@ -266,6 +271,7 @@ const save = async () => {
   const payload = {
     id: form.id,
     boxId: form.boxId,
+    boxNo: form.boxNo,
     station: form.station,
     area: form.area,
     boxAddress: form.boxAddress,
